@@ -1,5 +1,5 @@
 import React from "react";
-import AuthForm from "../common/AuthForm";
+import AuthForm from "../common/auth/AuthForm";
 import styled from "styled-components";
 
 const Header = styled.header`
@@ -44,7 +44,6 @@ export default function Signup() {
           buttonText="회원가입"
           onSubmit={handleSubmit}
           onButtonClick={handleButtonClick}
-          disabled={true}
         />
       </main>
     </>

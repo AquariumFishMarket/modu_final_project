@@ -56,6 +56,10 @@ button {
   border: none;
 }
 
+input {
+  border: none;
+}
+
 /* 변수 CSS */
 :root {
   /* color */

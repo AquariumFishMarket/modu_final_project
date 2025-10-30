@@ -2,7 +2,7 @@ import styled from "styled-components";
 import { Link } from "react-router-dom";
 import SocialButton from "../common/SocialButton";
 
-const LoginContainer = styled.div`
+const LoginContainer = styled.section`
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -10,8 +10,17 @@ const LoginContainer = styled.div`
 `;
 
 const LogoArea = styled.div`
-  /* 로고나 상단 콘텐츠 영역 */
   margin-bottom: auto;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const LogoImage = styled.img`
+  width: 300px;
+  height: 300px;
+  object-fit: contain;
 `;
 
 const LoginSection = styled.section`
@@ -61,13 +70,16 @@ function Login() {
     console.log("구글 로그인 클릭!");
   };
 
-  const handleEmailLogin = () => {
-    console.log("이메일 로그인 클릭!");
+  const handleFacebookLogin = () => {
+    console.log("페이스북 로그인 클릭!");
   };
 
   return (
     <LoginContainer>
-      <LogoArea>{/* 여기에 로고나 상단 콘텐츠 추가 가능 */}</LogoArea>
+      <LogoArea>
+        {" "}
+        <LogoImage src="/src/assets/icons/fish-logo.svg" alt="생선마켓 로고" />
+      </LogoArea>
 
       <LoginSection>
         {/* 카카오 로그인 버튼 */}
@@ -92,7 +104,7 @@ function Login() {
         <SocialButton
           width={322}
           text="페이스북 계정으로 로그인"
-          onClick={handleEmailLogin}
+          onClick={handleFacebookLogin}
           borderColor="#2D9CDB"
           icon="/src/assets/icons/facebook-logo.svg"
         />

@@ -1,10 +1,21 @@
 import React from "react";
-import AuthForm from "../common/AuthForm";
+import AuthForm from "../common/auth/AuthForm";
 import styled from "styled-components";
+import { Link } from "react-router-dom";
 
 const Header = styled.header`
   margin: 30px auto;
   font-size: 24px;
+`;
+
+const SignupLink = styled(Link)`
+  font-size: 12px;
+  text-decoration: none;
+  color: var(--color-gray-dark);
+  width: 100%;
+  display: inline-block;
+  text-align: center;
+  margin: 20px auto;
 `;
 
 export default function LoginEmail() {
@@ -42,8 +53,8 @@ export default function LoginEmail() {
           buttonText="로그인"
           onSubmit={handleSubmit}
           onButtonClick={handleButtonClick}
-          disabled={true}
         />
+        <SignupLink to="/signup">이메일로 회원가입</SignupLink>
       </main>
     </>
   );
