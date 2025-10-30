@@ -7,19 +7,24 @@ interface Deleteinterface {
 }
 
 const Delete = styled.button`
+    width: 22px;
+    height: 22px;
+    background-color:transparent;
+    border:unset;
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: 6px;
+    right: 6px;
     z-index: 999;
 `
 
 export default function DeleteButton({"data-index":i,setDeleteIdx}:Deleteinterface) {
     const handleDelete = (e:React.MouseEvent<HTMLButtonElement>):void => {
         setDeleteIdx(Number(e.currentTarget.dataset.index))
-
     }
 
     return (
-        <Delete data-index={i} onClick={handleDelete}>닫어!</Delete>
+        <Delete data-index={i} onClick={handleDelete}>
+            <img src="/img/icon-close.svg" alt="닫기" />
+        </Delete>
     )
 }
