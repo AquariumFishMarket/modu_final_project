@@ -1,4 +1,3 @@
-import { useState } from "react";
 import styled from "styled-components"
 
 interface imgcontainer {
@@ -6,6 +5,7 @@ interface imgcontainer {
     imgArr: File[]
 }
 
+//이미지 여러개일 때
 const ContainerArr = styled.ul`
     margin-top: 13px;
     display: flex;
@@ -26,7 +26,7 @@ const ImageListArr = styled.li`
         object-fit: cover;
     }
 `
-
+//단일 이미지일 때 (post / profile 공통 컴포넌트 사용)
 const ContainerSolo = styled.div<{type:string}>`
     width: 100%;
     height: ${(props)=>props.type === 'profile' ? '100%' : 'auto'};
@@ -45,46 +45,55 @@ const ImageSolo = styled.div`
 export default function ImageContainer({type,imgArr}:imgcontainer) {
     const LastImageIdx = imgArr[imgArr.length - 1];
 
-    return (
-        <>
-        {imgArr.length > 1 && type === 'post' && (
-            <ContainerArr>
-                {
-                    imgArr.map((imgele,i)=>(
-                        <ImageListArr key={i}>
-                            <img
-                            src={URL.createObjectURL(imgele)}
-                            alt={`preview-${i}`}
-                            ></img>
-                        </ImageListArr>
-                    ))
-                }
-            </ContainerArr>
-        )}
-        {imgArr.length < 2 && type === 'post' && (
-            <ContainerSolo type={type}>
-                {
-                    imgArr.map((imgele,i)=>(
-                        <ImageSolo key={i}>
-                            <img
-                            src={URL.createObjectURL(imgele)}
-                            alt={`preview-${i}`}
-                            ></img>
-                        </ImageSolo>
-                    ))
-                }
-            </ContainerSolo>
-        )}
-        {type === 'profile' && LastImageIdx && (
-            <ContainerSolo type={type}>
-                <ImageSolo>
-                    <img
-                    src={URL.createObjectURL(LastImageIdx)}
-                    alt={`나의 프로필`}
-                    ></img>
-                </ImageSolo>
-            </ContainerSolo>
-        )}
-        </>
-    )
+    if(type === 'post') {
+        return (
+            <>
+            {imgArr.length < 2 && (
+                <ContainerSolo type={type}>
+                    {
+                        imgArr.map((imgele,i)=>(
+                            <ImageSolo key={i}>
+                                <img
+                                src={URL.createObjectURL(imgele)}
+                                alt={`preview-${i}`}
+                                ></img>
+                            </ImageSolo>
+                        ))
+                    }
+                </ContainerSolo>
+            )}
+            {imgArr.length > 1 && (
+                <ContainerArr>
+                    {
+                        imgArr.map((imgele,i)=>(
+                            <ImageListArr key={i}>
+                                <img
+                                src={URL.createObjectURL(imgele)}
+                                alt={`preview-${i}`}
+                                ></img>
+                            </ImageListArr>
+                        ))
+                    }
+                </ContainerArr>
+            )}
+            </>
+        )
+    }
+    if(type === 'profile') {
+        return (
+            <>
+            {LastImageIdx && (
+                <ContainerSolo type={type}>
+                    <ImageSolo>
+                        <img
+                        src={URL.createObjectURL(LastImageIdx)}
+                        alt={`나의 프로필`}
+                        ></img>
+                    </ImageSolo>
+                </ContainerSolo>
+            )}
+            </>
+        )
+    }
+
 }
