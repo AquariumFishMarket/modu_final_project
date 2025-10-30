@@ -4,7 +4,7 @@ import styled from "styled-components"
 interface ImageButtonProps {
     colortype: 'color' | 'gray';
     size: 'large' | 'small';
-    imgArr: [];
+    imgArr: File[];
     setImgArr: Dispatch<SetStateAction<File[]>>
 }
 
