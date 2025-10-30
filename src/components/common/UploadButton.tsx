@@ -13,7 +13,7 @@ const DefaultBtn = styled.button<{size:string,type:string}>`
     display:inline-block;
     text-align:center;
     background-image:
-    ${(props)=>props.size === 'large' ? 'url(/images/icon-picture.svg)' : 'url(/images/icon-picture-s.svg)'};
+    ${(props)=>props.size === 'large' ? 'url(/img/icon-picture.svg)' : 'url(/img/icon-picture-s.svg)'};
     background-repeat: no-repeat;
     background-size: initial;
     background-position: center;
