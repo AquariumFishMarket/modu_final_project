@@ -29,7 +29,8 @@ const ImageListArr = styled.li`
 
 const ContainerSolo = styled.div<{type:string}>`
     width: 100%;
-    border-radius: ${(props)=>props.type === 'post' ? '20px' : '100%'};
+    height: ${(props)=>props.type === 'profile' ? '100%' : 'auto'};
+    border-radius: ${(props)=>props.type === 'profile' ? '100%' : '20px'};
     overflow: hidden;
 `
 const ImageSolo = styled.div`
@@ -42,10 +43,11 @@ const ImageSolo = styled.div`
 `
 
 export default function ImageContainer({type,imgArr}:imgcontainer) {
+    const LastImageIdx = imgArr[imgArr.length - 1];
 
     return (
         <>
-        {imgArr.length > 1 && (
+        {imgArr.length > 1 && type === 'post' && (
             <ContainerArr>
                 {
                     imgArr.map((imgele,i)=>(
@@ -59,7 +61,7 @@ export default function ImageContainer({type,imgArr}:imgcontainer) {
                 }
             </ContainerArr>
         )}
-        {imgArr.length < 2 && (
+        {imgArr.length < 2 && type === 'post' && (
             <ContainerSolo type={type}>
                 {
                     imgArr.map((imgele,i)=>(
@@ -71,6 +73,16 @@ export default function ImageContainer({type,imgArr}:imgcontainer) {
                         </ImageSolo>
                     ))
                 }
+            </ContainerSolo>
+        )}
+        {type === 'profile' && LastImageIdx && (
+            <ContainerSolo type={type}>
+                <ImageSolo>
+                    <img
+                    src={URL.createObjectURL(LastImageIdx)}
+                    alt={`나의 프로필`}
+                    ></img>
+                </ImageSolo>
             </ContainerSolo>
         )}
         </>
