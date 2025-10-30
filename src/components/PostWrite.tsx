@@ -38,6 +38,14 @@ const TextArea = styled.textarea`
         outline: none;
     }
 `
+const ImageContainer = styled.ul`
+    margin-top: 13px;
+`
+const ImageList = styled.li`
+    border-radius: 10px;
+    overflow: hidden;
+`
+
 const ImageUpButtonContainer = styled.div`
     position: fixed;
     bottom: 16px;
@@ -112,15 +120,17 @@ export default function PostWrite() {
                     onChange={(e)=>handleFileChange(e)}
                     className="sr-only"
                     />
-                <div>
+                <ImageContainer>
                     {images.map((imgele,i)=>(
-                        <img key={i}
-                        src={URL.createObjectURL(imgele)}
-                        alt={`preview-${i}`}
-                        style={{ width: '100%', height: 'auto', objectFit:'cover'}}
-                        ></img>
+                        <ImageList key={i}>
+                            <img
+                            src={URL.createObjectURL(imgele)}
+                            alt={`preview-${i}`}
+                            style={{ width: '100%', height: 'auto', objectFit:'cover'}}
+                            ></img>
+                        </ImageList>
                     ))}
-                </div>
+                </ImageContainer>
                 </WriteZone>
             </Contents>
             <ImageUpButtonContainer>
