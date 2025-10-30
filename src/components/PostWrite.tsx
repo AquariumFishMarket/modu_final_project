@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react"
 import ProfileImg from "./common/ProfileImg"
 import ImageUpButton from "./common/UploadButton"
 import styled from "styled-components"
@@ -11,20 +12,24 @@ const PostContainer = styled.div`
     border:1px solid;
     height:100vh;
 `
-const WriteZone = styled.div`
+const Contents = styled.div`
     height: 100%;
     display:flex;
     gap: 13px;
 `
-const TextArea = styled.textarea`
-    padding: 12px 12px 0;
+const WriteZone = styled.div`
     max-width: 100%;
     width: calc(100% - 55px);
     height: calc(100% - 100px);
+`
+const TextArea = styled.textarea`
+    padding: 12px 12px 0;
+    width: 100%;
+    min-height: 100px;
+    max-height: 100%;
+    resize:none;
     font-size: var(--font-size-md);
     color: black;
-    border: none;
-    resize: none;
     &:placeholder {
         color: rgba(196, 196, 196, 1);
     }
@@ -32,7 +37,6 @@ const TextArea = styled.textarea`
         outline: none;
     }
 `
-
 const ImageUpButtonContainer = styled.div`
     position: fixed;
     bottom: 16px;
@@ -40,15 +44,79 @@ const ImageUpButtonContainer = styled.div`
 `
 
 export default function PostWrite() {
+    const [images,setImages] = useState<File[]>([]);
+    const [textHeight,setTextHeight] = useState('')
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+    const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        const target = e.target;
+        target.style.height = 'auto';
+        target.style.height = target.scrollHeight + 'px';
+
+        setTextHeight(target.value)
+    }
+
+    const handleImgUpload = () => {
+        //button click -> input[type="file"] click
+        fileInputRef.current?.click();
+    }
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = Array.from(e.target.files ?? []);
+        const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+
+        const filtered = files.filter((file) => {
+        if (!validTypes.includes(file.type)) {
+            alert('이미지 파일만 업로드 가능합니다.');
+            return false;
+        }
+        if (file.size > 5 * 1024 * 1024) {
+            alert('파일 크기는 5MB 이하여야 합니다.');
+            return false;
+        }
+        return true;
+        });
+
+        const total = [...images, ...filtered].slice(0, 10);
+        setImages(total);
+
+        // input 초기화
+        e.target.value = '';
+    }
+
     return (
         <>
         <PostContainer>
-            <WriteZone>
+            <Contents>
                 <ProfileImg width={42} thumbimg={false}></ProfileImg>
-                <TextArea placeholder="게시글 입력하기"></TextArea>
-            </WriteZone>
+                <WriteZone>
+                    <TextArea placeholder="게시글 입력하기"
+                    value={textHeight}
+                    onChange={handleTextChange}
+                    />
+                    <input type="file"
+                    ref={fileInputRef}
+                    accept="image/jpeg,image/png,image/gif,image/webp"
+                    multiple
+                    onChange={(e)=>handleFileChange(e)}
+                    className="sr-only"
+                    />
+                <div>
+                    {images.map((imgele,i)=>(
+                        <img key={i}
+                        src={URL.createObjectURL(imgele)}
+                        alt={`preview-${i}`}
+                        style={{ width: '80px', height: '80px', objectFit:'cover'}}
+                        ></img>
+                    ))}
+                </div>
+                </WriteZone>
+            </Contents>
             <ImageUpButtonContainer>
-                <ImageUpButton colortype="color" size="large" />
+                <ImageUpButton
+                colortype="color"
+                size="large"
+                onClick={()=>handleImgUpload()}/>
             </ImageUpButtonContainer>
         </PostContainer>
         </>
