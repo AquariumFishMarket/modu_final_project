@@ -1,18 +1,15 @@
-
-import Header from "./components/common/Header";
-
-function App() {
-  return <Header />;
-=======
-import ProfileImg from "./components/common/ProfileImg";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import FeedPage from "./pages/Home/FeedPage";
 
 function App() {
   return (
-      <ProfileImg
-      thumbimg={false} width={110}
-      />
-  )
-
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Navigate to="/feed" replace />} />
+        <Route path="/feed" element={<FeedPage />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
 export default App;

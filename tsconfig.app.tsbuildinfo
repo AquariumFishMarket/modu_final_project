@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/main.tsx","./src/components/common/button.tsx","./src/components/common/footernav.tsx","./src/components/common/header.styled.ts","./src/components/common/header.tsx","./src/components/common/modal.tsx","./src/components/common/profileimg.tsx","./src/pages/home/feedpage.styled.ts","./src/pages/home/feedpage.tsx"],"errors":true,"version":"5.9.3"}

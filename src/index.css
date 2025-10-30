@@ -53,9 +53,14 @@ body {
 
 button {
     cursor: pointer;
-    border:none
+    border:none;
+    background-color: #fff;
 }
 
+img {
+    border: none;
+background-color: #fff;
+}
 
 /* 변수 CSS */
 :root {
