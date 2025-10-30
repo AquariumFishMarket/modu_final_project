@@ -4,6 +4,7 @@ import styled from "styled-components"
 interface ImageButtonProps {
     colortype: 'color' | 'gray';
     size: 'large' | 'small';
+    imgArr: [];
     setImgArr: Dispatch<SetStateAction<File[]>>
 }
 
@@ -29,8 +30,8 @@ const DefaultBtn = styled.button<{size:string,colortype:string}>`
     }
 `
 
-export default function ImageUpButton({colortype, size, setImgArr}:ImageButtonProps) {
-    const [images,setImages] = useState<File[]>([]);
+export default function ImageUpButton({colortype, size, imgArr, setImgArr}:ImageButtonProps) {
+
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 
     const handleImgUpload = () => {
@@ -53,16 +54,12 @@ export default function ImageUpButton({colortype, size, setImgArr}:ImageButtonPr
         return true;
         });
 
-        const total = [...images, ...filtered].slice(0, 10);
-        setImages(total);
+        const total = [...imgArr, ...filtered].slice(0, 10);
+        setImgArr(total);
 
         // input 초기화
         e.target.value = '';
     }
-
-    useEffect(()=>{
-        setImgArr(images)
-    },[images])
 
     return (
         <>

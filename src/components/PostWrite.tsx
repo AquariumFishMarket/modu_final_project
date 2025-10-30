@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react"
 import ProfileImg from "./common/ProfileImg"
 import ImageUpButton from "./common/imageUpload/UploadButton"
 import ImageContainer from "./common/imageUpload/ImageContainer"
+import DeleteButton from "./common/imageUpload/DeleteButton"
 import styled from "styled-components"
 
 const PostContainer = styled.div`
@@ -85,6 +86,7 @@ export default function PostWrite() {
                 <ImageUpButton
                 colortype="color"
                 size="large"
+                imgArr={imgArr}
                 setImgArr={setImgArr}
                 />
             </ImageUpButtonContainer>
