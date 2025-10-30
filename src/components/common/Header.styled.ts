@@ -1,6 +1,13 @@
 import styled from "styled-components";
 
-export const HeaderContainer = styled.header``;
+export const HeaderContainer = styled.header`
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 600px;
+  width: 100%;
+`;
 
 export const Section = styled.section`
   width: 100%;
