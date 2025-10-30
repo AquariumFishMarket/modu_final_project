@@ -1,18 +1,18 @@
 /* 공통 CSS */
 
 html {
-    font-size: 10px;
+  font-size: 10px;
 }
 
 * {
-    font-family: 'font-regular', sans-serif;
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  font-family: "font-regular", sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-    font-size: 1.6rem;
+  font-size: 1.6rem;
 }
 
 /* 스크린리더 전용 */
@@ -30,51 +30,58 @@ body {
 
 /* 폰트 */
 @font-face {
-    font-family: 'font-regular';
-    src: url('/font/SpoqaHanSansNeo-Regular.ttf') format('ttf');
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
+  font-family: "font-regular";
+  src: url("/font/SpoqaHanSansNeo-Regular.ttf") format("ttf");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
 @font-face {
-    font-family: 'font-medium';
-    src: url('/font/SpoqaHanSansNeo-Medium.ttf') format('ttf');
-    font-weight: 500;
-    font-style: normal;
-    font-display: swap;
+  font-family: "font-medium";
+  src: url("/font/SpoqaHanSansNeo-Medium.ttf") format("ttf");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
 }
 @font-face {
-    font-family: 'font-bold';
-    src: url('/font/SpoqaHanSansNeo-Bold.ttf') format('ttf');
-    font-weight: 700;
-    font-style: normal;
-    font-display: swap;
+  font-family: "font-bold";
+  src: url("/font/SpoqaHanSansNeo-Bold.ttf") format("ttf");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
 }
 
 button {
-    cursor: pointer;
-    border:none
+  cursor: pointer;
+  border: none;
 }
 
+input {
+  border: none;
+}
 
 /* 변수 CSS */
 :root {
-    --color-primary-100: #e6eeff;
-    --color-primary-200: #c1d2ff;
-    --color-primary-300: #99b5ff;
+  /* color */
+  --color-primary-100: #e6eeff;
+  --color-primary-200: #c1d2ff;
+  --color-primary-300: #99b5ff;
   --color-primary-400: #6f93ff; /* disabled */
-    --color-primary-500: #4773ff;
+  --color-primary-500: #4773ff;
   --color-primary-600: #245af6; /* main */
-    --color-primary-700: #1e4ad1;
-    --color-primary-800: #183baa;
-    --color-primary-900: #112d82;
-    --color-gray-light:rgba(242, 242, 242, 1);
-    --color-gray-medium: rgba(219, 219, 219, 1);
-    --color-gray-dark: :rgba(118, 118, 118, 1);
-    --font-size-sm: 1.2rem;
-    --font-size-md: 1.4rem;
-    --font-size-lg: 1.6rem;
-    --font-size-xl: 1.8rem;
-    --font-size-2xl: 2.4rem
-}
+  --color-primary-700: #1e4ad1;
+  --color-primary-800: #183baa;
+  --color-primary-900: #112d82;
+  --color-gray-light: rgba(242, 242, 242, 1);
+  --color-gray-medium: rgba(219, 219, 219, 1);
+  --color-gray-dark: rgba(118, 118, 118, 1);
+  --color-error: rgba(235, 87, 87, 1);
 
+  /* font-size */
+  --font-size-xs: 1rem;
+  --font-size-sm: 1.2rem;
+  --font-size-md: 1.4rem;
+  --font-size-lg: 1.6rem;
+  --font-size-xl: 1.8rem;
+  --font-size-2xl: 2.4rem;
+}
