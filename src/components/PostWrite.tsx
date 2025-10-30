@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 import ProfileImg from "./common/ProfileImg"
-import ImageUpButton from "./common/UploadButton"
+import ImageUpButton from "./common/imageUpload/UploadButton"
 import styled from "styled-components"
 
 const PostContainer = styled.div`
@@ -53,10 +53,10 @@ const ImageUpButtonContainer = styled.div`
 `
 
 export default function PostWrite() {
-    const [images,setImages] = useState<File[]>([]);
+    const [imgArr,setImgArr] = useState<File[]>([]); //file 배열이 필요할 경우 넣어주세요
     const [textHeight,setTextHeight] = useState('');
-    const [textPlaceholder,setTextPlaceholder] = useState('게시글 입력하기..')
-    const fileInputRef = useRef<HTMLInputElement | null>(null);
+    const [textPlaceholder,setTextPlaceholder] = useState('게시글 입력하기..');
+
     const textAreaRef = useRef<HTMLTextAreaElement | null>(null)
 
     const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -67,39 +67,11 @@ export default function PostWrite() {
         setTextHeight(target.value)
     }
 
-    const handleImgUpload = () => {
-        //button click -> input[type="file"] click
-        fileInputRef.current?.click();
-    }
-
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const files = Array.from(e.target.files ?? []);
-        const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-
-        const filtered = files.filter((file) => {
-        if (!validTypes.includes(file.type)) {
-            alert('이미지 파일만 업로드 가능합니다.');
-            return false;
-        }
-        if (file.size > 5 * 1024 * 1024) {
-            alert('파일 크기는 5MB 이하여야 합니다.');
-            return false;
-        }
-        return true;
-        });
-
-        const total = [...images, ...filtered].slice(0, 10);
-        setImages(total);
-
-        // input 초기화
-        e.target.value = '';
-    }
-
     useEffect(()=>{
-        if(images.length > 0) {
+        if(imgArr.length > 0) {
             setTextPlaceholder('')
         }
-    },[images])
+    },[imgArr])
 
     return (
         <>
@@ -113,15 +85,8 @@ export default function PostWrite() {
                     value={textHeight}
                     onChange={handleTextChange}
                     />
-                    <input type="file"
-                    ref={fileInputRef}
-                    accept="image/jpeg,image/png,image/gif,image/webp"
-                    multiple
-                    onChange={(e)=>handleFileChange(e)}
-                    className="sr-only"
-                    />
                 <ImageContainer>
-                    {images.map((imgele,i)=>(
+                    {imgArr.map((imgele,i)=>(
                         <ImageList key={i}>
                             <img
                             src={URL.createObjectURL(imgele)}
@@ -137,7 +102,8 @@ export default function PostWrite() {
                 <ImageUpButton
                 colortype="color"
                 size="large"
-                onClick={()=>handleImgUpload()}/>
+                setImgArr={setImgArr}
+                />
             </ImageUpButtonContainer>
         </PostContainer>
         </>
