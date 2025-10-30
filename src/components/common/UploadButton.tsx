@@ -3,7 +3,7 @@ import styled from "styled-components"
 interface ImageButtonProps {
     width: number;
     type: 'color' | 'gray';
-    size: 'large' | 'samll';
+    size: 'large' | 'small';
     onClick?:()=>void;
 }
 
