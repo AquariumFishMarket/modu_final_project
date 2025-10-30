@@ -5,15 +5,10 @@ import { Outlet, useLocation } from "react-router-dom";
 import styled from "styled-components";
 
 const LayoutContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
+
 `;
 
 const MainContent = styled.main<{ $hasFooter: boolean }>`
-  flex: 1;
-  display: flex;
-  flex-direction: column;
   padding-bottom: ${(props) => (props.$hasFooter ? "60px" : "0")};
 `;
 

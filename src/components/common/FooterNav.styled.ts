@@ -2,9 +2,13 @@ import styled from "styled-components";
 import { NavLink } from "react-router-dom";
 
 export const NavContainer = styled.nav`
+  max-width: 600px;
+  width: 100%;
+  background-color:#fff;
   position: fixed;
-  left: 0;
+  left: 50%;
   right: 0;
+  transform:translateX(-50%);
   bottom: 0;
   height: 60px;
   padding: 0 6px;
