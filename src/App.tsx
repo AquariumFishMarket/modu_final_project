@@ -1,9 +1,9 @@
-import ProfileImg from "./components/common/ProfileImg";
+import ImageUpButton from "./components/common/UploadButton";
 
 function App() {
   return (
-      <ProfileImg
-      thumbimg={false} width={110}
+      <ImageUpButton
+      width={100} type={"color"} size={"small"}
       />
   )
 }
