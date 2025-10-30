@@ -1,13 +1,12 @@
 import styled from "styled-components"
 
 interface ImageButtonProps {
-    width: number;
     type: 'color' | 'gray';
     size: 'large' | 'small';
     onClick?:()=>void;
 }
 
-const DefaultBtn = styled.button<{width:number,size:string,type:string}>`
+const DefaultBtn = styled.button<{size:string,type:string}>`
     background:unset;
     border:unset;
     cursor:pointer;
@@ -29,8 +28,8 @@ const DefaultBtn = styled.button<{width:number,size:string,type:string}>`
     }
 `
 
-export default function ImageUpButton({width, type, size, onClick}:ImageButtonProps) {
+export default function ImageUpButton({type, size, onClick}:ImageButtonProps) {
     return (
-        <DefaultBtn width={width} type={type} size={size} onClick={onClick} />
+        <DefaultBtn type={type} size={size} onClick={onClick} />
     )
 }
