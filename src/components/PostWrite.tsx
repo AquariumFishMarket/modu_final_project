@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react"
 import ProfileImg from "./common/ProfileImg"
 import ImageUpButton from "./common/imageUpload/UploadButton"
 import ImageContainer from "./common/imageUpload/ImageContainer"
-import DeleteButton from "./common/imageUpload/DeleteButton"
 import styled from "styled-components"
 
 const PostContainer = styled.div`
@@ -48,6 +47,7 @@ const ImageUpButtonContainer = styled.div`
 
 export default function PostWrite() {
     const [imgArr,setImgArr] = useState<File[]>([]); //file 배열이 필요할 경우 넣어주세요
+    const [deleteIndex,setDeleteIdx] = useState<number | undefined>();
     const [textHeight,setTextHeight] = useState('');
     const [textPlaceholder,setTextPlaceholder] = useState('게시글 입력하기..');
 
@@ -67,6 +67,12 @@ export default function PostWrite() {
         }
     },[imgArr])
 
+    useEffect(()=>{
+        setImgArr(prev => prev.filter((_, i) => i !== deleteIndex));
+        //초기화
+        setDeleteIdx(undefined);
+    },[deleteIndex])
+
     return (
         <>
         <PostContainer>
@@ -79,7 +85,7 @@ export default function PostWrite() {
                     value={textHeight}
                     onChange={handleTextChange}
                     />
-                <ImageContainer type={'post'} imgArr={imgArr} />
+                <ImageContainer type={'post'} imgArr={imgArr} setDeleteIdx={setDeleteIdx} />
                 </WriteZone>
             </Contents>
             <ImageUpButtonContainer>

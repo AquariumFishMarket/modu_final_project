@@ -1,7 +1,10 @@
+import { Dispatch, SetStateAction, useState } from "react";
+import DeleteButton from "./DeleteButton";
 import styled from "styled-components"
 
 interface imgcontainer {
     type: 'post' | 'profile';
+    setDeleteIdx: Dispatch<SetStateAction<number | undefined>>;
     imgArr: File[]
 }
 
@@ -14,6 +17,7 @@ const ContainerArr = styled.ul`
     gap: 0;
 `
 const ImageListArr = styled.li`
+    position: relative;
     width: 50%;
     border-radius: 10px;
     overflow: hidden;
@@ -34,6 +38,7 @@ const ContainerSolo = styled.div<{type:string}>`
     overflow: hidden;
 `
 const ImageSolo = styled.div`
+    position: relative;
     height: 100%;
     img {
         width: 100%;
@@ -42,9 +47,7 @@ const ImageSolo = styled.div`
     }
 `
 
-export default function ImageContainer({type,imgArr}:imgcontainer) {
-    const LastImageIdx = imgArr[imgArr.length - 1];
-
+export default function ImageContainer({type,imgArr,setDeleteIdx}:imgcontainer) {
     if(type === 'post') {
         return (
             <>
@@ -57,6 +60,7 @@ export default function ImageContainer({type,imgArr}:imgcontainer) {
                                 src={URL.createObjectURL(imgele)}
                                 alt={`preview-${i}`}
                                 ></img>
+                                <DeleteButton data-index={i} setDeleteIdx={setDeleteIdx}/>
                             </ImageSolo>
                         ))
                     }
@@ -71,6 +75,7 @@ export default function ImageContainer({type,imgArr}:imgcontainer) {
                                 src={URL.createObjectURL(imgele)}
                                 alt={`preview-${i}`}
                                 ></img>
+                                <DeleteButton data-index={i} setDeleteIdx={setDeleteIdx}/>
                             </ImageListArr>
                         ))
                     }
@@ -80,6 +85,7 @@ export default function ImageContainer({type,imgArr}:imgcontainer) {
         )
     }
     if(type === 'profile') {
+        const LastImageIdx = imgArr[imgArr.length - 1];
         return (
             <>
             {LastImageIdx && (
