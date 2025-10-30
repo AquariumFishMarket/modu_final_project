@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 import ProfileImg from "./common/ProfileImg"
 import ImageUpButton from "./common/imageUpload/UploadButton"
+import ImageContainer from "./common/imageUpload/ImageContainer"
 import styled from "styled-components"
 
 const PostContainer = styled.div`
@@ -38,14 +39,6 @@ const TextArea = styled.textarea`
         outline: none;
     }
 `
-const ImageContainer = styled.ul`
-    margin-top: 13px;
-`
-const ImageList = styled.li`
-    border-radius: 10px;
-    overflow: hidden;
-`
-
 const ImageUpButtonContainer = styled.div`
     position: fixed;
     bottom: 16px;
@@ -85,17 +78,7 @@ export default function PostWrite() {
                     value={textHeight}
                     onChange={handleTextChange}
                     />
-                <ImageContainer>
-                    {imgArr.map((imgele,i)=>(
-                        <ImageList key={i}>
-                            <img
-                            src={URL.createObjectURL(imgele)}
-                            alt={`preview-${i}`}
-                            style={{ width: '100%', height: 'auto', objectFit:'cover'}}
-                            ></img>
-                        </ImageList>
-                    ))}
-                </ImageContainer>
+                <ImageContainer type={'post'} imgArr={imgArr} />
                 </WriteZone>
             </Contents>
             <ImageUpButtonContainer>

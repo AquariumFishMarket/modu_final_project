@@ -33,7 +33,6 @@ export default function ImageUpButton({colortype, size, setImgArr}:ImageButtonPr
     const [images,setImages] = useState<File[]>([]);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-
     const handleImgUpload = () => {
         //button click -> input[type="file"] click
         fileInputRef.current?.click();
