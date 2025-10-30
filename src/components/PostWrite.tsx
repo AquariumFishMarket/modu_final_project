@@ -25,8 +25,9 @@ const WriteZone = styled.div`
 const TextArea = styled.textarea`
     padding: 12px 12px 0;
     width: 100%;
-    min-height: 100px;
+    min-height: 1px;
     max-height: 100%;
+    border: unset;
     resize:none;
     font-size: var(--font-size-md);
     color: black;
@@ -45,8 +46,10 @@ const ImageUpButtonContainer = styled.div`
 
 export default function PostWrite() {
     const [images,setImages] = useState<File[]>([]);
-    const [textHeight,setTextHeight] = useState('')
+    const [textHeight,setTextHeight] = useState('');
+    const [textPlaceholder,setTextPlaceholder] = useState('게시글 입력하기..')
     const fileInputRef = useRef<HTMLInputElement | null>(null);
+    const textAreaRef = useRef<HTMLTextAreaElement | null>(null)
 
     const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         const target = e.target;
@@ -84,13 +87,21 @@ export default function PostWrite() {
         e.target.value = '';
     }
 
+    useEffect(()=>{
+        if(images.length > 0) {
+            setTextPlaceholder('')
+        }
+    },[images])
+
     return (
         <>
         <PostContainer>
             <Contents>
                 <ProfileImg width={42} thumbimg={false}></ProfileImg>
                 <WriteZone>
-                    <TextArea placeholder="게시글 입력하기"
+                    <TextArea
+                    ref={textAreaRef}
+                    placeholder={textPlaceholder}
                     value={textHeight}
                     onChange={handleTextChange}
                     />
@@ -106,7 +117,7 @@ export default function PostWrite() {
                         <img key={i}
                         src={URL.createObjectURL(imgele)}
                         alt={`preview-${i}`}
-                        style={{ width: '80px', height: '80px', objectFit:'cover'}}
+                        style={{ width: '100%', height: 'auto', objectFit:'cover'}}
                         ></img>
                     ))}
                 </div>
