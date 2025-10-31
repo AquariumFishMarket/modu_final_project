@@ -14,20 +14,20 @@ const ImageUploadContainer = styled.div`
     margin-bottom: 20px;
 `
 const Contents = styled.div`
-    height: 100%;
+    height: calc(100% - 100px);
     display:flex;
     gap: 13px;
 `
 const WriteZone = styled.div`
     max-width: 100%;
     width: calc(100% - 55px);
-    height: calc(100% - 100px);
+    height: 100%;
 `
 const TextArea = styled.textarea`
     padding: 12px 12px 30px;
     width: 100%;
     min-height: 1px;
-    max-height: 500px;
+    max-height: 100%;
     border: unset;
     resize:none;
     font-size: var(--font-size-md);
@@ -71,7 +71,7 @@ export default function PostWrite() {
     }
 
     useEffect(()=>{
-        if(imgArr.length > 0) {
+        if(imgArr.length > 0 && textAreaRef.current?.value !=='') {
             setTextPlaceholder('')
         }
     },[imgArr])

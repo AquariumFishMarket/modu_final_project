@@ -12,7 +12,7 @@ interface imgcontainer {
 const ContainerArr = styled.ul`
     display: flex;
     width: calc(100% - 90px);
-    overflow-x: scroll;
+    overflow-x: auto;
 `
 const ImageListArr = styled.li`
     position: relative;

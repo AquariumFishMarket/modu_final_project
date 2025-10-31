@@ -51,6 +51,8 @@ export default function ImageUpButton({colortype, size, imgArr, setImgArr}:Image
             alert('파일 크기는 5MB 이하여야 합니다.');
             return false;
         }
+        console.log(files.length)
+
         return true;
         });
 
