@@ -7,6 +7,7 @@ export const HeaderContainer = styled.header`
   transform: translateX(-50%);
   max-width: 600px;
   width: 100%;
+  background-color: #fff;
 `;
 
 export const Section = styled.section`

@@ -1,12 +1,14 @@
 import { Routes, Route } from "react-router-dom";
 import GlobalLayout from "./components/layout/globalLayout";
 import Login from "./components/pages/Login";
+import PostWrite from "./components/PostWrite";
+import FeedPage from "./pages/Home/FeedPage";
 
 export default function RootRoute() {
   return (
     <Routes>
       <Route element={<GlobalLayout />}>
-        <Route path="/" />
+        <Route path="/"/>
         <Route path="/login" element={<Login />} />
         <Route path="/login/email" />
         <Route path="/signup" />
@@ -16,7 +18,7 @@ export default function RootRoute() {
 
         <Route path="/search" />
 
-        <Route path="/post" />
+        <Route path="/post" element={<PostWrite />}/>
 
         <Route path="/chat-list" />
         <Route path="/chat-room" />
