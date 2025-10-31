@@ -2,8 +2,12 @@ import { Routes, Route } from "react-router-dom";
 import { AnimatePresence } from "motion/react"
 import GlobalLayout from "./components/layout/globalLayout";
 import Login from "./components/pages/Login";
+
+import SearchPage from "./pages/Search/SearchPage";
+
 import PostWrite from "./components/PostWrite";
 import FeedPage from "./pages/Home/FeedPage";
+
 
 export default function RootRoute() {
   return (
@@ -18,7 +22,10 @@ export default function RootRoute() {
 
           {/* 나머지 route 경로 수정 */}
 
-          <Route path="/search" />
+
+        <Route path="/feed" element={<FeedPage />} />
+        <Route path="/search" element={<SearchPage />} />
+
 
           <Route path="/post" element={<PostWrite />}/>
 
