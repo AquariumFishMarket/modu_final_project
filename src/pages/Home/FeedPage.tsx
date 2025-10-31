@@ -100,7 +100,7 @@ type Feed = {
   if (isInitialLoading) {
     return (
       <>
-      
+
         <main>
           <InitialLoadingSection>
             {/* 애니메이션 넣기? 스피너? */}
@@ -115,7 +115,7 @@ type Feed = {
   if (feedList.length === 0) {
     return (
       <>
-      
+
         <main>
           <EmptyFeedSection>
             <LogoImage src="/img/fish-logo-GB.svg" alt="물고기마켓 로고" />
@@ -134,7 +134,7 @@ type Feed = {
   // 피드 있을 때 (메인 피드 목록)
   return (
     <>
-    
+
       <main>
         <FeedSection>
           {/* 피드 목록 렌더링 */}
