@@ -15,6 +15,7 @@ import FeedPage from "./pages/Home/FeedPage";
 
 export default function RootRoute() {
   return (
+    <AnimatePresence>
     <Routes>
       <Route element={<GlobalLayout />}>
         <Route path="/" />
@@ -34,8 +35,8 @@ export default function RootRoute() {
           <Route path="/chat-room" />
 
           <Route path="/404" />
-        </Route>
-      </Routes>
+      </Route>
+    </Routes>
     </AnimatePresence>
   );
 }
