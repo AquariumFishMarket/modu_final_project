@@ -47,5 +47,4 @@ export default function DefaultButton({width,text,disabled,onClick,href} : Defau
             >{text}</DefaultBtn>
         )
     }
-
 }
