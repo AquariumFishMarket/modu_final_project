@@ -10,6 +10,7 @@ import {
   InitialLoadingSection,
 } from "./FeedPage.styled";
 
+const FeedPage = () => {
 type Feed = {
   id: string; // 게시글 고유 ID
   profileImg: string; // 프로필 이미지 URL
@@ -123,7 +124,6 @@ type Feed = {
             <DefaultButton
               text="검색하기"
               width={120}
-              onClick={handleSearchClick}
             />
           </EmptyFeedSection>
         </main>
@@ -135,7 +135,6 @@ type Feed = {
   return (
     <>
 
-      <main>
         <FeedSection>
           {/* 피드 목록 렌더링 */}
           {feedList.map((feed) => (
@@ -161,7 +160,6 @@ type Feed = {
             </EndMessageText>
           )}
         </FeedSection>
-      </main
     </>
   );
 }
