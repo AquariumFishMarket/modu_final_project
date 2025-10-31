@@ -5,11 +5,22 @@ import { Outlet, useLocation } from "react-router-dom";
 import styled from "styled-components";
 
 const LayoutContainer = styled.div`
-
+  max-width: 600px;
+  width: 100%;
+  height: 100vh;
+  margin: 0 auto;
+  overflow-y: hidden;
+  background-color: #fff;
+  border: 1px solid #eeeeee;
 `;
 
 const MainContent = styled.main<{ $hasFooter: boolean }>`
-  padding-bottom: ${(props) => (props.$hasFooter ? "60px" : "0")};
+  padding-top: 68px;
+  padding-left: 15px;
+  padding-right: 15px;
+  height: 100vh;
+  overflow-y: scroll;
+  padding-bottom: ${(props) => (props.$hasFooter ? "110px" : "50px")};
 `;
 
 export default function GlobalLayout() {
