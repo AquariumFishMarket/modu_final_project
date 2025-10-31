@@ -25,7 +25,7 @@ const DefaultBtn = styled.button<{ width?: number, disabled?: boolean }>`
     width: ${(props)=>(props.width? `${props.width}px` : '100%')};
     transition: all 0.2s;
 
-    &:active {
+    &:not(:disabled):active {
         background-color:var(--color-primary-800);
     }
     `
