@@ -5,22 +5,26 @@ import ImageContainer from "./common/imageUpload/ImageContainer"
 import styled from "styled-components"
 
 const PostContainer = styled.div`
+    height: 100%;
     margin: 0 auto;
-    padding-left:16px;
-    padding-right:16px;
+`
+const ImageUploadContainer = styled.div`
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
 `
 const Contents = styled.div`
-    height: 100%;
+    height: calc(100% - 100px);
     display:flex;
     gap: 13px;
 `
 const WriteZone = styled.div`
     max-width: 100%;
     width: calc(100% - 55px);
-    height: calc(100% - 100px);
+    height: 100%;
 `
 const TextArea = styled.textarea`
-    padding: 12px 12px 0;
+    padding: 12px 12px 30px;
     width: 100%;
     min-height: 1px;
     max-height: 100%;
@@ -28,7 +32,6 @@ const TextArea = styled.textarea`
     resize:none;
     font-size: var(--font-size-md);
     color: black;
-    border:1px solid;
     &:placeholder {
         color: rgba(196, 196, 196, 1);
     }
@@ -37,9 +40,18 @@ const TextArea = styled.textarea`
     }
 `
 const ImageUpButtonContainer = styled.div`
-    position: fixed;
-    bottom: 16px;
-    right:0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    width: 80px;
+    height: 80px;
+    border-radius: 10px;
+    border: 1px solid var(--color-gray-medium);
+    > p {
+        font-size: var(--font-size-sm)
+    }
 `
 
 export default function PostWrite() {
@@ -59,7 +71,7 @@ export default function PostWrite() {
     }
 
     useEffect(()=>{
-        if(imgArr.length > 0) {
+        if(imgArr.length > 0 && textAreaRef.current?.value !=='') {
             setTextPlaceholder('')
         }
     },[imgArr])
@@ -73,6 +85,19 @@ export default function PostWrite() {
     return (
         <>
         <PostContainer>
+            <ImageUploadContainer>
+                <ImageUpButtonContainer>
+                    <ImageUpButton
+                    imgArrType="plural"
+                    colortype="color"
+                    size="small"
+                    imgArr={imgArr}
+                    setImgArr={setImgArr}
+                    />
+                    <p>{imgArr.length}/10</p>
+                </ImageUpButtonContainer>
+                <ImageContainer type={'post'} imgArr={imgArr} setDeleteIdx={setDeleteIdx} />
+            </ImageUploadContainer>
             <Contents>
                 <ProfileImg width={42} thumbimg={false}></ProfileImg>
                 <WriteZone>
@@ -82,17 +107,9 @@ export default function PostWrite() {
                     value={textHeight}
                     onChange={handleTextChange}
                     />
-                <ImageContainer type={'post'} imgArr={imgArr} setDeleteIdx={setDeleteIdx} />
                 </WriteZone>
             </Contents>
-            <ImageUpButtonContainer>
-                <ImageUpButton
-                colortype="color"
-                size="large"
-                imgArr={imgArr}
-                setImgArr={setImgArr}
-                />
-            </ImageUpButtonContainer>
+
         </PostContainer>
         </>
     )
