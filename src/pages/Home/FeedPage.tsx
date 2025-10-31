@@ -1,8 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import Header from "../../components/common/Header";
 import DefaultButton from "../../components/common/Button";
-import FooterNav from "../../components/common/FooterNav";
 import {
   EmptyFeedSection,
   LogoImage,
@@ -26,8 +23,6 @@ type Feed = {
   createdAt: string; // 게시글 작성일
 };
 
-function FeedPage() {
-  const navigate = useNavigate();
 
   /** 피드 게시글 목록 */
   const [feedList, setFeedList] = useState<Feed[]>([]);
@@ -98,22 +93,20 @@ function FeedPage() {
   // 무한스크롤 부분
   // useInfiniteScroll 훅 추가 예정
 
-  const handleSearchClick = () => {
-    navigate("/search");
-  };
+
+
 
   // 초기 로딩 중
   if (isInitialLoading) {
     return (
       <>
-        <Header type="feed" onSearchClick={handleSearchClick} />
+      
         <main>
           <InitialLoadingSection>
             {/* 애니메이션 넣기? 스피너? */}
             <p>불러오는 중...</p>
           </InitialLoadingSection>
         </main>
-        <FooterNav />
       </>
     );
   }
@@ -122,7 +115,7 @@ function FeedPage() {
   if (feedList.length === 0) {
     return (
       <>
-        <Header type="feed" onSearchClick={handleSearchClick} />
+      
         <main>
           <EmptyFeedSection>
             <LogoImage src="/img/fish-logo-GB.svg" alt="물고기마켓 로고" />
@@ -134,7 +127,6 @@ function FeedPage() {
             />
           </EmptyFeedSection>
         </main>
-        <FooterNav />
       </>
     );
   }
@@ -142,7 +134,7 @@ function FeedPage() {
   // 피드 있을 때 (메인 피드 목록)
   return (
     <>
-      <Header type="feed" onSearchClick={handleSearchClick} />
+    
       <main>
         <FeedSection>
           {/* 피드 목록 렌더링 */}
@@ -169,8 +161,7 @@ function FeedPage() {
             </EndMessageText>
           )}
         </FeedSection>
-      </main>
-      <FooterNav />
+      </main
     </>
   );
 }

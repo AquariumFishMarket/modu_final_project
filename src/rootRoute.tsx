@@ -1,6 +1,8 @@
 import { Routes, Route } from "react-router-dom";
 import GlobalLayout from "./components/layout/globalLayout";
 import Login from "./components/pages/Login";
+import FeedPage from "./pages/Home/FeedPage";
+import SearchPage from "./pages/Search/SearchPage";
 
 export default function RootRoute() {
   return (
@@ -14,7 +16,8 @@ export default function RootRoute() {
 
         {/* 나머지 route 경로 수정 */}
 
-        <Route path="/search" />
+        <Route path="/feed" element={<FeedPage />} />
+        <Route path="/search" element={<SearchPage />} />
 
         <Route path="/post" />
 
