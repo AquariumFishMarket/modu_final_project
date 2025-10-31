@@ -2,13 +2,14 @@ import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react"
 import styled from "styled-components"
 
 interface ImageButtonProps {
+    imgArrType: 'plural' | 'singular'; //복수, 단수 입니다. 이미지가 여러장 필요한지 한 장만 들어가는지
     colortype: 'color' | 'gray';
     size: 'large' | 'small';
     imgArr: File[];
     setImgArr: Dispatch<SetStateAction<File[]>>
 }
 
-const DefaultBtn = styled.button<{size:string,colortype:string}>`
+const DefaultBtn = styled.button<{size:string,$colortype:string}>`
     background:unset;
     border:unset;
     cursor:pointer;
@@ -19,7 +20,7 @@ const DefaultBtn = styled.button<{size:string,colortype:string}>`
     background-repeat: no-repeat;
     background-size: initial;
     background-position: center;
-    background-color: ${(props)=>props.colortype === 'color' ? 'var(--color-primary-600)' : 'var(--color-gray-medium)'};
+    background-color: ${(props)=>props.$colortype === 'color' ? 'var(--color-primary-600)' : 'var(--color-gray-medium)'};
     border-radius:100%;
     width:${(props)=>props.size === 'large' ? '50px' : '36px'};
     height:${(props)=>props.size === 'large' ? '50px' : '36px'};
@@ -30,9 +31,10 @@ const DefaultBtn = styled.button<{size:string,colortype:string}>`
     }
 `
 
-export default function ImageUpButton({colortype, size, imgArr, setImgArr}:ImageButtonProps) {
+export default function ImageUpButton({imgArrType, colortype, size, imgArr, setImgArr}:ImageButtonProps) {
 
     const fileInputRef = useRef<HTMLInputElement | null>(null);
+    const [realtimeArr,setRealtimeArr] = useState<File[]>([])
 
     const handleImgUpload = () => {
         //button click -> input[type="file"] click
@@ -43,25 +45,35 @@ export default function ImageUpButton({colortype, size, imgArr, setImgArr}:Image
         const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
 
         const filtered = files.filter((file) => {
-        if (!validTypes.includes(file.type)) {
-            alert('이미지 파일만 업로드 가능합니다.');
-            return false;
-        }
-        if (file.size > 5 * 1024 * 1024) {
-            alert('파일 크기는 5MB 이하여야 합니다.');
-            return false;
-        }
-        console.log(files.length)
-
-        return true;
+            if (!validTypes.includes(file.type)) {
+                alert('이미지 파일만 업로드 가능합니다.');
+                return false;
+            }
+            if (file.size > 5 * 1024 * 1024) {
+                alert('파일 크기는 5MB 이하여야 합니다.');
+                return false;
+            }
+            return true;
         });
-
-        const total = [...imgArr, ...filtered].slice(0, 10);
-        setImgArr(total);
+        setRealtimeArr(filtered)
 
         // input 초기화
         e.target.value = '';
     }
+
+    //post에서만 실행되도록..
+    useEffect(()=>{
+        const total = [...imgArr, ...realtimeArr];
+        if(imgArrType == 'plural') {
+            if(total.length > 10) {
+                alert('이미지는 10장까지 업로드 가능합니다.');
+            } else {
+                setImgArr(total);
+            }
+        } else {
+            setImgArr(total);
+        }
+    },[realtimeArr])
 
     return (
         <>
@@ -72,7 +84,7 @@ export default function ImageUpButton({colortype, size, imgArr, setImgArr}:Image
             onChange={(e)=>handleFileChange(e)}
             className="sr-only"
             />
-            <DefaultBtn colortype={colortype} size={size} onClick={()=>{handleImgUpload()}} />
+            <DefaultBtn $colortype={colortype} size={size} onClick={()=>{handleImgUpload()}} />
         </>
     )
 }
