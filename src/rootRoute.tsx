@@ -1,10 +1,17 @@
 import { Routes, Route } from "react-router-dom";
+import { AnimatePresence } from "motion/react"
 import GlobalLayout from "./components/layout/globalLayout";
 import Login from "./pages/login/Login";
 import LoginEmail from "./pages/login/LoginEmail";
 import Signup from "./pages/signup/Signup";
 import ProfileSetup from "./pages/profile/ProfileSetup";
 import ProfileEdit from "./pages/profile/ProfileEdit";
+
+import SearchPage from "./pages/Search/SearchPage";
+
+import PostWrite from "./components/PostWrite";
+import FeedPage from "./pages/Home/FeedPage";
+
 
 export default function RootRoute() {
   return (
@@ -17,17 +24,18 @@ export default function RootRoute() {
         <Route path="/profile/setup" element={<ProfileSetup />} />
         <Route path="/profile/edit" element={<ProfileEdit />} />
 
-        {/* 나머지 route 경로 수정 */}
+        <Route path="/feed" element={<FeedPage />} />
+        <Route path="/search" element={<SearchPage />} />
 
-        <Route path="/search" />
 
-        <Route path="/post" />
+          <Route path="/post" element={<PostWrite />}/>
 
-        <Route path="/chat-list" />
-        <Route path="/chat-room" />
+          <Route path="/chat-list" />
+          <Route path="/chat-room" />
 
-        <Route path="/404" />
-      </Route>
-    </Routes>
+          <Route path="/404" />
+        </Route>
+      </Routes>
+    </AnimatePresence>
   );
 }

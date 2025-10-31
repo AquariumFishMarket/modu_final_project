@@ -14,7 +14,9 @@ const Delete = styled.button`
     position: absolute;
     top: 6px;
     right: 6px;
-    z-index: 999;
+    z-index: 20;
+    background-color: #fff;
+    border-radius: 100%;
 `
 
 export default function DeleteButton({"data-index":i,setDeleteIdx}:Deleteinterface) {
@@ -24,7 +26,7 @@ export default function DeleteButton({"data-index":i,setDeleteIdx}:Deleteinterfa
 
     return (
         <Delete data-index={i} onClick={handleDelete}>
-            <img src="/img/icon-close.svg" alt="닫기" />
+            <img src="/img/icon-close.svg?" alt="닫기" />
         </Delete>
     )
 }
