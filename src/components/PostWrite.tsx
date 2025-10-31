@@ -5,13 +5,9 @@ import ImageContainer from "./common/imageUpload/ImageContainer"
 import styled from "styled-components"
 
 const PostContainer = styled.div`
-    padding-top: 20px;
     margin: 0 auto;
     padding-left:16px;
     padding-right:16px;
-    max-width:600px;
-    border:1px solid;
-    height:100vh;
 `
 const Contents = styled.div`
     height: 100%;
@@ -32,6 +28,7 @@ const TextArea = styled.textarea`
     resize:none;
     font-size: var(--font-size-md);
     color: black;
+    border:1px solid;
     &:placeholder {
         color: rgba(196, 196, 196, 1);
     }
