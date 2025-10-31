@@ -27,10 +27,17 @@ export default function GlobalLayout() {
   const location = useLocation();
 
   // FooterNav를 숨길 경로들
-  const hideNavPaths = ["/post", "/signup", "/login"];
+  const hideNavPaths = [
+    "/post",
+    "/signup",
+    "/login",
+    "/login/email",
+    "/profile/setup",
+    "/profile/edit",
+  ];
 
   // Header를 숨길 경로들
-  const hideHeadPaths = ["/login", "/login/email", "signup"];
+  const hideHeadPaths = ["/login", "/login/email", "signup", "/profile/setup"];
 
   // 현재 경로가 숨김 목록에 있는지 확인
   const shouldHideNav = hideNavPaths.some((path) =>

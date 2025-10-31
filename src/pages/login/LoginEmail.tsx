@@ -1,5 +1,5 @@
 import React from "react";
-import AuthForm from "../common/auth/AuthForm";
+import AuthForm from "../../components/common/auth/AuthForm";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 
