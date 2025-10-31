@@ -9,7 +9,7 @@ import ProfileEdit from "./pages/profile/ProfileEdit";
 
 import SearchPage from "./pages/Search/SearchPage";
 
-import PostWrite from "./components/PostWrite";
+import PostWrite from "./pages/post/PostWrite";
 import FeedPage from "./pages/Home/FeedPage";
 
 

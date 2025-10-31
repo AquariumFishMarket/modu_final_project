@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react"
-import ProfileImg from "./common/ProfileImg"
-import ImageUpButton from "./common/imageUpload/UploadButton"
-import ImageContainer from "./common/imageUpload/ImageContainer"
+import ProfileImg from "../../components/common/ProfileImg"
+import ImageUpButton from "../../components/common/imageUpload/UploadButton"
+import ImageContainer from "../../components/common/imageUpload/ImageContainer"
 import styled from "styled-components"
 import { motion } from "motion/react"
 
