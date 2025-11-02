@@ -1,50 +1,75 @@
-import styled from "styled-components"
+import styled from "styled-components";
 
 interface DefaultButtonProps {
-    text: string;
-    width?: number;
-    disabled?: boolean;
-    onClick?:()=>void;
-    href?:string;
+  text: string;
+  width?: number;
+  disabled?: boolean;
+  onClick?: () => void;
+  href?: string;
+  variant?: "primary" | "secondary" | "white";
 }
 
-const DefaultBtn = styled.button<{ width?: number, disabled?: boolean }>`
-    background:unset;
-    border:unset;
-    cursor:${(props)=>props.disabled === true ? 'initial' : 'pointer'};
-    display:inline-block;
-    text-align:center;
-    text-decoration:unset;
-    background-color:${(props)=>props.disabled === true ? 'var(--color-primary-400)' : 'var(--color-primary-600)'};
-    color:#fff;
-    font-size:14px;
-    border-radius:500px;
-    min-height:24px;
-    line-height:44px;
-    height:44px;
-    width: ${(props)=>(props.width? `${props.width}px` : '100%')};
-    transition: all 0.2s;
+const DefaultBtn = styled.button<{
+  width?: number;
+  disabled?: boolean;
+  variant?: "primary" | "secondary" | "white";
+}>`
+  background: unset;
+  border: ${(props) =>
+    props.variant === "white" ? "1px solid var(--color-gray-light)" : "unset"};
+  cursor: ${(props) => (props.disabled === true ? "initial" : "pointer")};
+  display: inline-block;
+  text-align: center;
+  text-decoration: unset;
+  background-color: ${(props) => {
+    if (props.disabled === true) return "var(--color-primary-400)";
+    if (props.variant === "secondary") return "var(--color-gray-semi-dark)";
+    if (props.variant === "white") return "#fff";
+    return "var(--color-primary-600)";
+  }};
+  color: ${(props) =>
+    props.variant === "white" ? "var(--color-gray-dark)" : "#fff"};
+  font-size: 14px;
+  border-radius: 500px;
+  min-height: 24px;
+  line-height: 44px;
+  height: 44px;
+  width: ${(props) => (props.width ? `${props.width}px` : "100%")};
+  transition: all 0.2s;
 
-    &:not(:disabled):active {
-        background-color:var(--color-primary-800);
-    }
-    `
+  &:not(:disabled):active {
+    background-color: ${(props) => {
+      if (props.variant === "secondary") return "var(--color-gray-semi-dark)";
+      if (props.variant === "white") return "var(--color-gray-light)";
+      return "var(--color-primary-800)";
+    }};
+  }
+`;
 
-export default function DefaultButton({width,text,disabled,onClick,href} : DefaultButtonProps) {
-    if(href) {
-        return (
-            <DefaultBtn as="a"
-            width={width}
-            href={href}
-            >{text}</DefaultBtn>
-        )
-    } else {
-        return (
-            <DefaultBtn
-            width={width}
-            disabled={disabled}
-            onClick={onClick}
-            >{text}</DefaultBtn>
-        )
-    }
+export default function DefaultButton({
+  width,
+  text,
+  disabled,
+  onClick,
+  href,
+  variant = "primary",
+}: DefaultButtonProps) {
+  if (href) {
+    return (
+      <DefaultBtn as="a" width={width} href={href} variant={variant}>
+        {text}
+      </DefaultBtn>
+    );
+  } else {
+    return (
+      <DefaultBtn
+        width={width}
+        disabled={disabled}
+        onClick={onClick}
+        variant={variant}
+      >
+        {text}
+      </DefaultBtn>
+    );
+  }
 }
