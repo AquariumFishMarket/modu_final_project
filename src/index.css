@@ -60,6 +60,7 @@ button {
 
 input {
   border: none;
+  outline: none;
 }
 
 /* 변수 CSS */
@@ -76,6 +77,7 @@ input {
   --color-primary-900: #112d82;
   --color-gray-light: rgba(242, 242, 242, 1);
   --color-gray-medium: rgba(219, 219, 219, 1);
+  --color-gray-semi-dark: rgba(196, 196, 196, 1); /* 검색, 댓글,게시글 입력 */
   --color-gray-dark: rgba(118, 118, 118, 1);
   --color-error: rgba(235, 87, 87, 1);
 

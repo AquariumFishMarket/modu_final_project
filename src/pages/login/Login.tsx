@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { Link } from "react-router-dom";
-import SocialButton from "../common/SocialButton";
+import SocialButton from "../../components/common/SocialButton";
 
 const LoginContainer = styled.section`
   display: flex;
