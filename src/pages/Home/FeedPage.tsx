@@ -10,19 +10,19 @@ import {
   InitialLoadingSection,
 } from "./FeedPage.styled";
 
-type Feed = {
-  id: string; // 게시글 고유 ID
-  profileImg: string; // 프로필 이미지 URL
-  userName: string; // 사용자 이름
-  userId: string; // 사용자 ID (예: @hanlabong22)
-  content: string; // 게시글 본문 텍스트
-  image?: string; // 게시글 이미지 (선택적)
-  isLiked: boolean; // 좋아요 여부
-  likeCount: number; // 좋아요 개수
-  commentCount: number; // 댓글 개수
-  createdAt: string; // 게시글 작성일
-};
-
+const FeedPage = () => {
+  type Feed = {
+    id: string; // 게시글 고유 ID
+    profileImg: string; // 프로필 이미지 URL
+    userName: string; // 사용자 이름
+    userId: string; // 사용자 ID (예: @hanlabong22)
+    content: string; // 게시글 본문 텍스트
+    image?: string; // 게시글 이미지 (선택적)
+    isLiked: boolean; // 좋아요 여부
+    likeCount: number; // 좋아요 개수
+    commentCount: number; // 댓글 개수
+    createdAt: string; // 게시글 작성일
+  };
 
   /** 피드 게시글 목록 */
   const [feedList, setFeedList] = useState<Feed[]>([]);
@@ -93,14 +93,10 @@ type Feed = {
   // 무한스크롤 부분
   // useInfiniteScroll 훅 추가 예정
 
-
-
-
   // 초기 로딩 중
   if (isInitialLoading) {
     return (
       <>
-      
         <main>
           <InitialLoadingSection>
             {/* 애니메이션 넣기? 스피너? */}
@@ -115,16 +111,11 @@ type Feed = {
   if (feedList.length === 0) {
     return (
       <>
-      
         <main>
           <EmptyFeedSection>
             <LogoImage src="/img/fish-logo-GB.svg" alt="물고기마켓 로고" />
             <h2>유저를 검색해 팔로우 해보세요!</h2>
-            <DefaultButton
-              text="검색하기"
-              width={120}
-              onClick={handleSearchClick}
-            />
+            <DefaultButton text="검색하기" width={120} />
           </EmptyFeedSection>
         </main>
       </>
@@ -134,36 +125,33 @@ type Feed = {
   // 피드 있을 때 (메인 피드 목록)
   return (
     <>
-    
-      <main>
-        <FeedSection>
-          {/* 피드 목록 렌더링 */}
-          {feedList.map((feed) => (
-            <FeedItemWrapper key={feed.id}>
-              {/* FeedCard 컴포넌트 추가 */}
-              {/* <FeedCard feed={feed} onLikeToggle={handleLikeToggle} /> */}
-            </FeedItemWrapper>
-          ))}
+      <FeedSection>
+        {/* 피드 목록 렌더링 */}
+        {feedList.map((feed) => (
+          <FeedItemWrapper key={feed.id}>
+            {/* FeedCard 컴포넌트 추가 */}
+            {/* <FeedCard feed={feed} onLikeToggle={handleLikeToggle} /> */}
+          </FeedItemWrapper>
+        ))}
 
-          {/* 추가 피드 로딩 중 */}
-          {isLoading && (
-            <LoadingText>
-              {/* 애니메이션 넣기? 스피너? */}
-              불러오는 중...
-            </LoadingText>
-          )}
+        {/* 추가 피드 로딩 중 */}
+        {isLoading && (
+          <LoadingText>
+            {/* 애니메이션 넣기? 스피너? */}
+            불러오는 중...
+          </LoadingText>
+        )}
 
-          {/* 더 이상 피드가 없을 때 */}
-          {!hasMore && (
-            <EndMessageText>
-              {/* 텍스트로 할지 아니면 피드카드가 없다는 . 이런거? 넣을지 */}
-              더이상 피드가 존재하지 않습니다.
-            </EndMessageText>
-          )}
-        </FeedSection>
-      </main
+        {/* 더 이상 피드가 없을 때 */}
+        {!hasMore && (
+          <EndMessageText>
+            {/* 텍스트로 할지 아니면 피드카드가 없다는 . 이런거? 넣을지 */}
+            더이상 피드가 존재하지 않습니다.
+          </EndMessageText>
+        )}
+      </FeedSection>
     </>
   );
-}
+};
 
 export default FeedPage;

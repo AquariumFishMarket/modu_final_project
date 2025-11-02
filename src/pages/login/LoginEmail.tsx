@@ -3,9 +3,11 @@ import AuthForm from "../../components/common/auth/AuthForm";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 
-const Header = styled.header`
-  margin: 30px auto;
+const LoginTitle = styled.h2`
+  text-align: center;
   font-size: 24px;
+  font-weight: 500;
+  margin: 0 auto 40px;
 `;
 
 const SignupLink = styled(Link)`
@@ -46,16 +48,14 @@ export default function LoginEmail() {
 
   return (
     <>
-      <Header>로그인</Header>
-      <main>
-        <AuthForm
-          fields={loginFields}
-          buttonText="로그인"
-          onSubmit={handleSubmit}
-          onButtonClick={handleButtonClick}
-        />
-        <SignupLink to="/signup">이메일로 회원가입</SignupLink>
-      </main>
+      <LoginTitle>로그인</LoginTitle>
+      <AuthForm
+        fields={loginFields}
+        buttonText="로그인"
+        onSubmit={handleSubmit}
+        onButtonClick={handleButtonClick}
+      />
+      <SignupLink to="/signup">이메일로 회원가입</SignupLink>
     </>
   );
 }

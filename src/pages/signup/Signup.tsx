@@ -1,10 +1,23 @@
 import React from "react";
 import AuthForm from "../../components/common/auth/AuthForm";
 import styled from "styled-components";
+import { Link } from "react-router-dom";
 
-const Header = styled.header`
-  margin: 30px auto 40px;
+const Signuptitle = styled.h2`
+  text-align: center;
   font-size: 24px;
+  font-weight: 500;
+  margin: 0 auto 40px;
+`;
+
+const LoginLink = styled(Link)`
+  font-size: 12px;
+  text-decoration: none;
+  color: var(--color-gray-dark);
+  width: 100%;
+  display: inline-block;
+  text-align: center;
+  margin: 20px auto;
 `;
 
 export default function Signup() {
@@ -37,15 +50,14 @@ export default function Signup() {
 
   return (
     <>
-      <Header>회원가입</Header>
-      <main>
-        <AuthForm
-          fields={signupFields}
-          buttonText="회원가입"
-          onSubmit={handleSubmit}
-          onButtonClick={handleButtonClick}
-        />
-      </main>
+      <Signuptitle>회원가입</Signuptitle>
+      <AuthForm
+        fields={signupFields}
+        buttonText="회원가입"
+        onSubmit={handleSubmit}
+        onButtonClick={handleButtonClick}
+      />
+      <LoginLink to={"/login/email"}>이메일로 로그인</LoginLink>
     </>
   );
 }
