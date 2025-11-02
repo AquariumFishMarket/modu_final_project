@@ -32,14 +32,17 @@ const ContainerProfile = styled.div`
   width: 100%;
   height: 100%;
 `;
+
 const ImageSolo = styled.div`
   position: relative;
   height: 100%;
+  border-radius: 100%; // 이미지 적용 후 동글동글
+  overflow: hidden;
+
   img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: 100%; // 이미지 적용 후 동글동글
   }
 `;
 
