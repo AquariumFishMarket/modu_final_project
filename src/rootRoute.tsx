@@ -17,7 +17,7 @@ export default function RootRoute() {
 
       <Routes>
         <Route element={<GlobalLayout />}>
-          <Route path="/" />
+          <Route path="/"/>
           <Route path="/login" element={<Login />} />
           <Route path="/login/email" element={<LoginEmail />} />
           <Route path="/signup" element={<Signup />} />
