@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import DefaultButton from "../../components/common/Button";
 import {
   EmptyFeedSection,
@@ -11,6 +12,7 @@ import {
 } from "./FeedPage.styled";
 
 const FeedPage = () => {
+  const navigate = useNavigate();
   type Feed = {
     id: string; // 게시글 고유 ID
     profileImg: string; // 프로필 이미지 URL
@@ -115,7 +117,11 @@ const FeedPage = () => {
           <EmptyFeedSection>
             <LogoImage src="/img/fish-logo-GB.svg" alt="물고기마켓 로고" />
             <h2>유저를 검색해 팔로우 해보세요!</h2>
-            <DefaultButton text="검색하기" width={120} />
+            <DefaultButton
+              text="검색하기"
+              width={120}
+              onClick={() => navigate("/search")}
+            />
           </EmptyFeedSection>
         </main>
       </>

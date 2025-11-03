@@ -18,7 +18,7 @@ export default function RootRoute() {
 
       <Routes>
         <Route element={<GlobalLayout />}>
-          <Route path="/" />
+          <Route path="/" element={<FeedPage />} />
           {/* 로그인, 회원가입 */}
 
           <Route path="/login" element={<Login />} />
@@ -26,7 +26,7 @@ export default function RootRoute() {
           <Route path="/signup" element={<Signup />} />
           {/* 프로필 */}
           <Route path="/profile/setup" element={<ProfileSetup />} />
-          <Route path="/Profile" element={<Profile />} />
+          <Route path="/profile" element={<Profile />} />
           <Route path="/profile/edit" element={<ProfileEdit />} />
           {/* 메인 피드, 검색 */}
           <Route path="/feed" element={<FeedPage />} />
