@@ -6,6 +6,10 @@ import ImageContainer from "./imageUpload/ImageContainer";
 import ProfileImg from "./ProfileImg";
 import ImageUpButton from "./imageUpload/UploadButton";
 
+/**
+ * 프로필, 상품 등록 페이지에서 공통으로 쓰일 입력폼 컴포넌트
+ */
+
 // 타입
 interface CommonFormProps {
   formType: "profile" | "product";
