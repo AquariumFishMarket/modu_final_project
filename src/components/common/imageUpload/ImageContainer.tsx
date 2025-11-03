@@ -2,14 +2,23 @@ import { Dispatch, SetStateAction, useState } from "react";
 import DeleteButton from "./DeleteButton";
 import styled from "styled-components";
 
-interface imgcontainer {
-  type: "post" | "profile";
+interface DefaultType {
   setDeleteIdx: Dispatch<SetStateAction<number | undefined>>;
   imgArr: File[];
 }
 
+interface MultipleContainer extends DefaultType {
+  multiple: true;
+}
+
+interface SingleContainer extends DefaultType {
+  multiple: false;
+}
+
+type ContainerType = MultipleContainer | SingleContainer;
+
 //이미지 여러개일 때
-const ContainerArr = styled.ul`
+const MultipleCont = styled.ul`
   display: flex;
   width: calc(100% - 90px);
   overflow-x: auto;
@@ -28,12 +37,11 @@ const ImageListArr = styled.li`
     object-fit: cover;
   }
 `;
-const ContainerProfile = styled.div`
+const SingleCont = styled.div`
   width: 100%;
   height: 100%;
 `;
-
-const ImageSolo = styled.div`
+const Image = styled.div`
   position: relative;
   height: 100%;
   border-radius: 100%; // 이미지 적용 후 동글동글
@@ -47,35 +55,35 @@ const ImageSolo = styled.div`
 `;
 
 export default function ImageContainer({
-  type,
+  multiple,
   imgArr,
   setDeleteIdx,
-}: imgcontainer) {
-  if (type === "post") {
+}: ContainerType) {
+  if (multiple === true) {
     return (
-      <ContainerArr>
+      <MultipleCont>
         {imgArr.map((imgele, i) => (
           <ImageListArr key={i}>
             <img src={URL.createObjectURL(imgele)} alt={`preview-${i}`}></img>
             <DeleteButton data-index={i} setDeleteIdx={setDeleteIdx} />
           </ImageListArr>
         ))}
-      </ContainerArr>
+      </MultipleCont>
     );
   }
-  if (type === "profile") {
+  if (multiple === false) {
     const LastImageIdx = imgArr[imgArr.length - 1];
     return (
       <>
         {LastImageIdx && (
-          <ContainerProfile>
-            <ImageSolo>
+          <SingleCont>
+            <Image>
               <img
                 src={URL.createObjectURL(LastImageIdx)}
-                alt={`나의 프로필`}
+                alt={''}
               ></img>
-            </ImageSolo>
-          </ContainerProfile>
+            </Image>
+          </SingleCont>
         )}
       </>
     );
