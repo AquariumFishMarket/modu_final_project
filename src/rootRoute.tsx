@@ -11,6 +11,7 @@ import SearchPage from "./pages/Search/SearchPage";
 
 import PostWrite from "./components/PostWrite";
 import FeedPage from "./pages/Home/FeedPage";
+import PostCardTest from "./pages/PostCardTest";
 
 export default function RootRoute() {
   return (
