@@ -76,8 +76,8 @@ const ImgContainer = styled.div`
   margin: 0 auto;
   position: relative;
   margin-bottom: 30px;
-  width: 110px;
-  height: 110px;
+  width: 150px;
+  height: 150px;
 `;
 
 const BtnContainer = styled.div`
@@ -256,7 +256,7 @@ export default function ProfileForm({
         <ImgContainer>
           {/* 이미지가 없으면 기본 ProfileImg, 있으면 ImageContainer */}
           {!hasSelectedImage ? (
-            <ProfileImg width={110} thumbimg={false} imgSrc={undefined} />
+            <ProfileImg width={150} thumbimg={false} imgSrc={undefined} />
           ) : (
             <ImageContainer
               type="profile"
@@ -266,6 +266,7 @@ export default function ProfileForm({
           )}
           <BtnContainer>
             <ImageUpButton
+              imgArrType="singular"
               colortype="color"
               size="small"
               imgArr={imgFiles}
