@@ -8,12 +8,13 @@ import ProfileSetup from "./pages/profile/ProfileSetup";
 import Profile from "./components/common/profile/Profile";
 import ProfileEdit from "./pages/profile/ProfileEdit";
 import SearchPage from "./pages/Search/SearchPage";
-import PostWrite from "./components/PostWrite";
+import PostWrite from "./pages/post/PostWrite";
 import FeedPage from "./pages/Home/FeedPage";
 
 export default function RootRoute() {
   return (
     <AnimatePresence>
+
       <Routes>
         <Route element={<GlobalLayout />}>
           <Route path="/" />

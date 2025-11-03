@@ -5,7 +5,7 @@ import ImageContainer from "../../components/common/imageUpload/ImageContainer"
 import styled from "styled-components"
 import { motion } from "motion/react"
 
-import TextField from "../../components/common/TextField"
+import PostStateBar from "../../components/common/PostStateBar"
 
 const PostContainer = styled.div`
     height: 100%;
