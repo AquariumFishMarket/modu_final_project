@@ -383,7 +383,7 @@ function Profile() {
       </ProfileSection>
 
       {/* 판매중인상품 영역 */}
-      <SellingProducts />
+      {/* <SellingProducts /> */}
 
       {/* 피드 섹션 - 모든 프로필에서 표시 */}
       <MyFeedSection>
