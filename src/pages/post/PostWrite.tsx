@@ -99,7 +99,7 @@ export default function PostWrite() {
                     <ImageUploadContainer>
                         <ImageUpButtonContainer>
                             <ImageUpButton
-                            imgArrType="plural"
+                            multiple={true}
                             colortype="color"
                             size="small"
                             imgArr={imgArr}

@@ -98,11 +98,10 @@ const FormImgContainer = styled.div<{ $formType: "profile" | "product" }>`
   ${(props) =>
     props.$formType === "product" &&
     `
+    aspect-ratio: 322 / 204;
     min-height: 204px;
-    background-color: var(--color-gray-light);
     border: 1px solid var(--color-gray-medium);
     border-radius: 10px;
-    overflow: hidden;
   `}
 `;
 
@@ -240,7 +239,7 @@ export default function CommonForm({
                 <ProfileImg width={150} thumbimg={false} imgSrc={undefined} />
               ) : (
                 <ImageContainer
-                  type="profile"
+                  multiple={false}
                   imgArr={imgFiles}
                   setDeleteIdx={setDeleteIdx}
                 />
@@ -251,7 +250,6 @@ export default function CommonForm({
           {/* 상품용 이미지 렌더링 */}
           {formType === "product" && (
             <ImageContainer
-              type="post" // 단일 사진만 이용할지, post 방식대로 할지?
               imgArr={imgFiles}
               setDeleteIdx={setDeleteIdx}
             />
@@ -259,7 +257,7 @@ export default function CommonForm({
 
           <FormBtnContainer $formType={formType}>
             <ImageUpButton
-              imgArrType="singular"
+              multiple={false}
               colortype="color"
               size="small"
               imgArr={imgFiles}
