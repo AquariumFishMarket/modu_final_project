@@ -5,13 +5,11 @@ import Login from "./pages/login/Login";
 import LoginEmail from "./pages/login/LoginEmail";
 import Signup from "./pages/signup/Signup";
 import ProfileSetup from "./pages/profile/ProfileSetup";
+import Profile from "./components/common/profile/Profile";
 import ProfileEdit from "./pages/profile/ProfileEdit";
-
 import SearchPage from "./pages/Search/SearchPage";
-
 import PostWrite from "./components/PostWrite";
 import FeedPage from "./pages/Home/FeedPage";
-import PostCardTest from "./pages/PostCardTest";
 
 export default function RootRoute() {
   return (
@@ -22,7 +20,9 @@ export default function RootRoute() {
           <Route path="/login" element={<Login />} />
           <Route path="/login/email" element={<LoginEmail />} />
           <Route path="/signup" element={<Signup />} />
+
           <Route path="/profile/setup" element={<ProfileSetup />} />
+          <Route path="/Profile" element={<Profile />} />
           <Route path="/profile/edit" element={<ProfileEdit />} />
 
           <Route path="/feed" element={<FeedPage />} />
