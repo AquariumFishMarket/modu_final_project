@@ -5,6 +5,8 @@ import ImageContainer from "../../components/common/imageUpload/ImageContainer"
 import styled from "styled-components"
 import { motion } from "motion/react"
 
+import TextField from "../../components/common/TextField"
+
 const PostContainer = styled.div`
     height: 100%;
     margin: 0 auto;
@@ -71,6 +73,10 @@ export default function PostWrite() {
         setTextHeight(target.value)
     }
 
+    const handleSubmit = () => {
+        //게시글 전송 메서드
+    }
+
     useEffect(()=>{
         if(imgArr.length > 0 && textAreaRef.current?.value !=='') {
             setTextPlaceholder('')
@@ -91,6 +97,16 @@ export default function PostWrite() {
             transition={{ duration: 0.5, ease: "easeOut" }}
             style={{ height: '100%' }}
             >
+                <TextField
+                left={
+                    <ImageUpButton imgArrType="singular" colortype="gray"
+                    size="small"
+                    imgArr={[]}
+                    setImgArr={setImgArr}
+                    ></ImageUpButton>
+                }
+                placeholder="댓글을 입력하세요.."
+                />
                 <PostContainer>
                     <ImageUploadContainer>
                         <ImageUpButtonContainer>
