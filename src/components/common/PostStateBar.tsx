@@ -3,7 +3,7 @@ import styled from "styled-components"
 
 interface postStateBar {
     postState: string;
-    setPostState: Dispatch<SetStateAction<string>>;
+    setPostState: Dispatch<SetStateAction<'list'|'gallery'>>;
 }
 
 const BarContainer = styled.div`
@@ -37,7 +37,6 @@ export default function PostStateBar({postState,setPostState}:postStateBar) {
     const ListRef = useRef<HTMLButtonElement | null>(null)
     const GalleryRef = useRef<HTMLButtonElement | null>(null)
 
-
     const handlePostState = (e:React.MouseEvent<HTMLDivElement>) => {
         e.preventDefault();
         const target = e.target as HTMLElement;
@@ -47,7 +46,6 @@ export default function PostStateBar({postState,setPostState}:postStateBar) {
             setPostState('gallery')
         }
     }
-
 
     return (
         <BarContainer>
