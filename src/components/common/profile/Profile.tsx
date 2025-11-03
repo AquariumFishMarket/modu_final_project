@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   ProfileSection,
   ProfileContainer,
@@ -17,8 +17,25 @@ import {
   ActionButtonsContainer,
   IconButton,
   LoadingText,
+  MyFeedSection,
+  MyFeedTitle,
+  PostListContainer,
+  EmptyPostMessage,
 } from "./Profile.styled";
 import DefaultButton from "../Button";
+import SellingProducts from "./SellingProducts";
+import PostCard from "../postCard/PostCard";
+
+//  Profile 컴포넌트
+//   - 내 프로필과 다른 유저의 프로필을 조건부 렌더링
+//   - isMyProfile = (profileData.id === currentUserId)로 구분
+
+//  테스트
+//    1. 내 프로필 보기: profileData.id를 currentUserId와 동일하게 설정 (현재 user123)
+//      - 프로필 수정, 상품 등록 버튼 + 나의 게시글 피드 표시
+
+//    2. 다른 사람 프로필 보기: profileData.id를 다른 값으로 변경 (예: user456)
+//      → 채팅, 팔로우/언팔로우, 공유 버튼 표시 + 피드 미표시
 
 // 사용자 프로필 타입 정의
 interface UserProfile {
@@ -30,10 +47,37 @@ interface UserProfile {
   followerCount: number; // 팔로워 수
   followingCount: number; // 팔로잉 수
   isFollowing: boolean; // 현재 사용자가 팔로우 중인지 여부
+  createdAt?: string; // 가입일 (API 연동 대비)
+  updatedAt?: string; // 프로필 수정일 (API 연동 대비)
+}
+
+// 게시글 더미 데이터 타입
+interface DummyPost {
+  postId: string;
+  content: string;
+  imageSrc: string;
+  imageAlt: string;
+  dateTime: string;
+  dateText: string;
+  likeCount: number;
+  commentCount: number;
+  isLiked: boolean;
 }
 
 function Profile() {
   const navigate = useNavigate();
+
+  // URL 파라미터에서 userId 가져오기 (동적 라우팅 대비)
+  // 예: /profile/:userId 라우트에서 사용
+  const { userId: paramUserId } = useParams<{ userId?: string }>();
+
+  // 실제 로그인된 사용자 ID는 상태관리 따로 해서 (Context API 또는 Redux에서) 가져오기
+  const [currentUserId] = useState<string>("user123"); // 임시 현재 사용자 ID
+
+  // URL 파라미터가 있으면 해당 유저, 없으면 내 프로필
+  // API 연동 시 fetchProfileData(targetUserId)로 사용 예정
+  const targetUserId = paramUserId || currentUserId;
+  console.log("Profile targetUserId:", targetUserId); // 개발용 로그
 
   // 프로필 데이터 상태 관리
   const [profileData, setProfileData] = useState<UserProfile>({
@@ -50,30 +94,38 @@ function Profile() {
   // 로딩 상태
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  // API: 프로필 데이터 가져오기
-  // API 분리 예정 - 렌더링마다 함수 재생성 방지를 위해 주석처리
+  // 게시글 피드 데이터 상태 관리
+  const [userPosts, setUserPosts] = useState<DummyPost[]>([]);
+
+  // 내 프로필인지 다른 사람 프로필인지 구분
+  const isMyProfile = profileData.id && profileData.id === currentUserId;
+
+  // API 분리 예정 - 프로필 데이터 가져오기
   // const fetchProfileData = async (
   //   userId: string
   // ): Promise<UserProfile | null> => {
   //   try {
-  //     // 실제 API 엔드포인트로 교체
-  //     // const response = await fetch(`/api/users/${userId}/profile`);
-  //     // const data = await response.json();
-  //     // return data;
-
-  //     // 임시 데이터 (실제 API 연결 시 삭제)
-  //     return {
-  //       id: "user123",
-  //       userName: "물고기마켓",
-  //       userId: "@fishmarket",
-  //       profileImage: "/img/fish_profile.png",
-  //       description: "물고기를 사랑하는 사람들의 커뮤니티",
-  //       followerCount: 1234,
-  //       followingCount: 567,
-  //       isFollowing: false,
-  //     };
+  //     const response = await fetch(`/api/users/${userId}/profile`);
+  //     if (!response.ok) throw new Error('프로필 데이터 가져오기 실패');
+  //     const data = await response.json();
+  //     return data;
   //   } catch (error) {
   //     console.error("프로필 데이터 가져오기 실패:", error);
+  //     return null;
+  //   }
+  // };
+
+  // API 분리 예정 - 사용자 게시글 피드 가져오기
+  // const fetchUserPosts = async (
+  //   userId: string
+  // ): Promise<DummyPost[] | null> => {
+  //   try {
+  //     const response = await fetch(`/api/users/${userId}/posts`);
+  //     if (!response.ok) throw new Error('게시글 데이터 가져오기 실패');
+  //     const data = await response.json();
+  //     return data;
+  //   } catch (error) {
+  //     console.error("게시글 데이터 가져오기 실패:", error);
   //     return null;
   //   }
   // };
@@ -83,14 +135,15 @@ function Profile() {
     // 1. 현재 상태 스냅샷 저장 (롤백용)
     const previousData = profileData;
 
-    // 2. 낙관적 업데이트
+    // 2. 낙관적 업데이트 (팔로워 수 음수 방지)
     const newFollowState = !profileData.isFollowing;
     setProfileData((prev) => ({
       ...prev,
       isFollowing: newFollowState,
-      followerCount: newFollowState
-        ? prev.followerCount + 1
-        : prev.followerCount - 1,
+      followerCount: Math.max(
+        0,
+        newFollowState ? prev.followerCount + 1 : prev.followerCount - 1
+      ),
     }));
 
     // 3. API 호출
@@ -120,12 +173,12 @@ function Profile() {
 
   // 팔로워 목록 클릭 핸들러
   const handleFollowerClick = (): void => {
-    navigate(`/profile/${profileData.userId}/followers`);
+    navigate(`/profile/${encodeURIComponent(profileData.userId)}/followers`);
   };
 
   // 팔로잉 목록 클릭 핸들러
   const handleFollowingClick = (): void => {
-    navigate(`/profile/${profileData.userId}/following`);
+    navigate(`/profile/${encodeURIComponent(profileData.userId)}/following`);
   };
 
   // 이미지 로드 에러 핸들러
@@ -135,8 +188,51 @@ function Profile() {
     e.currentTarget.src = "/img/fish_profile.png";
   };
 
+  // 프로필 수정 버튼 클릭 핸들러
+  const handleEditProfile = (): void => {
+    navigate("/profile/edit");
+  };
+
+  // 상품 등록 버튼 클릭 핸들러
+  const handleUploadProduct = (): void => {
+    navigate("/product/upload");
+  };
+
+  // 게시글 좋아요 토글 핸들러 (낙관적 업데이트)
+  const handleLikeToggle = async (postId: string): Promise<void> => {
+    // 1. 현재 상태 스냅샷 저장 (롤백용)
+    const prevPosts = userPosts;
+
+    // 2. 낙관적 업데이트
+    setUserPosts((prev) =>
+      prev.map((p) =>
+        p.postId === postId
+          ? {
+              ...p,
+              isLiked: !p.isLiked,
+              likeCount: p.isLiked ? p.likeCount - 1 : p.likeCount + 1,
+            }
+          : p
+      )
+    );
+
+    // 3. API 호출
+    try {
+      // 실제 API 엔드포인트로 교체
+      // const response = await fetch(`/api/posts/${postId}/like`, {
+      //   method: "POST",
+      // });
+      // if (!response.ok) throw new Error("좋아요 처리 실패");
+      console.log("좋아요 처리 성공:", postId);
+    } catch (error) {
+      console.error("좋아요 실패:", error);
+      // 4. 실패 시 원래 상태로 복원
+      setUserPosts(prevPosts);
+    }
+  };
+
   // 프로필 공유 버튼 클릭 핸들러
-  // 공유 기능 구현 예정 - 공유 방식 고민(텍스트만 복사할지 아니면 Web Share API사용할지)
+  // 공유 기능 구현 예정 - 공유 방식 고민(링크만 복사할지 아니면 Web Share API사용할지)
   // const handleShareClick = async (): Promise<void> => {
   //   const profileUrl = `${window.location.origin}/profile/${profileData.userId}`;
 
@@ -159,23 +255,33 @@ function Profile() {
   //   }
   // };
 
-  // 컴포넌트 마운트 시 프로필 데이터 로드
+  // 컴포넌트 마운트 시 프로필 데이터 및 게시글 로드
   useEffect(() => {
-    // API 분리 후 실제 데이터 로드 로직 구현
-    // const loadProfile = async (): Promise<void> => {
+    // API 연동 - 프로필 데이터 및 게시글 로드
+    // const loadProfileAndPosts = async (): Promise<void> => {
     //   setIsLoading(true);
     //   try {
-    //     // 실제 사용자 ID로 교체
-    //     const data = await fetchProfileData("currentUserId");
-    //     if (data) {
-    //       setProfileData(data);
+    //     // 1. 프로필 데이터 로드 (targetUserId 사용)
+    //     const profileData = await fetchProfileData(targetUserId);
+    //     if (profileData) {
+    //       setProfileData(profileData);
+    //
+    //       // 2. 내 프로필일 경우에만 게시글 피드 로드
+    //       if (profileData.id === currentUserId) {
+    //         const posts = await fetchUserPosts(profileData.id);
+    //         if (posts) {
+    //           setUserPosts(posts);
+    //         }
+    //       }
     //     }
+    //   } catch (error) {
+    //     console.error("데이터 로드 실패:", error);
     //   } finally {
     //     setIsLoading(false);
     //   }
     // };
-
-    // loadProfile();
+    //
+    // loadProfileAndPosts();
 
     // 임시: 로딩 상태 해제
     setIsLoading(false);
@@ -191,75 +297,133 @@ function Profile() {
   }
 
   return (
-    <ProfileSection>
-      <h2 className="sr-only">프로필</h2>
-      <ProfileContainer>
-        {/* 상단: 팔로워 - 이미지 - 팔로잉 */}
-        <ProfileTopSection>
-          {/* 팔로워 수 */}
-          <FollowStatBox onClick={handleFollowerClick}>
-            <FollowerValue>{profileData.followerCount}</FollowerValue>
-            <FollowText>followers</FollowText>
-          </FollowStatBox>
+    <>
+      <ProfileSection>
+        <h2 className="sr-only">프로필</h2>
+        <ProfileContainer>
+          {/* 상단: 팔로워 - 이미지 - 팔로잉 */}
+          <ProfileTopSection>
+            {/* 팔로워 수 */}
+            <FollowStatBox onClick={handleFollowerClick}>
+              <FollowerValue>{profileData.followerCount}</FollowerValue>
+              <FollowText>followers</FollowText>
+            </FollowStatBox>
 
-          {/* 프로필 이미지 */}
-          <ProfileImageBox>
-            <ProfileImage
-              src={profileData.profileImage}
-              alt={`${profileData.userName}의 프로필 이미지`}
-              onError={handleImageError}
-            />
-          </ProfileImageBox>
+            {/* 프로필 이미지 */}
+            <ProfileImageBox>
+              <ProfileImage
+                src={profileData.profileImage}
+                alt={`${profileData.userName}의 프로필 이미지`}
+                onError={handleImageError}
+              />
+            </ProfileImageBox>
 
-          {/* 팔로잉 수 */}
-          <FollowStatBox onClick={handleFollowingClick}>
-            <FollowingValue>{profileData.followingCount}</FollowingValue>
-            <FollowText>following</FollowText>
-          </FollowStatBox>
-        </ProfileTopSection>
+            {/* 팔로잉 수 */}
+            <FollowStatBox onClick={handleFollowingClick}>
+              <FollowingValue>{profileData.followingCount}</FollowingValue>
+              <FollowText>following</FollowText>
+            </FollowStatBox>
+          </ProfileTopSection>
 
-        {/* 유저 정보 (이름 + 아이디) */}
-        <UserInfoBox>
-          <UserName>{profileData.userName}</UserName>
-          <UserId>{profileData.userId}</UserId>
-        </UserInfoBox>
-      </ProfileContainer>
+          {/* 유저 정보 (이름 + 아이디) */}
+          <UserInfoBox>
+            <UserName>{profileData.userName}</UserName>
+            <UserId>{profileData.userId}</UserId>
+          </UserInfoBox>
+        </ProfileContainer>
 
-      {/* 사용자 소개 */}
-      <UserDescription>{profileData.description}</UserDescription>
+        {/* 사용자 소개 */}
+        <UserDescription>{profileData.description}</UserDescription>
 
-      {/* 액션 버튼들 */}
-      <ActionButtonsContainer>
-        {/* 채팅 버튼 */}
-        <IconButton
-          $iconUrl="/img/message-circle.svg"
-          onClick={handleChatClick}
-          aria-label="채팅하기"
-        />
+        {/* 액션 버튼들 - 내 프로필 vs 다른 사람 프로필에 따라 다르게 렌더링 */}
+        <ActionButtonsContainer>
+          {isMyProfile ? (
+            <>
+              {/* 내 프로필: 프로필 수정 + 상품 등록 버튼 */}
+              <DefaultButton
+                text="프로필 수정"
+                variant="secondary"
+                width={120}
+                onClick={handleEditProfile}
+              />
+              <DefaultButton
+                text="상품 등록"
+                variant="primary"
+                width={120}
+                onClick={handleUploadProduct}
+              />
+            </>
+          ) : (
+            <>
+              {/* 다른 사람 프로필: 채팅 + 팔로우 + 공유 버튼 */}
+              {/* 채팅 버튼 */}
+              <IconButton
+                $iconUrl="/img/message-circle.svg"
+                onClick={handleChatClick}
+                aria-label="채팅하기"
+              />
 
-        {/* 팔로우/언팔로우 버튼 */}
-        <DefaultButton
-          text={profileData.isFollowing ? "언팔로우" : "팔로우"}
-          variant={profileData.isFollowing ? "secondary" : "primary"}
-          width={120}
-          onClick={handleFollowToggle}
-        />
+              {/* 팔로우/언팔로우 버튼 */}
+              <DefaultButton
+                text={profileData.isFollowing ? "언팔로우" : "팔로우"}
+                variant={profileData.isFollowing ? "secondary" : "primary"}
+                width={120}
+                onClick={handleFollowToggle}
+              />
 
-        {/* 공유 버튼 - 공유 기능 구현 예정 */}
-        <IconButton
-          $iconUrl="/img/icon-share.svg"
-          onClick={() => console.log("공유 기능 구현 예정")}
-          aria-label="프로필 공유하기"
-        />
-      </ActionButtonsContainer>
-    </ProfileSection>
+              {/* 공유 버튼 - 공유 기능 구현 예정 */}
+              <IconButton
+                $iconUrl="/img/icon-share.svg"
+                onClick={() => console.log("공유 기능 구현 예정")}
+                aria-label="프로필 공유하기"
+              />
+            </>
+          )}
+        </ActionButtonsContainer>
+      </ProfileSection>
 
-    // 판매중인상품 영역
-    // <sellingProducts/>
+      {/* 판매중인상품 영역 */}
+      <SellingProducts />
 
-    // 피드 헤더 추가
+      {/* 피드 섹션 - 모든 프로필에서 표시 */}
+      <MyFeedSection>
+        <MyFeedTitle>
+          {isMyProfile ? "나의 게시글" : `${profileData.userName}님의 게시글`}
+        </MyFeedTitle>
 
-    // 피드 게시물 추가
+        <PostListContainer>
+          {userPosts.length > 0 ? (
+            userPosts.map((post) => (
+              <PostCard
+                key={post.postId}
+                postId={post.postId}
+                userName={profileData.userName}
+                userId={profileData.userId}
+                avatarSrc={profileData.profileImage}
+                avatarAlt={`${profileData.userName}의 프로필 이미지`}
+                content={post.content}
+                imageSrc={post.imageSrc}
+                imageAlt={post.imageAlt}
+                dateTime={post.dateTime}
+                dateText={post.dateText}
+                likeCount={post.likeCount}
+                commentCount={post.commentCount}
+                isLiked={post.isLiked}
+                onLikeClick={() => handleLikeToggle(post.postId)}
+                onCommentClick={() => console.log("댓글 클릭:", post.postId)}
+                onMoreClick={(postId) => console.log("더보기 클릭:", postId)}
+              />
+            ))
+          ) : (
+            <EmptyPostMessage>
+              {isMyProfile
+                ? "아직 작성한 게시글이 없습니다."
+                : `${profileData.userName}님이 작성한 게시글이 없습니다.`}
+            </EmptyPostMessage>
+          )}
+        </PostListContainer>
+      </MyFeedSection>
+    </>
   );
 }
 
