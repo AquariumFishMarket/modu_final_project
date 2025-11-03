@@ -22,7 +22,7 @@ export default function RootRoute() {
           <Route path="/signup" element={<Signup />} />
 
           <Route path="/profile/setup" element={<ProfileSetup />} />
-          <Route path="/Profile" element={<Profile />} />
+          <Route path="/profile" element={<Profile />} />
           <Route path="/profile/edit" element={<ProfileEdit />} />
 
           <Route path="/feed" element={<FeedPage />} />

@@ -19,18 +19,8 @@ import {
   LoadingText,
 } from "./Profile.styled";
 import DefaultButton from "../Button";
-
-// 사용자 프로필 타입 정의
-interface UserProfile {
-  id: string; // 사용자 고유 ID
-  userName: string; // 사용자 이름
-  userId: string; // 사용자 ID (예: @username)
-  profileImage: string; // 프로필 이미지 URL
-  description: string; // 사용자 소개
-  followerCount: number; // 팔로워 수
-  followingCount: number; // 팔로잉 수
-  isFollowing: boolean; // 현재 사용자가 팔로우 중인지 여부
-}
+import SellingProducts from "./SellingProducts";
+import type { UserProfile } from "../../../types/user";
 
 function Profile() {
   const navigate = useNavigate();
@@ -50,14 +40,26 @@ function Profile() {
   // 로딩 상태
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
+  // 실제 로그인한 사용자 ID (추후 Auth Context나 Redux에서 가져올 예정)
+  // const currentUserId = ""; // 임시로 빈 문자열
+
+  // 내 프로필인지 여부 확인 (임시로 false로 설정하여 다른 사람 프로필 테스트)
+  const isMyProfile = true; // 원래: profileData.id !== "" && profileData.id === currentUserId;
+
   // API: 프로필 데이터 가져오기
   // API 분리 예정 - 렌더링마다 함수 재생성 방지를 위해 주석처리
   // const fetchProfileData = async (
-  //   userId: string
+  //   accountname: string
   // ): Promise<UserProfile | null> => {
   //   try {
+  //     // accountname 빈 값 검증 추가
+  //     // if (!accountname || accountname.trim() === "") {
+  //     //   throw new Error("유효하지 않은 사용자 ID입니다");
+  //     // }
+  //
   //     // 실제 API 엔드포인트로 교체
-  //     // const response = await fetch(`/api/users/${userId}/profile`);
+  //     // const response = await fetch(`/api/profile/${accountname}`);
+  //     // if (!response.ok) throw new Error('프로필을 불러올 수 없습니다');
   //     // const data = await response.json();
   //     // return data;
 
@@ -78,8 +80,14 @@ function Profile() {
   //   }
   // };
 
+  // 팔로우 처리 중 상태 (중복 클릭 방지)
+  const [isFollowLoading, setIsFollowLoading] = useState(false);
+
   // API: 팔로우/언팔로우 처리 (낙관적 업데이트)
   const handleFollowToggle = async (): Promise<void> => {
+    // 중복 클릭 방지
+    if (isFollowLoading) return;
+
     // 1. 현재 상태 스냅샷 저장 (롤백용)
     const previousData = profileData;
 
@@ -88,12 +96,14 @@ function Profile() {
     setProfileData((prev) => ({
       ...prev,
       isFollowing: newFollowState,
+      // 팔로워 수 음수 방지
       followerCount: newFollowState
         ? prev.followerCount + 1
-        : prev.followerCount - 1,
+        : Math.max(0, prev.followerCount - 1),
     }));
 
     // 3. API 호출
+    setIsFollowLoading(true);
     try {
       // 실제 API 엔드포인트로 교체
       // const response = await fetch(`/api/users/${profileData.id}/follow`, {
@@ -109,6 +119,8 @@ function Profile() {
       console.error("팔로우 처리 실패:", error);
       // 4. 실패 시 정확한 원래 상태로 복원
       setProfileData(previousData);
+    } finally {
+      setIsFollowLoading(false);
     }
   };
 
@@ -120,12 +132,12 @@ function Profile() {
 
   // 팔로워 목록 클릭 핸들러
   const handleFollowerClick = (): void => {
-    navigate(`/profile/${profileData.userId}/followers`);
+    navigate(`/profile/${encodeURIComponent(profileData.userId)}/followers`);
   };
 
   // 팔로잉 목록 클릭 핸들러
   const handleFollowingClick = (): void => {
-    navigate(`/profile/${profileData.userId}/following`);
+    navigate(`/profile/${encodeURIComponent(profileData.userId)}/following`);
   };
 
   // 이미지 로드 에러 핸들러
@@ -191,75 +203,98 @@ function Profile() {
   }
 
   return (
-    <ProfileSection>
-      <h2 className="sr-only">프로필</h2>
-      <ProfileContainer>
-        {/* 상단: 팔로워 - 이미지 - 팔로잉 */}
-        <ProfileTopSection>
-          {/* 팔로워 수 */}
-          <FollowStatBox onClick={handleFollowerClick}>
-            <FollowerValue>{profileData.followerCount}</FollowerValue>
-            <FollowText>followers</FollowText>
-          </FollowStatBox>
+    <>
+      <ProfileSection>
+        <h2 className="sr-only">프로필</h2>
+        <ProfileContainer>
+          {/* 상단: 팔로워 - 이미지 - 팔로잉 */}
+          <ProfileTopSection>
+            {/* 팔로워 수 */}
+            <FollowStatBox onClick={handleFollowerClick}>
+              <FollowerValue>{profileData.followerCount}</FollowerValue>
+              <FollowText>followers</FollowText>
+            </FollowStatBox>
 
-          {/* 프로필 이미지 */}
-          <ProfileImageBox>
-            <ProfileImage
-              src={profileData.profileImage}
-              alt={`${profileData.userName}의 프로필 이미지`}
-              onError={handleImageError}
-            />
-          </ProfileImageBox>
+            {/* 프로필 이미지 */}
+            <ProfileImageBox>
+              <ProfileImage
+                src={profileData.profileImage}
+                alt={`${profileData.userName}의 프로필 이미지`}
+                onError={handleImageError}
+              />
+            </ProfileImageBox>
 
-          {/* 팔로잉 수 */}
-          <FollowStatBox onClick={handleFollowingClick}>
-            <FollowingValue>{profileData.followingCount}</FollowingValue>
-            <FollowText>following</FollowText>
-          </FollowStatBox>
-        </ProfileTopSection>
+            {/* 팔로잉 수 */}
+            <FollowStatBox onClick={handleFollowingClick}>
+              <FollowingValue>{profileData.followingCount}</FollowingValue>
+              <FollowText>following</FollowText>
+            </FollowStatBox>
+          </ProfileTopSection>
 
-        {/* 유저 정보 (이름 + 아이디) */}
-        <UserInfoBox>
-          <UserName>{profileData.userName}</UserName>
-          <UserId>{profileData.userId}</UserId>
-        </UserInfoBox>
-      </ProfileContainer>
+          {/* 유저 정보 (이름 + 아이디) */}
+          <UserInfoBox>
+            <UserName>{profileData.userName}</UserName>
+            <UserId>{profileData.userId}</UserId>
+          </UserInfoBox>
+        </ProfileContainer>
 
-      {/* 사용자 소개 */}
-      <UserDescription>{profileData.description}</UserDescription>
+        {/* 사용자 소개 */}
+        <UserDescription>{profileData.description}</UserDescription>
 
-      {/* 액션 버튼들 */}
-      <ActionButtonsContainer>
-        {/* 채팅 버튼 */}
-        <IconButton
-          $iconUrl="/img/message-circle.svg"
-          onClick={handleChatClick}
-          aria-label="채팅하기"
-        />
+        {/* 액션 버튼들 */}
+        <ActionButtonsContainer>
+          {isMyProfile ? (
+            <>
+              {/* 내 프로필일 때: 프로필 수정 + 상품 등록 버튼 표시 */}
+              <DefaultButton
+                text="프로필 수정"
+                variant="secondary"
+                width={120}
+                onClick={() => navigate("/profile/edit")}
+              />
+              <DefaultButton
+                text="상품 등록"
+                variant="secondary"
+                width={120}
+                onClick={() => navigate("/product/add")}
+              />
+            </>
+          ) : (
+            <>
+              {/* 다른 사람 프로필일 때: 채팅 + 팔로우 + 공유 버튼 표시 */}
+              {/* 채팅 버튼 */}
+              <IconButton
+                $iconUrl="/img/message-circle.svg"
+                onClick={handleChatClick}
+                aria-label="채팅하기"
+              />
 
-        {/* 팔로우/언팔로우 버튼 */}
-        <DefaultButton
-          text={profileData.isFollowing ? "언팔로우" : "팔로우"}
-          variant={profileData.isFollowing ? "secondary" : "primary"}
-          width={120}
-          onClick={handleFollowToggle}
-        />
+              {/* 팔로우/언팔로우 버튼 */}
+              <DefaultButton
+                text={profileData.isFollowing ? "언팔로우" : "팔로우"}
+                variant={profileData.isFollowing ? "secondary" : "primary"}
+                width={120}
+                onClick={handleFollowToggle}
+              />
 
-        {/* 공유 버튼 - 공유 기능 구현 예정 */}
-        <IconButton
-          $iconUrl="/img/icon-share.svg"
-          onClick={() => console.log("공유 기능 구현 예정")}
-          aria-label="프로필 공유하기"
-        />
-      </ActionButtonsContainer>
-    </ProfileSection>
+              {/* 공유 버튼 - 공유 기능 구현 예정 */}
+              <IconButton
+                $iconUrl="/img/icon-share.svg"
+                onClick={() => console.log("공유 기능 구현 예정")}
+                aria-label="프로필 공유하기"
+              />
+            </>
+          )}
+        </ActionButtonsContainer>
+      </ProfileSection>
 
-    // 판매중인상품 영역
-    // <sellingProducts/>
+      {/* 판매중인상품 영역 */}
+      <SellingProducts />
 
-    // 피드 헤더 추가
+      {/* 피드 헤더 추가 */}
 
-    // 피드 게시물 추가
+      {/* 피드 게시물 추가 */}
+    </>
   );
 }
 
