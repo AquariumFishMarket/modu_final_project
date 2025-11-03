@@ -55,20 +55,6 @@ interface UserProfile {
   updatedAt?: string; // 프로필 수정일 (API 연동 대비)
 }
 
-// 게시글 더미 데이터 타입
-interface DummyPost {
-  postId: string;
-  content: string;
-  imageSrc: string;
-  imageAlt: string;
-  dateTime: string;
-  dateText: string;
-  likeCount: number;
-  commentCount: number;
-  isLiked: boolean;
-}
-
-
 function Profile() {
   const navigate = useNavigate();
 
@@ -98,16 +84,6 @@ function Profile() {
 
   // 로딩 상태
   const [isLoading, setIsLoading] = useState<boolean>(true);
-
-
-  // 실제 로그인한 사용자 ID (추후 Auth Context나 Redux에서 가져올 예정)
-  // const currentUserId = ""; // 임시로 빈 문자열
-
-  // 내 프로필인지 여부 확인 (임시로 false로 설정하여 다른 사람 프로필 테스트)
-  const isMyProfile = true; // 원래: profileData.id !== "" && profileData.id === currentUserId;
-
-  // API: 프로필 데이터 가져오기
-  // API 분리 예정 - 렌더링마다 함수 재생성 방지를 위해 주석처리
 
   // 게시글 피드 데이터 상태 관리
   const [userPosts, setUserPosts] = useState<DummyPost[]>([]);
@@ -156,7 +132,6 @@ function Profile() {
   //   }
   // };
 
-
   // 팔로우 처리 중 상태 (중복 클릭 방지)
   const [isFollowLoading, setIsFollowLoading] = useState(false);
 
@@ -174,7 +149,6 @@ function Profile() {
   //     return null;
   //   }
   // };
-
 
   // API: 팔로우/언팔로우 처리 (낙관적 업데이트)
   const handleFollowToggle = async (): Promise<void> => {
@@ -393,42 +367,20 @@ function Profile() {
         {/* 사용자 소개 */}
         <UserDescription>{profileData.description}</UserDescription>
 
-
-        {/* 액션 버튼들 */}
-        <ActionButtonsContainer>
-          {isMyProfile ? (
-            <>
-              {/* 내 프로필일 때: 프로필 수정 + 상품 등록 버튼 표시 */}
-
         {/* 액션 버튼들 - 내 프로필 vs 다른 사람 프로필에 따라 다르게 렌더링 */}
         <ActionButtonsContainer>
           {isMyProfile ? (
             <>
               {/* 내 프로필: 프로필 수정 + 상품 등록 버튼 */}
-
               <DefaultButton
                 text="프로필 수정"
                 variant="secondary"
                 width={120}
-
-                onClick={() => navigate("/profile/edit")}
-              />
-              <DefaultButton
-                text="상품 등록"
-                variant="secondary"
-                width={120}
-                onClick={() => navigate("/product/add")}
-              />
-            </>
-          ) : (
-            <>
-              {/* 다른 사람 프로필일 때: 채팅 + 팔로우 + 공유 버튼 표시 */}
-
                 onClick={handleEditProfile}
               />
               <DefaultButton
                 text="상품 등록"
-                variant="primary"
+                variant="secondary"
                 width={120}
                 onClick={handleUploadProduct}
               />
@@ -465,7 +417,6 @@ function Profile() {
 
       {/* 판매중인상품 영역 */}
       {/* <SellingProducts /> */}
-
 
       {/* 피드 헤더 추가 */}
 
@@ -509,7 +460,6 @@ function Profile() {
           )}
         </PostListContainer>
       </MyFeedSection>
-
     </>
   );
 }
