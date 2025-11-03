@@ -3,9 +3,15 @@ import { Link } from "react-router-dom";
 import SocialButton from "../../components/common/SocialButton";
 
 const LoginContainer = styled.section`
+  position: absolute; /* 전체화면을 위해 */
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   flex-direction: column;
-  flex: 1;
+  max-width: 600px;
+  width: 100%;
+  height: 100vh;
   background-color: var(--color-primary-600);
 `;
 
