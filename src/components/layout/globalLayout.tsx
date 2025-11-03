@@ -1,6 +1,5 @@
 import Header from "../common/Header";
 import FooterNav from "../common/FooterNav";
-// import ProfileImg from "../common/ProfileImg";
 import { Outlet, useLocation } from "react-router-dom";
 import styled from "styled-components";
 
@@ -37,7 +36,7 @@ export default function GlobalLayout() {
   ];
 
   // Header를 숨길 경로들
-  const hideHeadPaths = ["/login", "/login/email", "signup", "/profile/setup"];
+  const hideHeadPaths = ["/login", "/login/email", "/signup", "/profile/setup"];
 
   // 현재 경로가 숨김 목록에 있는지 확인
   const shouldHideNav = hideNavPaths.some((path) =>
@@ -52,7 +51,6 @@ export default function GlobalLayout() {
     <LayoutContainer>
       {!shouldHideHead && <Header />}
       <MainContent $hasFooter={!shouldHideNav}>
-        {/* <ProfileImg thumbimg={false} width={110} /> */}
         <Outlet />
       </MainContent>
       {!shouldHideNav && <FooterNav />}
