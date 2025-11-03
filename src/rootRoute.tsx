@@ -18,12 +18,9 @@ export default function RootRoute() {
 
       <Routes>
         <Route element={<GlobalLayout />}>
-<<<<<<< HEAD
-          <Route path="/"/>
-=======
           <Route path="/" />
           {/* 로그인, 회원가입 */}
->>>>>>> f44ad6881f21cb419b773e66686d2a0b8016c72d
+
           <Route path="/login" element={<Login />} />
           <Route path="/login/email" element={<LoginEmail />} />
           <Route path="/signup" element={<Signup />} />
