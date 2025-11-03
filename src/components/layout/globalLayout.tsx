@@ -18,7 +18,8 @@ const MainContent = styled.main<{ $hasFooter: boolean }>`
   padding-left: 15px;
   padding-right: 15px;
   height: 100vh;
-  overflow-y: scroll;
+  overflow-x: hidden;
+  overflow-y: auto;
   padding-bottom: ${(props) => (props.$hasFooter ? "110px" : "50px")};
 `;
 
@@ -33,6 +34,7 @@ export default function GlobalLayout() {
     "/login/email",
     "/profile/setup",
     "/profile/edit",
+    "/product/add",
   ];
 
   // Header를 숨길 경로들

@@ -123,3 +123,28 @@ export const LoadingText = styled.p`
   text-align: center;
   padding: 2rem;
 `;
+
+// 내 프로필 피드 섹션
+export const MyFeedSection = styled.section`
+  margin-top: 2rem;
+`;
+
+export const MyFeedTitle = styled.h2`
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 1.6rem;
+  padding: 0 1.6rem;
+`;
+
+export const PostListContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1.6rem;
+`;
+
+export const EmptyPostMessage = styled.p`
+  text-align: center;
+  color: var(--color-gray-semi-dark);
+  padding: 2rem;
+  font-size: 1.4rem;
+`;
