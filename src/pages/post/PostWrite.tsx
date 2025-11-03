@@ -89,15 +89,7 @@ export default function PostWrite() {
         setDeleteIdx(undefined);
     },[deleteIndex])
 
-    const [postState,setPostState]=useState<'list'|'gallery'>('list')
-
     return (
-        <>
-
-<PostStateBar
-postState={postState}
-setPostState={setPostState}
-></PostStateBar>
         <div style={{ height: '100%', overflow: 'hidden' }}>
             <motion.div initial={{ y: '100%', opacity: 0 }}
             animate={{ y: 0, opacity: 1}}
@@ -134,6 +126,5 @@ setPostState={setPostState}
                 </PostContainer>
             </motion.div>
         </div>
-        </>
     )
 }
