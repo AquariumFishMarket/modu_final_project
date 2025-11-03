@@ -23,6 +23,10 @@ import {
   EmptyPostMessage,
 } from "./Profile.styled";
 import DefaultButton from "../Button";
+
+import SellingProducts from "./SellingProducts";
+import type { UserProfile } from "../../../types/user";
+
 // import SellingProducts from "./SellingProducts";
 import PostCard from "../postCard/PostCard";
 
@@ -64,6 +68,7 @@ interface DummyPost {
   isLiked: boolean;
 }
 
+
 function Profile() {
   const navigate = useNavigate();
 
@@ -94,6 +99,16 @@ function Profile() {
   // 로딩 상태
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
+
+  // 실제 로그인한 사용자 ID (추후 Auth Context나 Redux에서 가져올 예정)
+  // const currentUserId = ""; // 임시로 빈 문자열
+
+  // 내 프로필인지 여부 확인 (임시로 false로 설정하여 다른 사람 프로필 테스트)
+  const isMyProfile = true; // 원래: profileData.id !== "" && profileData.id === currentUserId;
+
+  // API: 프로필 데이터 가져오기
+  // API 분리 예정 - 렌더링마다 함수 재생성 방지를 위해 주석처리
+
   // 게시글 피드 데이터 상태 관리
   const [userPosts, setUserPosts] = useState<DummyPost[]>([]);
 
@@ -101,19 +116,49 @@ function Profile() {
   const isMyProfile = profileData.id && profileData.id === currentUserId;
 
   // API 분리 예정 - 프로필 데이터 가져오기
+
   // const fetchProfileData = async (
-  //   userId: string
+  //   accountname: string
   // ): Promise<UserProfile | null> => {
   //   try {
+
+  //     // accountname 빈 값 검증 추가
+  //     // if (!accountname || accountname.trim() === "") {
+  //     //   throw new Error("유효하지 않은 사용자 ID입니다");
+  //     // }
+  //
+  //     // 실제 API 엔드포인트로 교체
+  //     // const response = await fetch(`/api/profile/${accountname}`);
+  //     // if (!response.ok) throw new Error('프로필을 불러올 수 없습니다');
+  //     // const data = await response.json();
+  //     // return data;
+
+  //     // 임시 데이터 (실제 API 연결 시 삭제)
+  //     return {
+  //       id: "user123",
+  //       userName: "물고기마켓",
+  //       userId: "@fishmarket",
+  //       profileImage: "/img/fish_profile.png",
+  //       description: "물고기를 사랑하는 사람들의 커뮤니티",
+  //       followerCount: 1234,
+  //       followingCount: 567,
+  //       isFollowing: false,
+  //     };
+
   //     const response = await fetch(`/api/users/${userId}/profile`);
   //     if (!response.ok) throw new Error('프로필 데이터 가져오기 실패');
   //     const data = await response.json();
   //     return data;
+
   //   } catch (error) {
   //     console.error("프로필 데이터 가져오기 실패:", error);
   //     return null;
   //   }
   // };
+
+
+  // 팔로우 처리 중 상태 (중복 클릭 방지)
+  const [isFollowLoading, setIsFollowLoading] = useState(false);
 
   // API 분리 예정 - 사용자 게시글 피드 가져오기
   // const fetchUserPosts = async (
@@ -130,8 +175,12 @@ function Profile() {
   //   }
   // };
 
+
   // API: 팔로우/언팔로우 처리 (낙관적 업데이트)
   const handleFollowToggle = async (): Promise<void> => {
+    // 중복 클릭 방지
+    if (isFollowLoading) return;
+
     // 1. 현재 상태 스냅샷 저장 (롤백용)
     const previousData = profileData;
 
@@ -140,6 +189,12 @@ function Profile() {
     setProfileData((prev) => ({
       ...prev,
       isFollowing: newFollowState,
+
+      // 팔로워 수 음수 방지
+      followerCount: newFollowState
+        ? prev.followerCount + 1
+        : Math.max(0, prev.followerCount - 1),
+
       followerCount: Math.max(
         0,
         newFollowState ? prev.followerCount + 1 : prev.followerCount - 1
@@ -147,6 +202,7 @@ function Profile() {
     }));
 
     // 3. API 호출
+    setIsFollowLoading(true);
     try {
       // 실제 API 엔드포인트로 교체
       // const response = await fetch(`/api/users/${profileData.id}/follow`, {
@@ -162,6 +218,8 @@ function Profile() {
       console.error("팔로우 처리 실패:", error);
       // 4. 실패 시 정확한 원래 상태로 복원
       setProfileData(previousData);
+    } finally {
+      setIsFollowLoading(false);
     }
   };
 
@@ -335,15 +393,37 @@ function Profile() {
         {/* 사용자 소개 */}
         <UserDescription>{profileData.description}</UserDescription>
 
+
+        {/* 액션 버튼들 */}
+        <ActionButtonsContainer>
+          {isMyProfile ? (
+            <>
+              {/* 내 프로필일 때: 프로필 수정 + 상품 등록 버튼 표시 */}
+
         {/* 액션 버튼들 - 내 프로필 vs 다른 사람 프로필에 따라 다르게 렌더링 */}
         <ActionButtonsContainer>
           {isMyProfile ? (
             <>
               {/* 내 프로필: 프로필 수정 + 상품 등록 버튼 */}
+
               <DefaultButton
                 text="프로필 수정"
                 variant="secondary"
                 width={120}
+
+                onClick={() => navigate("/profile/edit")}
+              />
+              <DefaultButton
+                text="상품 등록"
+                variant="secondary"
+                width={120}
+                onClick={() => navigate("/product/add")}
+              />
+            </>
+          ) : (
+            <>
+              {/* 다른 사람 프로필일 때: 채팅 + 팔로우 + 공유 버튼 표시 */}
+
                 onClick={handleEditProfile}
               />
               <DefaultButton
@@ -356,6 +436,7 @@ function Profile() {
           ) : (
             <>
               {/* 다른 사람 프로필: 채팅 + 팔로우 + 공유 버튼 */}
+
               {/* 채팅 버튼 */}
               <IconButton
                 $iconUrl="/img/message-circle.svg"
@@ -384,6 +465,11 @@ function Profile() {
 
       {/* 판매중인상품 영역 */}
       {/* <SellingProducts /> */}
+
+
+      {/* 피드 헤더 추가 */}
+
+      {/* 피드 게시물 추가 */}
 
       {/* 피드 섹션 - 모든 프로필에서 표시 */}
       <MyFeedSection>
@@ -423,6 +509,7 @@ function Profile() {
           )}
         </PostListContainer>
       </MyFeedSection>
+
     </>
   );
 }
