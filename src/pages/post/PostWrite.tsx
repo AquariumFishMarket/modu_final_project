@@ -5,7 +5,7 @@ import ImageContainer from "../../components/common/imageUpload/ImageContainer"
 import styled from "styled-components"
 import { motion } from "motion/react"
 
-import TextField from "../../components/common/TextField"
+import PostStateBar from "../../components/common/PostStateBar"
 
 const PostContainer = styled.div`
     height: 100%;
@@ -89,7 +89,15 @@ export default function PostWrite() {
         setDeleteIdx(undefined);
     },[deleteIndex])
 
+    const [postState,setPostState]=useState('list')
+
     return (
+        <>
+
+        <PostStateBar
+        postState={postState}
+        setPostState={setPostState}
+        ></PostStateBar>
         <div style={{ height: '100%', overflow: 'hidden' }}>
             <motion.div initial={{ y: '100%', opacity: 0 }}
             animate={{ y: 0, opacity: 1}}
@@ -126,5 +134,6 @@ export default function PostWrite() {
                 </PostContainer>
             </motion.div>
         </div>
+        </>
     )
 }
