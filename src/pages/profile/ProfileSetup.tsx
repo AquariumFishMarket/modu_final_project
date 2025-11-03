@@ -1,6 +1,22 @@
 import CommonForm, {
   FormSubmissionData,
 } from "../../components/common/CommonForm";
+import styled from "styled-components";
+
+const ProfileTitle = styled.div`
+  text-align: center;
+
+  h2 {
+    font-size: var(--font-size-2xl);
+    font-weight: 500;
+    margin-bottom: 12px;
+  }
+
+  p {
+    font-size: var(--font-size-md);
+    color: var(--color-gray-dark);
+  }
+`;
 
 // 유효성 검사 함수 -> profile 유효성만 따로 분리
 const validateUsername = (username: string): string | null => {
@@ -75,16 +91,16 @@ export default function ProfileSetup() {
   };
 
   return (
-    <CommonForm
-      formType="profile"
-      showTitle={true}
-      titleConfig={{
-        title: "프로필 설정",
-        subtitle: "나중에 언제든지 변경할 수 있습니다.",
-      }}
-      fields={profileFields}
-      buttonText="시작하기"
-      onSubmit={handleSubmit}
-    />
+    <>
+      <ProfileTitle>
+        <h2>프로필 설정</h2>
+        <p>나중에 언제든지 변경할 수 있습니다.</p>
+      </ProfileTitle>
+      <CommonForm
+        formType="profile"
+        fields={profileFields}
+        onSubmit={handleSubmit}
+      />
+    </>
   );
 }

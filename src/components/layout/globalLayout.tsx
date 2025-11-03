@@ -33,6 +33,7 @@ export default function GlobalLayout() {
     "/login/email",
     "/profile/setup",
     "/profile/edit",
+    "/product/add",
   ];
 
   // Header를 숨길 경로들

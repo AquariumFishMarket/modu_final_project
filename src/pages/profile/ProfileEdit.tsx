@@ -73,9 +73,7 @@ export default function ProfileEdit() {
   return (
     <CommonForm
       formType="profile"
-      showTitle={false} // ProfileEdit는 제목 없음
       fields={profileFields}
-      buttonText="저장"
       showButton={false} // ProfileEdit는 버튼 없음 (메뉴 버튼으로 대체)
       onSubmit={handleSubmit}
     />

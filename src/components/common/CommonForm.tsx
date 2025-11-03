@@ -6,15 +6,10 @@ import ImageContainer from "./imageUpload/ImageContainer";
 import ProfileImg from "./ProfileImg";
 import ImageUpButton from "./imageUpload/UploadButton";
 
+// 타입
 interface CommonFormProps {
   formType: "profile" | "product";
-  showTitle?: boolean;
-  titleConfig?: {
-    title: string;
-    subtitle?: string;
-  };
   fields: FormFieldConfig[];
-  buttonText?: string;
   showButton?: boolean;
   onSubmit?: (data: FormSubmissionData) => void;
 }
@@ -37,22 +32,8 @@ interface ValidationErrors {
   [key: string]: string;
 }
 
-const FormTitle = styled.div`
-  text-align: center;
-
-  h2 {
-    font-size: var(--font-size-2xl);
-    font-weight: 500;
-    margin-bottom: 12px;
-  }
-
-  p {
-    font-size: var(--font-size-md);
-    color: var(--color-gray-dark);
-  }
-`;
-
-const StyledForm = styled.form`
+// Styled
+const InputForm = styled.form`
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -103,15 +84,25 @@ const ErrorMessage = styled.span`
   display: block;
 `;
 
-const ImgContainer = styled.div<{ $formType: "profile" | "product" }>`
+const FormImgContainer = styled.div<{ $formType: "profile" | "product" }>`
   margin: 0 auto;
   position: relative;
   margin-bottom: 30px;
   width: ${(props) => (props.$formType === "profile" ? "150px" : "100%")};
   height: ${(props) => (props.$formType === "profile" ? "150px" : "auto")};
+  /* 상품 이미지 */
+  ${(props) =>
+    props.$formType === "product" &&
+    `
+    min-height: 204px;
+    background-color: var(--color-gray-light);
+    border: 1px solid var(--color-gray-medium);
+    border-radius: 10px;
+    overflow: hidden;
+  `}
 `;
 
-const BtnContainer = styled.div<{ $formType: "profile" | "product" }>`
+const FormBtnContainer = styled.div<{ $formType: "profile" | "product" }>`
   position: absolute;
   bottom: 0;
   right: 0;
@@ -125,10 +116,7 @@ const BtnContainer = styled.div<{ $formType: "profile" | "product" }>`
 
 export default function CommonForm({
   formType,
-  showTitle = false,
-  titleConfig,
   fields,
-  buttonText = "저장하기",
   showButton = true,
   onSubmit,
 }: CommonFormProps) {
@@ -237,17 +225,10 @@ export default function CommonForm({
 
   return (
     <section>
-      {showTitle && titleConfig && (
-        <FormTitle>
-          <h2>{titleConfig.title}</h2>
-          {titleConfig.subtitle && <p>{titleConfig.subtitle}</p>}
-        </FormTitle>
-      )}
-
-      <StyledForm onSubmit={handleSubmit}>
+      <InputForm onSubmit={handleSubmit}>
         <legend className="sr-only">사용자 설정</legend>
 
-        <ImgContainer $formType={formType}>
+        <FormImgContainer $formType={formType}>
           {/* 프로필용 이미지 렌더링 */}
           {formType === "profile" && (
             <>
@@ -266,13 +247,13 @@ export default function CommonForm({
           {/* 상품용 이미지 렌더링 */}
           {formType === "product" && (
             <ImageContainer
-              type="post"
+              type="post" // 단일 사진만 이용할지, post 방식대로 할지?
               imgArr={imgFiles}
               setDeleteIdx={setDeleteIdx}
             />
           )}
 
-          <BtnContainer $formType={formType}>
+          <FormBtnContainer $formType={formType}>
             <ImageUpButton
               imgArrType="singular"
               colortype="color"
@@ -280,8 +261,8 @@ export default function CommonForm({
               imgArr={imgFiles}
               setImgArr={setImgFiles}
             />
-          </BtnContainer>
-        </ImgContainer>
+          </FormBtnContainer>
+        </FormImgContainer>
 
         {/* 입력 필드들 */}
         {fields.map((field) => (
@@ -306,12 +287,12 @@ export default function CommonForm({
 
         {showButton && (
           <DefaultButton
-            text={buttonText}
+            text="시작하기"
             disabled={!isFormValid()}
             onClick={handleButtonClick}
           />
         )}
-      </StyledForm>
+      </InputForm>
     </section>
   );
 }
