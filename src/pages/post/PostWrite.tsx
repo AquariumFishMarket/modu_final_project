@@ -97,16 +97,6 @@ export default function PostWrite() {
             transition={{ duration: 0.5, ease: "easeOut" }}
             style={{ height: '100%' }}
             >
-                <TextField
-                left={
-                    <ImageUpButton imgArrType="singular" colortype="gray"
-                    size="small"
-                    imgArr={[]}
-                    setImgArr={setImgArr}
-                    ></ImageUpButton>
-                }
-                placeholder="댓글을 입력하세요.."
-                />
                 <PostContainer>
                     <ImageUploadContainer>
                         <ImageUpButtonContainer>
