@@ -23,7 +23,7 @@ import {
   EmptyPostMessage,
 } from "./Profile.styled";
 import DefaultButton from "../Button";
-import SellingProducts from "./SellingProducts";
+// import SellingProducts from "./SellingProducts";
 import PostCard from "../postCard/PostCard";
 
 //  Profile 컴포넌트
