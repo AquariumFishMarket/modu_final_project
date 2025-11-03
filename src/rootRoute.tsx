@@ -11,6 +11,7 @@ import SearchPage from "./pages/Search/SearchPage";
 
 import PostWrite from "./components/PostWrite";
 import FeedPage from "./pages/Home/FeedPage";
+import PostCardTest from "./pages/PostCardTest";
 
 
 export default function RootRoute() {
@@ -25,10 +26,14 @@ export default function RootRoute() {
         <Route path="/profile/setup" element={<ProfileSetup />} />
         <Route path="/profile/edit" element={<ProfileEdit />} />
 
+
+        {/* 나머지 route 경로 수정 */}
+        <Route path="/search" />
+
+        <Route path="/post" element={<PostWrite />} />
+        <Route path="/postcard-test" element={<PostCardTest />} />
         <Route path="/feed" element={<FeedPage />} />
         <Route path="/search" element={<SearchPage />} />
-
-
           <Route path="/post" element={<PostWrite />}/>
 
           <Route path="/chat-list" />
