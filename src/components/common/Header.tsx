@@ -12,6 +12,7 @@ import {
   AllyHiddenTitle,
 } from "./Header.styled";
 import DefaultButton from "./Button";
+import MoreMenu from "./MoreMenu";
 import { useHeader } from "../../contexts/HeaderContext";
 
 function Header() {
@@ -65,9 +66,12 @@ function Header() {
           <IconButton onClick={config.onBackClick}>
             <img src="/img/icon-arrow-left.svg" alt="이전 페이지로 이동" />
           </IconButton>
-          <IconButton onClick={config.onMoreClick}>
-            <img src="/img/icon-more-vertical.svg" alt="더보기" />
-          </IconButton>
+          {/* 기존 더보기 버튼을 MoreMenu로 교체 */}
+          <MoreMenu
+            type="profile"
+            onSettings={() => console.log("설정")}
+            onLogout={() => console.log("로그아웃")}
+          />
         </Section>
       )}
 
@@ -101,20 +105,18 @@ function Header() {
         </Section>
       )}
 
-      {/* 채팅 목록 */}
-      {config.type === "chatList" && (
+      {/* 채팅 */}
+      {config.type === "chat" && (
         <Section>
           <IconButton onClick={config.onBackClick}>
             <img src="/img/icon-arrow-left.svg" alt="이전 페이지로 이동" />
           </IconButton>
-          <IconButton onClick={config.onMoreClick}>
-            <img src="/img/icon-more-vertical.svg" alt="더보기" />
-          </IconButton>
+          <MoreMenu type="chat" onLeave={() => console.log("채팅방 나가기")} />
         </Section>
       )}
 
-      {/* 채팅 */}
-      {config.type === "chat" && (
+      {/* 채팅 목록 */}
+      {config.type === "chatList" && (
         <Section>
           <ChatUserContainer>
             <IconButton onClick={config.onBackClick}>
@@ -122,9 +124,10 @@ function Header() {
             </IconButton>
             <h2>{config.userName}</h2>
           </ChatUserContainer>
-          <IconButton onClick={config.onMoreClick}>
-            <img src="/img/icon-more-vertical.svg" alt="더보기" />
-          </IconButton>
+          <MoreMenu
+            type="chatList"
+            onLeave={() => console.log("채팅방 나가기")}
+          />
         </Section>
       )}
     </HeaderContainer>

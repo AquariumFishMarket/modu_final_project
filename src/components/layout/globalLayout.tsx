@@ -38,23 +38,24 @@ function LayoutContent() {
     if (
       path === "/login" ||
       path === "/login/email" ||
-      path === "/signup"
+      path === "/signup" ||
+      path === "/profile/setup"
     ) {
       setHeaderConfig({ show: false });
       return;
     }
 
     // 프로필 셋업 (정확한 경로 체크)
-    if (path === "/profile/setup") {
-      setHeaderConfig({
-        show: true,
-        type: "edit",
-        inputState: true,
-        onBackClick: () => navigate("/login"),
-        onButtonClick: () => console.log("프로필 설정 완료"),
-      });
-      return;
-    }
+    // if (path === "/profile/setup") {
+    //   setHeaderConfig({
+    //     show: true,
+    //     type: "edit",
+    //     inputState: true,
+    //     onBackClick: () => navigate("/login"),
+    //     onButtonClick: () => console.log("프로필 설정 완료"),
+    //   });
+    //   return;
+    // }
 
     // 프로필 수정 (정확한 경로를 먼저 체크)
     if (path === "/profile/edit") {
