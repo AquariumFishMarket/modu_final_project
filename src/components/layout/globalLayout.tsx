@@ -27,7 +27,7 @@ const MainContent = styled.main<{ $hasFooter: boolean; $isProfile?: boolean }>`
     if (props.$isProfile) return "0";
     return props.$hasFooter ? "110px" : "50px";
   }};
-  background-color: #fafafa;
+  background-color: #fff;
 `;
 
 function LayoutContent() {
