@@ -1,8 +1,6 @@
 import React from "react";
 import { Player } from "@lottiefiles/react-lottie-player";
-import { useRef, useEffect } from "react";
-
-import { NavLinkRenderProps, useLocation } from "react-router-dom";
+import { NavLinkRenderProps } from "react-router-dom";
 import HOME from '../../json/home.json'
 import HOMEACTIVE from '../../json/home-active.json'
 import CHAT from '../../json/chat.json'
@@ -56,9 +54,6 @@ const navItems: NavItemType[] = [
 ];
 
 const FooterNav = () => {
-  const { pathname } = useLocation()
-  const HomeRef = useRef<Player>(null)
-
   return (
     <NavContainer>
       <NavList>
@@ -69,9 +64,8 @@ const FooterNav = () => {
                 <>
                   <IconWrapper>
                   <Player
-                  ref={HomeRef}
                   src={isActive ? item.activeIcon || item.icon : item.icon}
-                  autoplay={isActive ? true || false : false}
+                  autoplay={isActive ? true : false}
                   style={{ width: '30px', height: '30px' }}
                   />
                   </IconWrapper>
