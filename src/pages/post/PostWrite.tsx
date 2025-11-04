@@ -107,7 +107,7 @@ export default function PostWrite() {
                             />
                             <p>{imgArr.length}/10</p>
                         </ImageUpButtonContainer>
-                        <ImageContainer multiple={true} imgArr={imgArr} setDeleteIdx={setDeleteIdx} />
+                        <ImageContainer imgArr={imgArr} setDeleteIdx={setDeleteIdx} />
                     </ImageUploadContainer>
                     <Contents>
                         <ProfileImg width={42} thumbimg={false}></ProfileImg>

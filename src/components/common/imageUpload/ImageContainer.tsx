@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import DeleteButton from "./DeleteButton";
 import styled,{ css } from "styled-components";
@@ -11,32 +11,33 @@ interface ContainerType {
 }
 
 
-const PostWriteCont = styled.ul`
-    display: flex;
-    width: calc(100% - 90px);
-    overflow-x: auto;
-
-    li {
+const PostWriteCont = styled.div`
+  width: calc(100% - 90px);
+  overflow: hidden;
+`;
+const PostWrapper = styled.div`
+  display: flex;
+  gap: 8px;
+`
+const PostSlide = styled.div`
       position: relative;
       width: 80px;
       border-radius: 10px;
       overflow: hidden;
       flex: 0 0 auto;
       aspect-ratio: 1;
-      margin-right: 8px;
       img {
         width: 100%;
         height: 100%;
         object-fit: cover;
       }
-    }
-`;
+`
 
-const SingleCont = styled.div`
+const ProfileWriteCont = styled.div`
   width: 100%;
   height: 100%;
 `;
-const Image = styled.div`
+const ProfileSlide = styled.div`
   position: relative;
   height: 100%;
   overflow: hidden;
@@ -64,7 +65,6 @@ const ProductSlide = styled.div<{$length:number}>`
   ${({$length})=> ($length == 1) && css`
     flex: 0 0 100%;
   `}
-
   position: relative;
   background-color: #fff;
   border-radius: 10px;
@@ -81,7 +81,33 @@ export default function ImageContainer({
   setDeleteIdx,
 }: ContainerType) {
 
-  const [emblaRef] = useEmblaCarousel();
+  const [emblaRef, emblaApi] = useEmblaCarousel({ watchDrag: false });
+  const [canDrag, setCanDrag] = useState(false);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+
+    const checkDraggable = () => {
+      const container = emblaApi.containerNode();
+      const viewport = emblaApi.rootNode();
+
+      // 실제 너비 비교
+      const containerWidth = container.scrollWidth;
+      const viewportWidth = viewport.clientWidth;
+
+      setCanDrag(containerWidth > viewportWidth);
+    };
+
+    checkDraggable();
+    window.addEventListener("resize", checkDraggable);
+    return () => window.removeEventListener("resize", checkDraggable);
+  }, [emblaApi, imgArr]);
+
+  // emblaApi가 갱신될 때마다 watchDrag 토글
+  useEffect(() => {
+    if (!emblaApi) return;
+    emblaApi.reInit({ watchDrag: canDrag });
+  }, [canDrag, emblaApi]);
 
   /*
     현재 pathname을 기준으로 UI 분리했습니다.
@@ -110,13 +136,15 @@ export default function ImageContainer({
 
   if (isLocation === 'post') {
     return (
-      <PostWriteCont>
+      <PostWriteCont ref={emblaRef}>
+        <PostWrapper>
         {imgArr.map((imgele, i) => (
-          <li key={i}>
+          <PostSlide key={i}>
             <img src={URL.createObjectURL(imgele)} alt={`preview-${i}`}></img>
             <DeleteButton data-index={i} setDeleteIdx={setDeleteIdx} />
-          </li>
+          </PostSlide>
         ))}
+        </PostWrapper>
       </PostWriteCont>
     );
   }
@@ -125,14 +153,14 @@ export default function ImageContainer({
     return (
       <>
         {LastImageIdx && (
-          <SingleCont>
-            <Image>
+          <ProfileWriteCont>
+            <ProfileSlide>
               <img
                 src={URL.createObjectURL(LastImageIdx)}
-                alt={''}
+                alt={'나의 프로필'}
               ></img>
-            </Image>
-          </SingleCont>
+            </ProfileSlide>
+          </ProfileWriteCont>
         )}
       </>
     );

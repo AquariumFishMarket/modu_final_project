@@ -88,7 +88,7 @@ const ErrorMessage = styled.span`
   display: block;
 `;
 
-const FormImgContainer = styled.div<{ $formType: "profile" | "product" }>`
+const FormImgContainer = styled.div<{ $formType: "profile" | "product", $hasSelectedImage:boolean }>`
   margin: 0 auto;
   position: relative;
   margin-bottom: 30px;
@@ -100,9 +100,11 @@ const FormImgContainer = styled.div<{ $formType: "profile" | "product" }>`
     `
     aspect-ratio: 322 / 204;
     min-height: 204px;
-    border: 1px solid var(--color-gray-medium);
     border-radius: 10px;
   `}
+  ${(props) => !props.$hasSelectedImage && props.$formType === "product" && `
+    border: 1px solid var(--color-gray-medium);
+    `}
 `;
 
 const FormBtnContainer = styled.div<{ $formType: "profile" | "product" }>`
@@ -231,7 +233,7 @@ export default function CommonForm({
       <InputForm onSubmit={handleSubmit}>
         <legend className="sr-only">사용자 설정</legend>
 
-        <FormImgContainer $formType={formType}>
+        <FormImgContainer $formType={formType} $hasSelectedImage={hasSelectedImage}>
           {/* 프로필용 이미지 렌더링 */}
           {formType === "profile" && (
             <>
@@ -239,7 +241,6 @@ export default function CommonForm({
                 <ProfileImg width={150} thumbimg={false} imgSrc={undefined} />
               ) : (
                 <ImageContainer
-                  multiple={false}
                   imgArr={imgFiles}
                   setDeleteIdx={setDeleteIdx}
                 />
