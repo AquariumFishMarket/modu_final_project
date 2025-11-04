@@ -3,7 +3,7 @@ import styled from "styled-components";
 interface DefaultButtonProps {
   text: string;
   width?: number;
-  height?: string;
+  height?: "large" | "medium" | "small";
   disabled?: boolean;
   onClick?: () => void;
   href?: string;
