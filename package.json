@@ -10,12 +10,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "framer-motion": "^12.23.24",
     "@lordicon/element": "^2.0.1",
     "embla-carousel-react": "^8.6.0",
+    "framer-motion": "^12.23.24",
     "motion": "^12.23.24",
-    "react": "^19.1.1",
-    "react-dom": "^19.1.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "react-router-dom": "^7.9.5",
     "react-spring": "^10.0.3",
     "react-spring-bottom-sheet": "^3.4.1",
