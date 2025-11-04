@@ -84,6 +84,7 @@ function Header() {
           <DefaultButton
             text="저장"
             width={90}
+            height="medium"
             disabled={!config.inputState}
             onClick={config.onButtonClick}
           />
@@ -99,6 +100,7 @@ function Header() {
           <DefaultButton
             text="업로드"
             width={90}
+            height="medium"
             disabled={!config.inputState}
             onClick={config.onButtonClick}
           />

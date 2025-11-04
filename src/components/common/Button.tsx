@@ -35,14 +35,14 @@ const DefaultBtn = styled.button<{
   border-radius: 500px;
   min-height: 24px;
   height: ${(props) => {
-    if (props.height == 'large') return '44px';
-    if (props.height == 'mediup') return '34px';
-    if (props.height == 'small') return '28px'
+    if (props.height === 'medium') return '34px';
+    else if (props.height === 'small') return '28px';
+    else return '44px';
   }};
   line-height: ${(props) => {
-    if (props.height == 'large') return '44px';
-    if (props.height == 'mediup') return '34px';
-    if (props.height == 'small') return '28px'
+    if (props.height === 'medium') return '34px';
+    else if (props.height === 'small') return '28px';
+    else return '44px';
   }};
   width: ${(props) => (props.width ? `${props.width}px` : "100%")};
   transition: all 0.2s;
