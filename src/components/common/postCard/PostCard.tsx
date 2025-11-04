@@ -60,10 +60,7 @@ function PostCard({
   const [likes, setLikes] = useState(likeCount);
   const [postImageSrc, setPostImageSrc] = useState(imageSrc);
 
-<<<<<<< Updated upstream
-=======
 
->>>>>>> Stashed changes
   // 낙관적 업데이트
   const handleLikeClick = () => {
     const newLikedState = !liked;
@@ -176,10 +173,6 @@ function PostCard({
         {/* API 연동 준비 (추후 사용) */}
         {/* 당일 게시글 xx분전, 올해의 게시글은 MM/DD, 작년이전이면 YY/MM/DD 이런식으로 인스타처럼 만들면 좋을것 같습니다. */}
         {/* <PostTime dateTime={post.createdAt}>{formatDate(post.createdAt)}</PostTime> */}
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
       </PostContent>
     </PostCardContainer>
   );

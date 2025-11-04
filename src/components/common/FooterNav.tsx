@@ -1,4 +1,5 @@
 import React from "react";
+import { defineElement } from "@lordicon/element";
 import { NavLinkRenderProps } from "react-router-dom";
 import {
   NavContainer,
@@ -41,10 +42,11 @@ const navItems: NavItemType[] = [
     activeIcon: "/src/assets/icons/icon-user-fill.svg",
   },
 ];
-
+defineElement();
 const FooterNav = () => {
   return (
     <NavContainer>
+      <lord-icon trigger="hover" src="/my-icon.json"></lord-icon>
       <NavList>
         {navItems.map((item: NavItemType) => (
           <NavItem key={item.path}>
