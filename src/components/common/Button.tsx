@@ -3,6 +3,7 @@ import styled from "styled-components";
 interface DefaultButtonProps {
   text: string;
   width?: number;
+  height?: "large" | "medium" | "small";
   disabled?: boolean;
   onClick?: () => void;
   href?: string;
@@ -11,6 +12,7 @@ interface DefaultButtonProps {
 
 const DefaultBtn = styled.button<{
   width?: number;
+  height?: string;
   disabled?: boolean;
   variant?: "primary" | "secondary" | "white";
 }>`
@@ -32,8 +34,16 @@ const DefaultBtn = styled.button<{
   font-size: 14px;
   border-radius: 500px;
   min-height: 24px;
-  line-height: 44px;
-  height: 44px;
+  height: ${(props) => {
+    if (props.height === 'medium') return '34px';
+    else if (props.height === 'small') return '28px';
+    else return '44px';
+  }};
+  line-height: ${(props) => {
+    if (props.height === 'medium') return '34px';
+    else if (props.height === 'small') return '28px';
+    else return '44px';
+  }};
   width: ${(props) => (props.width ? `${props.width}px` : "100%")};
   transition: all 0.2s;
 
@@ -48,6 +58,7 @@ const DefaultBtn = styled.button<{
 
 export default function DefaultButton({
   width,
+  height = "large",
   text,
   disabled,
   onClick,
@@ -56,7 +67,7 @@ export default function DefaultButton({
 }: DefaultButtonProps) {
   if (href) {
     return (
-      <DefaultBtn as="a" width={width} href={href} variant={variant}>
+      <DefaultBtn as="a" width={width} height={height} href={href} variant={variant}>
         {text}
       </DefaultBtn>
     );
@@ -64,6 +75,7 @@ export default function DefaultButton({
     return (
       <DefaultBtn
         width={width}
+        height={height}
         disabled={disabled}
         onClick={onClick}
         variant={variant}
