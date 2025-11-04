@@ -2,12 +2,21 @@ import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react"
 import styled from "styled-components"
 
 interface ImageButtonProps {
-    imgArrType: 'plural' | 'singular'; //복수, 단수 입니다. 이미지가 여러장 필요한지 한 장만 들어가는지
     colortype: 'color' | 'gray';
     size: 'large' | 'small';
     imgArr: File[];
     setImgArr: Dispatch<SetStateAction<File[]>>
 }
+
+interface MultipleBtn extends ImageButtonProps {
+    multiple: true;
+}
+
+interface SingleBtn extends ImageButtonProps {
+    multiple: false;
+}
+
+type ButtonType = MultipleBtn | SingleBtn;
 
 const DefaultBtn = styled.button<{size:string,$colortype:string}>`
     background:unset;
@@ -31,7 +40,7 @@ const DefaultBtn = styled.button<{size:string,$colortype:string}>`
     }
 `
 
-export default function ImageUpButton({imgArrType, colortype, size, imgArr, setImgArr}:ImageButtonProps) {
+export default function ImageUpButton({multiple, colortype, size, imgArr, setImgArr}:ButtonType) {
 
     const fileInputRef = useRef<HTMLInputElement | null>(null);
     const [realtimeArr,setRealtimeArr] = useState<File[]>([])
@@ -64,7 +73,7 @@ export default function ImageUpButton({imgArrType, colortype, size, imgArr, setI
     //post에서만 실행되도록..
     useEffect(()=>{
         const total = [...imgArr, ...realtimeArr];
-        if(imgArrType == 'plural') {
+        if(multiple == true) {
             if(total.length > 10) {
                 alert('이미지는 10장까지 업로드 가능합니다.');
             } else {
