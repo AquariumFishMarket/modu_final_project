@@ -60,6 +60,7 @@ function PostCard({
   const [likes, setLikes] = useState(likeCount);
   const [postImageSrc, setPostImageSrc] = useState(imageSrc);
 
+
   // 낙관적 업데이트
   const handleLikeClick = () => {
     const newLikedState = !liked;

@@ -1,44 +1,47 @@
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import DeleteButton from "./DeleteButton";
-import styled from "styled-components";
+import styled,{ css } from "styled-components";
 
-interface imgcontainer {
-  type: "post" | "profile";
+import useEmblaCarousel from "embla-carousel-react";
+
+interface ContainerType {
   setDeleteIdx: Dispatch<SetStateAction<number | undefined>>;
   imgArr: File[];
 }
 
-//이미지 여러개일 때
-const ContainerArr = styled.ul`
-  display: flex;
+
+const PostWriteCont = styled.div`
   width: calc(100% - 90px);
-  overflow-x: auto;
-`;
-const ImageListArr = styled.li`
-  position: relative;
-  width: 80px;
-  border-radius: 10px;
   overflow: hidden;
-  flex: 0 0 auto;
-  aspect-ratio: 1;
-  margin-right: 8px;
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
 `;
-const ContainerProfile = styled.div`
+const PostWrapper = styled.div`
+  display: flex;
+  gap: 8px;
+`
+const PostSlide = styled.div`
+      position: relative;
+      width: 80px;
+      border-radius: 10px;
+      overflow: hidden;
+      flex: 0 0 auto;
+      aspect-ratio: 1;
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+`
+
+const ProfileWriteCont = styled.div`
   width: 100%;
   height: 100%;
 `;
-
-const ImageSolo = styled.div`
+const ProfileSlide = styled.div`
   position: relative;
   height: 100%;
-  border-radius: 100%; // 이미지 적용 후 동글동글
   overflow: hidden;
-
+  border-radius: 100%;
   img {
     width: 100%;
     height: 100%;
@@ -46,36 +49,118 @@ const ImageSolo = styled.div`
   }
 `;
 
+const ProductWriteCont = styled.div`
+  height: 100%;
+  overflow: hidden;
+`
+const ProductWrapper = styled.div`
+  display: flex;
+  gap: 10px;
+  height: 100%;
+`
+const ProductSlide = styled.div<{$length:number}>`
+  ${({$length})=> ($length > 1) && css`
+    flex: 0 0 80%;
+  `}
+  ${({$length})=> ($length == 1) && css`
+    flex: 0 0 100%;
+  `}
+  position: relative;
+  background-color: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+`
+
 export default function ImageContainer({
-  type,
   imgArr,
   setDeleteIdx,
-}: imgcontainer) {
-  if (type === "post") {
+}: ContainerType) {
+
+  const [emblaRef, emblaApi] = useEmblaCarousel({ watchDrag: false });
+  const [canDrag, setCanDrag] = useState(false);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+
+    const checkDraggable = () => {
+      const container = emblaApi.containerNode();
+      const viewport = emblaApi.rootNode();
+
+      // 실제 너비 비교
+      const containerWidth = container.scrollWidth;
+      const viewportWidth = viewport.clientWidth;
+
+      setCanDrag(containerWidth > viewportWidth);
+    };
+
+    checkDraggable();
+    window.addEventListener("resize", checkDraggable);
+    return () => window.removeEventListener("resize", checkDraggable);
+  }, [emblaApi, imgArr]);
+
+  // emblaApi가 갱신될 때마다 watchDrag 토글
+  useEffect(() => {
+    if (!emblaApi) return;
+    emblaApi.reInit({ watchDrag: canDrag });
+  }, [canDrag, emblaApi]);
+
+  /*
+    현재 pathname을 기준으로 UI 분리했습니다.
+    추후 사용 할 pathname이 늘어날 경우 조건문 추가해주세요
+  */
+  const {pathname} = useLocation();
+  let isLocation:string = 'default';
+  if(pathname.includes('post')) { isLocation = 'post' }
+  else if(pathname.includes('profile')) { isLocation = 'profile' }
+  else if(pathname.includes('product')) { isLocation = 'product' }
+
+  if(isLocation == 'product') {
     return (
-      <ContainerArr>
+      <ProductWriteCont ref={emblaRef}>
+        <ProductWrapper>
+          {imgArr.map((imgele, i) => (
+            <ProductSlide key={i} $length={imgArr.length}>
+              <img src={URL.createObjectURL(imgele)} alt={`preview-${i}`}></img>
+              <DeleteButton data-index={i} setDeleteIdx={setDeleteIdx} />
+            </ProductSlide>
+          ))}
+        </ProductWrapper>
+      </ProductWriteCont>
+    )
+  }
+
+  if (isLocation === 'post') {
+    return (
+      <PostWriteCont ref={emblaRef}>
+        <PostWrapper>
         {imgArr.map((imgele, i) => (
-          <ImageListArr key={i}>
+          <PostSlide key={i}>
             <img src={URL.createObjectURL(imgele)} alt={`preview-${i}`}></img>
             <DeleteButton data-index={i} setDeleteIdx={setDeleteIdx} />
-          </ImageListArr>
+          </PostSlide>
         ))}
-      </ContainerArr>
+        </PostWrapper>
+      </PostWriteCont>
     );
   }
-  if (type === "profile") {
+  if (isLocation === 'profile') {
     const LastImageIdx = imgArr[imgArr.length - 1];
     return (
       <>
         {LastImageIdx && (
-          <ContainerProfile>
-            <ImageSolo>
+          <ProfileWriteCont>
+            <ProfileSlide>
               <img
                 src={URL.createObjectURL(LastImageIdx)}
-                alt={`나의 프로필`}
+                alt={'나의 프로필'}
               ></img>
-            </ImageSolo>
-          </ContainerProfile>
+            </ProfileSlide>
+          </ProfileWriteCont>
         )}
       </>
     );
