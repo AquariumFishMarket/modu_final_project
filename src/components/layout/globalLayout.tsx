@@ -5,24 +5,29 @@ import styled from "styled-components";
 import { HeaderProvider, useHeader } from "../../contexts/HeaderContext";
 import { useEffect } from "react";
 
-const LayoutContainer = styled.div`
+const LayoutContainer = styled.div<{ $isProfile?: boolean }>`
   max-width: 600px;
   width: 100%;
-  height: 100vh;
+  height: ${(props) => (props.$isProfile ? "auto" : "100vh")};
+  min-height: ${(props) => (props.$isProfile ? "100vh" : "auto")};
   margin: 0 auto;
-  overflow-y: hidden;
+  overflow-y: ${(props) => (props.$isProfile ? "visible" : "hidden")};
   background-color: #fff;
   border: 1px solid #eeeeee;
 `;
 
-const MainContent = styled.main<{ $hasFooter: boolean }>`
+const MainContent = styled.main<{ $hasFooter: boolean; $isProfile?: boolean }>`
   padding-top: 68px;
   padding-left: 15px;
   padding-right: 15px;
-  height: 100vh;
+  height: ${(props) => (props.$isProfile ? "auto" : "100vh")};
   overflow-x: hidden;
-  overflow-y: auto;
-  padding-bottom: ${(props) => (props.$hasFooter ? "110px" : "50px")};
+  overflow-y: ${(props) => (props.$isProfile ? "visible" : "auto")};
+  padding-bottom: ${(props) => {
+    if (props.$isProfile) return "0";
+    return props.$hasFooter ? "110px" : "50px";
+  }};
+  background-color: #fafafa;
 `;
 
 function LayoutContent() {
@@ -138,10 +143,12 @@ function LayoutContent() {
     location.pathname.startsWith(path)
   );
 
+  const isProfilePage = location.pathname === "/profile";
+
   return (
-    <LayoutContainer>
+    <LayoutContainer $isProfile={isProfilePage}>
       <Header />
-      <MainContent $hasFooter={!shouldHideNav}>
+      <MainContent $hasFooter={!shouldHideNav} $isProfile={isProfilePage}>
         <Outlet />
       </MainContent>
       {!shouldHideNav && <FooterNav />}

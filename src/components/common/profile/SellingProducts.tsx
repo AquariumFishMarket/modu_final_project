@@ -16,12 +16,16 @@ import {
 } from "./SellingProducts.styled";
 import type { Product } from "../../../types/product";
 
+interface SellingProductsProps {
+  isLastSection?: boolean;
+}
+
 // 가격 포맷터 (성능 최적화 및 일관성)
 const priceFormatter = new Intl.NumberFormat("ko-KR", {
   style: "decimal",
 });
 
-function SellingProducts() {
+function SellingProducts({ isLastSection = false }: SellingProductsProps) {
   const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -34,7 +38,10 @@ function SellingProducts() {
   const scrollLeftRef = useRef(0);
   const dragDistanceRef = useRef(0); // 드래그 이동량 추적 (성능 최적화)
 
-  // API: 판매 중인 상품 목록 가져오기
+  /**
+   * API: 판매 중인 상품 목록 가져오기
+   * TODO: API 연동 시 주석 해제
+   */
   useEffect(() => {
     const controller = new AbortController();
 
@@ -42,7 +49,8 @@ function SellingProducts() {
       try {
         setIsLoading(true);
         setError(null);
-        // TODO: 실제 API 엔드포인트로 교체
+
+        // TODO: API 연동 시 주석 해제
         // const response = await fetch('/api/products/selling', {
         //   signal: controller.signal
         // });
@@ -50,54 +58,9 @@ function SellingProducts() {
         // const data = await response.json();
         // setProducts(data.products);
 
-        // 임시: 테스트용 더미 데이터
-        await new Promise((resolve) => setTimeout(resolve, 500)); // 로딩 시뮬레이션
-        setProducts([
-          {
-            id: "1",
-            itemName: "네온테트라 10마리",
-            price: 15000,
-            itemImage: "https://picsum.photos/200/200?random=1",
-            link: "/product/1",
-          },
-          {
-            id: "2",
-            itemName: "구피 한 쌍",
-            price: 8000,
-            itemImage: [
-              "https://picsum.photos/200/200?random=2",
-              "https://picsum.photos/200/200?random=3",
-            ],
-            link: "/product/2",
-          },
-          {
-            id: "3",
-            itemName: "수조 여과기 (중고)",
-            price: 35000,
-            itemImage: "https://picsum.photos/200/200?random=4",
-            link: "/product/3",
-          },
-          {
-            id: "4",
-            itemName: "베타 물고기 (레드)",
-            price: 12000,
-            itemImage: [
-              "https://picsum.photos/200/200?random=5",
-              "https://picsum.photos/200/200?random=6",
-              "https://picsum.photos/200/200?random=7",
-            ],
-            link: "/product/4",
-          },
-          {
-            id: "5",
-            itemName: "수초 모음 패키지",
-            price: 20000,
-            itemImage: "/img/empty-profile.png",
-            link: "/product/5",
-          },
-        ]);
+        // 임시: API 연동 전까지 빈 배열
+        setProducts([]);
       } catch (error) {
-        // AbortError는 정상적인 취소이므로 에러로 처리하지 않음
         if (error instanceof Error && error.name === "AbortError") {
           return;
         }
@@ -111,7 +74,6 @@ function SellingProducts() {
 
     fetchProducts();
 
-    // 컴포넌트 언마운트 시 비동기 요청 취소
     return () => controller.abort();
   }, []);
 
@@ -210,21 +172,15 @@ function SellingProducts() {
     return itemImage;
   };
 
-  return (
-    <ProductSection aria-busy={isLoading}>
-      <ProductTitle>판매 중인 상품</ProductTitle>
+  // 로딩 중이거나 에러가 있거나 상품이 없으면 아예 렌더링하지 않음
+  if (isLoading || error || products.length === 0) {
+    return null;
+  }
 
-      {isLoading ? (
-        <LoadingMessage aria-live="polite">
-          상품을 불러오는 중...
-        </LoadingMessage>
-      ) : error ? (
-        <ErrorMessage aria-live="assertive">{error}</ErrorMessage>
-      ) : products.length === 0 ? (
-        <EmptyMessage aria-live="polite">
-          판매 중인 상품이 없습니다.
-        </EmptyMessage>
-      ) : (
+  return (
+    <ProductSection $isLastSection={isLastSection}>
+      <ProductTitle>판매 중인 상품</ProductTitle>
+      {(
         <ProductListContainer
           ref={scrollContainerRef}
           $isDragging={isDragging}
