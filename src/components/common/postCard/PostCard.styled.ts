@@ -8,13 +8,11 @@ export const PostCardContainer = styled.article`
   display: flex;
   flex-direction: column;
   gap: 1.6rem;
-  border: 1px solid #eee;
-  border-radius: 8px;
   overflow: hidden;
 `;
 
 export const PostContent = styled.div`
-  padding-left: 3.7rem;
+  padding-left: 0;
 `;
 
 export const PostMain = styled.figure`
@@ -23,6 +21,11 @@ export const PostMain = styled.figure`
   gap: 1.6rem;
   margin: 0;
   border: none;
+  padding-left: 5.4rem;
+
+  figcaption {
+    padding-right: 1.6rem;
+  }
 
   img {
     max-width: 100%;
@@ -40,6 +43,8 @@ export const PostFooter = styled.footer`
   flex-direction: column;
   gap: 1.6rem;
   padding-top: 1.2rem;
+  padding-left: 5.4rem;
+  padding-right: 1.6rem;
 `;
 
 export const PostActions = styled.div`
