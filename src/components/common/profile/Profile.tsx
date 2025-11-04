@@ -346,12 +346,14 @@ function Profile() {
                 text="프로필 수정"
                 variant="secondary"
                 width={120}
+                height="medium"
                 onClick={handleEditProfile}
               />
               <DefaultButton
                 text="상품 등록"
                 variant="secondary"
                 width={120}
+                height="medium"
                 onClick={handleUploadProduct}
               />
             </>
@@ -369,6 +371,7 @@ function Profile() {
               {/* 팔로우/언팔로우 버튼 */}
               <DefaultButton
                 text={profileData.isFollowing ? "언팔로우" : "팔로우"}
+                height="medium"
                 variant={profileData.isFollowing ? "secondary" : "primary"}
                 width={120}
                 onClick={handleFollowToggle}
