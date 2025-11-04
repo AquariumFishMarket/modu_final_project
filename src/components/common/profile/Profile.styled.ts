@@ -1,7 +1,14 @@
 import styled from "styled-components";
 
 export const ProfileSection = styled.section`
-  width: 100%;
+  width: calc(100% + 30px);
+  margin-left: -15px;
+  margin-right: -15px;
+  margin-top: -68px;
+  padding-top: 68px;
+  background-color: #ffffff;
+  padding-bottom: 2.4rem;
+  margin-bottom: 0.6rem;
 `;
 
 export const ProfileContainer = styled.div`
@@ -126,7 +133,10 @@ export const LoadingText = styled.p`
 
 // 내 프로필 피드 섹션
 export const MyFeedSection = styled.section`
-  margin-top: 2rem;
+  width: calc(100% + 30px);
+  margin-left: -15px;
+  margin-right: -15px;
+  background-color: #ffffff;
 `;
 
 export const MyFeedTitle = styled.h2`
@@ -140,6 +150,7 @@ export const PostListContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 1.6rem;
+  padding: 0 1.6rem 2rem 1.6rem;
 `;
 
 export const EmptyPostMessage = styled.p`

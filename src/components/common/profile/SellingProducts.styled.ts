@@ -1,7 +1,11 @@
 import styled from "styled-components";
 
-export const ProductSection = styled.section`
-  margin-top: 0.6rem;
+export const ProductSection = styled.section<{ $isLastSection?: boolean }>`
+  width: calc(100% + 30px);
+  margin-left: -15px;
+  margin-right: -15px;
+  background-color: #ffffff;
+  margin-bottom: ${(props) => (props.$isLastSection ? "0" : "0.6rem")};
   padding: 2rem 1.6rem;
   display: flex;
   flex-direction: column;

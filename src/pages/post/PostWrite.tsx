@@ -5,8 +5,6 @@ import ImageContainer from "../../components/common/imageUpload/ImageContainer"
 import styled from "styled-components"
 import { motion } from "motion/react"
 
-import PostStateBar from "../../components/common/PostStateBar"
-
 const PostContainer = styled.div`
     height: 100%;
     margin: 0 auto;
@@ -101,7 +99,7 @@ export default function PostWrite() {
                     <ImageUploadContainer>
                         <ImageUpButtonContainer>
                             <ImageUpButton
-                            imgArrType="plural"
+                            multiple={true}
                             colortype="color"
                             size="small"
                             imgArr={imgArr}
@@ -109,7 +107,7 @@ export default function PostWrite() {
                             />
                             <p>{imgArr.length}/10</p>
                         </ImageUpButtonContainer>
-                        <ImageContainer type={'post'} imgArr={imgArr} setDeleteIdx={setDeleteIdx} />
+                        <ImageContainer imgArr={imgArr} setDeleteIdx={setDeleteIdx} />
                     </ImageUploadContainer>
                     <Contents>
                         <ProfileImg width={42} thumbimg={false}></ProfileImg>
