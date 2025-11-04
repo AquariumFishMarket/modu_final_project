@@ -41,18 +41,17 @@ import PostCard from "../postCard/PostCard";
 //    2. 다른 사람 프로필 보기: profileData.id를 다른 값으로 변경 (예: user456)
 //      → 채팅, 팔로우/언팔로우, 공유 버튼 표시 + 피드 미표시
 
-// 사용자 프로필 타입 정의
-interface UserProfile {
-  id: string; // 사용자 고유 ID
-  userName: string; // 사용자 이름
-  userId: string; // 사용자 ID (예: @username)
-  profileImage: string; // 프로필 이미지 URL
-  description: string; // 사용자 소개
-  followerCount: number; // 팔로워 수
-  followingCount: number; // 팔로잉 수
-  isFollowing: boolean; // 현재 사용자가 팔로우 중인지 여부
-  createdAt?: string; // 가입일 (API 연동 대비)
-  updatedAt?: string; // 프로필 수정일 (API 연동 대비)
+// 게시글 타입 정의 (임시)
+interface Post {
+  postId: string;
+  content: string;
+  imageSrc?: string;
+  imageAlt?: string;
+  dateTime: string;
+  dateText: string;
+  likeCount: number;
+  commentCount: number;
+  isLiked: boolean;
 }
 
 function Profile() {
@@ -68,7 +67,6 @@ function Profile() {
   // URL 파라미터가 있으면 해당 유저, 없으면 내 프로필
   // API 연동 시 fetchProfileData(targetUserId)로 사용 예정
   const targetUserId = paramUserId || currentUserId;
-  console.log("Profile targetUserId:", targetUserId); // 개발용 로그
 
   // 프로필 데이터 상태 관리
   const [profileData, setProfileData] = useState<UserProfile>({
@@ -86,7 +84,7 @@ function Profile() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // 게시글 피드 데이터 상태 관리
-  const [userPosts, setUserPosts] = useState<DummyPost[]>([]);
+  const [userPosts, setUserPosts] = useState<Post[]>([]);
 
   // 내 프로필인지 다른 사람 프로필인지 구분
   const isMyProfile = profileData.id && profileData.id === currentUserId;
@@ -163,12 +161,6 @@ function Profile() {
     setProfileData((prev) => ({
       ...prev,
       isFollowing: newFollowState,
-
-      // 팔로워 수 음수 방지
-      followerCount: newFollowState
-        ? prev.followerCount + 1
-        : Math.max(0, prev.followerCount - 1),
-
       followerCount: Math.max(
         0,
         newFollowState ? prev.followerCount + 1 : prev.followerCount - 1
@@ -183,14 +175,9 @@ function Profile() {
       //   method: newFollowState ? 'POST' : 'DELETE',
       // });
       // if (!response.ok) throw new Error('팔로우 처리 실패');
-
-      console.log(
-        newFollowState ? "팔로우 처리" : "언팔로우 처리",
-        profileData.id
-      );
     } catch (error) {
       console.error("팔로우 처리 실패:", error);
-      // 4. 실패 시 정확한 원래 상태로 복원
+      // 실패 시 정확한 원래 상태로 복원
       setProfileData(previousData);
     } finally {
       setIsFollowLoading(false);
@@ -200,7 +187,7 @@ function Profile() {
   // 채팅 버튼 클릭 핸들러
   const handleChatClick = (): void => {
     // 채팅 페이지로 이동
-    console.log("채팅 시작:", profileData.id);
+    // TODO: 채팅 페이지 연동
   };
 
   // 팔로워 목록 클릭 핸들러
@@ -255,10 +242,9 @@ function Profile() {
       //   method: "POST",
       // });
       // if (!response.ok) throw new Error("좋아요 처리 실패");
-      console.log("좋아요 처리 성공:", postId);
     } catch (error) {
-      console.error("좋아요 실패:", error);
-      // 4. 실패 시 원래 상태로 복원
+      console.error("좋아요 처리 실패:", error);
+      // 실패 시 원래 상태로 복원
       setUserPosts(prevPosts);
     }
   };
@@ -407,7 +393,9 @@ function Profile() {
               {/* 공유 버튼 - 공유 기능 구현 예정 */}
               <IconButton
                 $iconUrl="/img/icon-share.svg"
-                onClick={() => console.log("공유 기능 구현 예정")}
+                onClick={() => {
+                  // TODO: 공유 기능 구현
+                }}
                 aria-label="프로필 공유하기"
               />
             </>
@@ -447,8 +435,12 @@ function Profile() {
                 commentCount={post.commentCount}
                 isLiked={post.isLiked}
                 onLikeClick={() => handleLikeToggle(post.postId)}
-                onCommentClick={() => console.log("댓글 클릭:", post.postId)}
-                onMoreClick={(postId) => console.log("더보기 클릭:", postId)}
+                onCommentClick={() => {
+                  // TODO: 댓글 페이지 연동
+                }}
+                onMoreClick={() => {
+                  // TODO: 더보기 메뉴 구현
+                }}
               />
             ))
           ) : (
