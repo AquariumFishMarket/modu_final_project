@@ -28,6 +28,7 @@ import PostCard from "../postCard/PostCard";
 import PostStateBar from "../PostStateBar";
 import PostGallery from "./PostGallery";
 import { dummyPosts, type Post } from "../../../data/dummyPosts";
+import { motion } from "motion/react"
 
 //  Profile 컴포넌트
 //  - 내 프로필과 다른 유저의 프로필을 조건부 렌더링

@@ -4,6 +4,10 @@ import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { HeaderProvider, useHeader } from "../../contexts/HeaderContext";
 import { useEffect } from "react";
+import { motion } from "framer-motion";
+import { AnimatePresence } from "motion/react";
+import { relative } from "path";
+
 
 const LayoutContainer = styled.div<{ $isProfile?: boolean }>`
   max-width: 600px;
@@ -11,6 +15,7 @@ const LayoutContainer = styled.div<{ $isProfile?: boolean }>`
   height: ${(props) => (props.$isProfile ? "auto" : "100vh")};
   min-height: ${(props) => (props.$isProfile ? "100vh" : "auto")};
   margin: 0 auto;
+  overflow-x: hidden;
   overflow-y: ${(props) => (props.$isProfile ? "visible" : "hidden")};
   background-color: #fff;
   border: 1px solid #eeeeee;
@@ -166,11 +171,19 @@ function LayoutContent() {
 
   return (
     <LayoutContainer $isProfile={isProfilePage}>
-      <Header />
-      <MainContent $hasFooter={shouldShowNav()} $isProfile={isProfilePage}>
-
-        <Outlet />
-      </MainContent>
+      <AnimatePresence mode="wait">
+        <motion.div initial={{ x: 40, opacity: 0 }}
+          animate={{ x: 0, opacity: 1}}
+          transition={{ duration: 0.3, ease: "easeOut" }}
+          style={{ position: 'relative', height: '100%' }}
+          key={location.pathname}
+          >
+          <Header />
+          <MainContent $hasFooter={shouldShowNav()} $isProfile={isProfilePage}>
+            <Outlet />
+          </MainContent>
+        </motion.div>
+      </AnimatePresence>
       {shouldShowNav() && <FooterNav />}
     </LayoutContainer>
   );
