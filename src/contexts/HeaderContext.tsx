@@ -10,7 +10,8 @@ export type HeaderType =
   | "post"
   | "chatList"
   | "chat"
-  | "detail"; //상품 상세 추가!
+  | "productAdd" // 상품 등록
+  | "productDetail"; //상품 상세 추가!
 
 // Header 설정 인터페이스
 export interface HeaderConfig {

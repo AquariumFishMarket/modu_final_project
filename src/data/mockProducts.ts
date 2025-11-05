@@ -7,7 +7,7 @@ export const mockProducts: Product[] = [
     itemName: "베타 피쉬 하프문 블루 레드 페어",
     price: 45000,
     itemImage: ["/img/fish/betta-1.jpg", "/img/fish/betta-2.jpg"],
-    link: "/product/1",
+    link: "https://github.com/AquariumFishMarket",
     description: `아름다운 하프문 베타 피쉬 페어입니다. 🐠
     
 직접 번식시킨 건강한 베타로, 색깔이 정말 선명하고 아름답습니다.
@@ -22,6 +22,7 @@ export const mockProducts: Product[] = [
 베타 전용 사료와 컨디셔닝 가이드를 함께 드립니다.
 베타 키우기가 처음이신분들께도 자세한 사육 가이드 제공해드려요!`,
     createdAt: "2024-11-04T08:30:00Z",
+    status: "selling",
     interactions: {
       views: 125,
       likes: 34,
@@ -37,7 +38,6 @@ export const mockProducts: Product[] = [
       "/img/fish/guppy-blue.jpg",
       "/img/fish/guppy-yellow.jpg",
     ],
-    link: "/product/2",
     description: `색상이 다양하고 아름다운 구피 트리오입니다! 🌈
     
 번식력이 뛰어나고 키우기 쉬워서 초보자분들께 강력 추천합니다.
@@ -51,7 +51,8 @@ export const mockProducts: Product[] = [
 
 모두 건강하고 활발하며, 먹이도 잘 먹습니다.
 치어 사육에 대한 팁도 함께 알려드려요!`,
-    createdAt: "2024-11-04T06:15:00Z", // 4시간 전
+    createdAt: "2024-11-04T06:15:00Z",
+    status: "selling",
     interactions: {
       views: 89,
       likes: 23,
@@ -63,7 +64,7 @@ export const mockProducts: Product[] = [
     itemName: "네온테트라 스쿨링 세트 (20마리)",
     price: 32000,
     itemImage: "/img/fish/neon-tetra-school.jpg",
-    link: "/product/3",
+    link: "https://github.com/yeaseula",
     description: `아름다운 스쿨링을 보여주는 네온테트라 20마리 세트입니다! ✨
     
 모두 같은 사이즈로 통일되어 있어서 스쿨링이 더욱 아름답게 보입니다.
@@ -76,7 +77,8 @@ export const mockProducts: Product[] = [
 - 생존율 높음
 
 평화로운 성격이라 다른 소형 열대어들과 함께 키우기 좋습니다.`,
-    createdAt: "2024-11-03T20:45:00Z", // 1일 전
+    createdAt: "2024-11-03T20:45:00Z",
+    status: "sold",
     interactions: {
       views: 67,
       likes: 19,
@@ -88,7 +90,7 @@ export const mockProducts: Product[] = [
     itemName: "아쿠아스케이핑용 모스볼 세트 (10개입)",
     price: 25000,
     itemImage: "/img/plants/moss-ball-set.jpg",
-    link: "/product/4",
+    link: "https://github.com/qwezxc3810",
     description: `아쿠아스케이핑에 완벽한 자연산 모스볼 세트입니다! 🌿
     
 직접 채취한 신선한 모스로 만든 볼들로, 어항의 자연스러운 분위기를 연출해줍니다.
@@ -98,7 +100,8 @@ export const mockProducts: Product[] = [
 - 대형 모스볼 4개 (지름 5-7cm)
 - 중형 모스볼 6개 (지름 3-5cm)
 - 관리 가이드 포함`,
-    createdAt: "2024-11-02T14:20:00Z", // 2일 전
+    createdAt: "2024-11-02T14:20:00Z",
+    status: "sold",
     interactions: {
       views: 45,
       likes: 12,
@@ -111,7 +114,7 @@ export const mockProducts: Product[] = [
     price: 35000,
     itemImage: "/img/fish/ancistrus-1.png",
 
-    link: "/product/5",
+    link: "https://github.com/nockbeet",
     description: `청소부 물고기로 유명한 안시스트루스 알비노 브리딩 페어입니다! 🧹
     
 어항 청소도 해주고 번식도 가능한 일석이조 물고기예요.
@@ -122,7 +125,8 @@ export const mockProducts: Product[] = [
 - 매우 활발하게 이끼와 잔여사료 청소
 - 온순한 성격으로 다른 물고기와 잘 어울림
 - 동굴이나 나무 장식을 좋아함`,
-    createdAt: "2024-11-01T16:30:00Z", // 3일 전
+    createdAt: "2024-11-01T16:30:00Z",
+    status: "selling",
     interactions: {
       views: 156,
       likes: 41,

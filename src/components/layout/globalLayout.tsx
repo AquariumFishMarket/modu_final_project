@@ -111,7 +111,7 @@ function LayoutContent() {
     if (path === "/product/add") {
       setHeaderConfig({
         show: true,
-        type: "edit",
+        type: "productAdd",
         inputState: true,
         onBackClick: () => navigate("/"),
         onButtonClick: () => console.log("상품 등록"),
@@ -123,7 +123,7 @@ function LayoutContent() {
     if (path.match(/^\/product\/[^/]+$/)) {
       setHeaderConfig({
         show: true,
-        type: "detail",
+        type: "productDetail",
         onBackClick: () => navigate("/"),
         onMoreClick: () => console.log("더보기"),
       });

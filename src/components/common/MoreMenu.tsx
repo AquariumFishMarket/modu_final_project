@@ -34,7 +34,7 @@ export default function MoreMenu({
   onLeave,
   onLogout,
   onSettings,
-  onMarkasSold,
+  onMarkAsSold,
 }: MoreMenuProps) {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [alertType, setAlertType] = useState<
@@ -192,7 +192,7 @@ export default function MoreMenu({
         onConfirm={{
           delete: onDelete,
           logout: onLogout,
-          sold: onMarkasSold,
+          sold: onMarkAsSold,
         }}
       />
     </>

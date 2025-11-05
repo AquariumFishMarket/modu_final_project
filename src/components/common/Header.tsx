@@ -90,8 +90,23 @@ function Header() {
         </Section>
       )}
 
+      {/* 상품 등록 */}
+      {config.type === "productAdd" && (
+        <Section>
+          <IconButton onClick={config.onBackClick}>
+            <img src="/img/icon-arrow-left.svg" alt="이전 페이지로 이동" />
+          </IconButton>
+          <DefaultButton
+            text="등록"
+            width={90}
+            disabled={!config.inputState}
+            onClick={config.onButtonClick}
+          />
+        </Section>
+      )}
+
       {/* 상품 상세 */}
-      {config.type === "detail" && (
+      {config.type === "productDetail" && (
         <Section>
           <IconButton onClick={config.onBackClick}>
             <img src="/img/icon-arrow-left.svg" alt="이전 페이지로 이동" />
