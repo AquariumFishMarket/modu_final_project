@@ -5,7 +5,18 @@ export interface UserProfile {
   userId: string; // 사용자 ID (예: @username)
   profileImage: string; // 프로필 이미지 URL
   description: string; // 사용자 소개
+
+  // SNS
   followerCount: number; // 팔로워 수
   followingCount: number; // 팔로잉 수
   isFollowing: boolean; // 현재 사용자가 팔로우 중인지 여부
+
+  /* 명슬 추가! */
+  // 🆕 기본 회원 정보
+  email: string; // 이메일 주소
+
+  // 🆕 계정 상태
+  accountStatus: "active" | "suspended" | "deleted"; // 계정 상태
+  createdAt: string; // 가입일
+  lastActiveAt: string; // 마지막 활동일
 }

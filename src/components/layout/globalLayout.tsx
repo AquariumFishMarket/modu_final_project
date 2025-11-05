@@ -111,10 +111,33 @@ function LayoutContent() {
     if (path === "/product/add") {
       setHeaderConfig({
         show: true,
-        type: "edit",
+        type: "productAdd",
         inputState: true,
         onBackClick: () => navigate("/"),
         onButtonClick: () => console.log("상품 등록"),
+      });
+      return;
+    }
+
+    // 상품 상세
+    if (path.match(/^\/product\/[^/]+$/)) {
+      setHeaderConfig({
+        show: true,
+        type: "productDetail",
+        onBackClick: () => navigate("/"),
+        onMoreClick: () => console.log("더보기"),
+      });
+      return;
+    }
+
+    // 상품 수정 (상품 상세보다 뒤에 위치)
+    if (path.match(/^\/product\/[^/]+\/edit$/)) {
+      setHeaderConfig({
+        show: true,
+        type: "edit",
+        inputState: true,
+        onBackClick: () => navigate(-1),
+        onButtonClick: () => console.log("상품 수정 완료"),
       });
       return;
     }
@@ -128,31 +151,24 @@ function LayoutContent() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
 
-  // FooterNav를 숨길 경로들
-  const hideNavPaths = [
-    "/post",
-    "/signup",
-    "/login",
-    "/login/email",
-    "/profile/setup",
-    "/profile/edit",
-    "/product/add",
-  ];
+  // Nav 있을 부분
+  const shouldShowNav = (): boolean => {
+    const path = location.pathname;
 
-  // 현재 경로가 숨김 목록에 있는지 확인
-  const shouldHideNav = hideNavPaths.some((path) =>
-    location.pathname.startsWith(path)
-  );
+    const showNavPaths = ["/", "/search", "/profile", "/chat"];
+
+    return showNavPaths.includes(path);
+  };
 
   const isProfilePage = location.pathname === "/profile";
 
   return (
     <LayoutContainer $isProfile={isProfilePage}>
       <Header />
-      <MainContent $hasFooter={!shouldHideNav} $isProfile={isProfilePage}>
+      <MainContent $hasFooter={shouldShowNav()} $isProfile={isProfilePage}>
         <Outlet />
       </MainContent>
-      {!shouldHideNav && <FooterNav />}
+      {shouldShowNav() && <FooterNav />}
     </LayoutContainer>
   );
 }
