@@ -128,31 +128,24 @@ function LayoutContent() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
 
-  // FooterNav를 숨길 경로들
-  const hideNavPaths = [
-    "/post",
-    "/signup",
-    "/login",
-    "/login/email",
-    "/profile/setup",
-    "/profile/edit",
-    "/product/add",
-  ];
+  // Nav 있을 부분
+  const shouldShowNav = (): boolean => {
+    const path = location.pathname;
 
-  // 현재 경로가 숨김 목록에 있는지 확인
-  const shouldHideNav = hideNavPaths.some((path) =>
-    location.pathname.startsWith(path)
-  );
+    const showNavPaths = ["/", "/search", "/profile", "/chat"];
+
+    return showNavPaths.includes(path);
+  };
 
   const isProfilePage = location.pathname === "/profile";
 
   return (
     <LayoutContainer $isProfile={isProfilePage}>
       <Header />
-      <MainContent $hasFooter={!shouldHideNav} $isProfile={isProfilePage}>
+      <MainContent $hasFooter={shouldShowNav()} $isProfile={isProfilePage}>
         <Outlet />
       </MainContent>
-      {!shouldHideNav && <FooterNav />}
+      {shouldShowNav() && <FooterNav />}
     </LayoutContainer>
   );
 }
