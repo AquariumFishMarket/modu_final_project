@@ -14,9 +14,11 @@ import {
 import DefaultButton from "./Button";
 import MoreMenu from "./MoreMenu";
 import { useHeader } from "../../contexts/HeaderContext";
+import { useSearchContext } from "../../contexts/SearchContext";
 
 function Header() {
   const { config } = useHeader();
+  const { inputValue, handleInputChange, clearSearch } = useSearchContext();
 
   // Header를 숨길 경우 아무것도 렌더링하지 않음
   if (!config.show) {
@@ -41,11 +43,36 @@ function Header() {
       {config.type === "search" && (
         <Section>
           <AllyHiddenTitle>검색</AllyHiddenTitle>
-          <SearchForm>
-            <BackButton onClick={config.onBackClick}>
+          <SearchForm
+            onSubmit={(e) => {
+              e.preventDefault(); // 폼 제출 방지
+            }}
+          >
+            <BackButton
+              onClick={() => {
+                clearSearch();
+                config.onBackClick?.();
+              }}
+            >
               <img src="/img/icon-arrow-left.svg" alt="이전 페이지로 이동" />
             </BackButton>
-            <SearchInput type="text" placeholder="계정 검색" autoFocus />
+            <SearchInput
+              type="text"
+              placeholder="계정 검색  (2글자 이상 입력해주세요.)"
+              autoFocus
+              value={inputValue}
+              onChange={(e) => handleInputChange(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault(); // 엔터키로 폼 제출 방지
+                }
+              }}
+              onBlur={() => {
+                if (!inputValue.trim()) {
+                  clearSearch();
+                }
+              }}
+            />
           </SearchForm>
         </Section>
       )}
@@ -87,6 +114,35 @@ function Header() {
             height="medium"
             disabled={!config.inputState}
             onClick={config.onButtonClick}
+          />
+        </Section>
+      )}
+
+      {/* 상품 등록 */}
+      {config.type === "productAdd" && (
+        <Section>
+          <IconButton onClick={config.onBackClick}>
+            <img src="/img/icon-arrow-left.svg" alt="이전 페이지로 이동" />
+          </IconButton>
+          <DefaultButton
+            text="등록"
+            width={90}
+            disabled={!config.inputState}
+            onClick={config.onButtonClick}
+          />
+        </Section>
+      )}
+
+      {/* 상품 상세 */}
+      {config.type === "productDetail" && (
+        <Section>
+          <IconButton onClick={config.onBackClick}>
+            <img src="/img/icon-arrow-left.svg" alt="이전 페이지로 이동" />
+          </IconButton>
+          <MoreMenu
+            type="product"
+            onSettings={() => console.log("설정")}
+            onLogout={() => console.log("로그아웃")}
           />
         </Section>
       )}

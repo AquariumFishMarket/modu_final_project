@@ -5,39 +5,15 @@ import styled, { keyframes } from "styled-components";
 interface AlertModalProps {
   isOpen: boolean;
   onClose: () => void;
-  type: "delete" | "logout" | "block" | "report" | null;
+  type: "delete" | "logout" | "block" | "report" | "sold" | null;
   onConfirm?: {
     delete?: () => void;
     logout?: () => void;
     block?: () => void;
     report?: () => void;
+    sold?: () => void; // sold 확인 함수 추가!
   };
 }
-
-const ALERT_CONFIGS = {
-  delete: {
-    message: "게시글을 삭제할까요?",
-    confirmText: "삭제",
-    variant: "danger" as const,
-  },
-  logout: {
-    message: "로그아웃 하시겠어요?",
-    confirmText: "로그아웃",
-    variant: "primary" as const,
-  },
-  block: {
-    message: "이 사용자를 차단할까요?",
-    confirmText: "차단",
-    variant: "danger" as const,
-  },
-  report: {
-    title: "이 게시글을 신고할까요?",
-    message: "부적절한 내용으로 신고됩니다.",
-    confirmText: "신고",
-    variant: "danger" as const,
-  },
-  // ... 다른 타입들
-};
 
 // 애니메이션 정의
 const fadeIn = keyframes`
@@ -134,7 +110,41 @@ export default function AlertModal({
 }: AlertModalProps) {
   if (!type || !isOpen) return null;
 
-  const config = ALERT_CONFIGS[type];
+  const getAlertConfig = (alertType: string) => {
+    switch (alertType) {
+      case "delete":
+        return {
+          message: "게시글을 삭제할까요?",
+          confirmText: "삭제",
+        };
+      case "logout":
+        return {
+          message: "로그아웃 하시겠어요?",
+          confirmText: "로그아웃",
+        };
+      case "block":
+        return {
+          message: "이 사용자를 차단할까요?",
+          confirmText: "차단",
+        };
+      case "report":
+        return {
+          message: "이 게시글을 신고할까요?",
+          confirmText: "신고",
+        };
+      case "sold":
+        return {
+          message: "판매완료 처리할까요?",
+          confirmText: "판매완료",
+        };
+      default: // 타입 안정성 보장을 위해
+        return {
+          message: "확인하시겠어요?",
+          confirmText: "확인",
+        };
+    }
+  };
+  const config = getAlertConfig(type);
 
   const handleConfirm = () => {
     onConfirm?.[type]?.();

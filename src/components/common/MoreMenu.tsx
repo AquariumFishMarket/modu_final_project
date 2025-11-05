@@ -4,8 +4,7 @@ import BottomSheet, { SheetItem } from "./modal/BottomSheet";
 import AlertModal from "./modal/AlertModal";
 
 interface MoreMenuProps {
-  // productDetail 추가
-  type: "profile" | "post" | "comment" | "chat" | "chatList";
+  type: "profile" | "post" | "comment" | "chat" | "chatList" | "product";
   onEdit?: () => void;
   onDelete?: () => void;
   onReport?: () => void;
@@ -13,7 +12,7 @@ interface MoreMenuProps {
   onLeave?: () => void;
   onLogout?: () => void;
   onSettings?: () => void;
-  className?: string;
+  onMarkAsSold?: () => void; // 상품 판매완료 함수 추가!
 }
 
 const MoreButton = styled.button`
@@ -35,9 +34,12 @@ export default function MoreMenu({
   onLeave,
   onLogout,
   onSettings,
+  onMarkAsSold,
 }: MoreMenuProps) {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const [alertType, setAlertType] = useState<"delete" | "logout" | null>(null);
+  const [alertType, setAlertType] = useState<
+    "delete" | "logout" | "sold" | null
+  >(null);
 
   const openSheet = () => {
     setIsSheetOpen(true);
@@ -61,6 +63,12 @@ export default function MoreMenu({
     console.log("로그아웃?");
   };
 
+  const handleMarkAsSold = () => {
+    closeSheet();
+    setAlertType("sold");
+    console.log("판매완료?");
+  };
+
   return (
     <>
       <MoreButton onClick={openSheet}>
@@ -79,9 +87,22 @@ export default function MoreMenu({
             >
               설정 및 개인정보
             </SheetItem>
-            <SheetItem className="danger" onClick={handleLogout}>
-              로그아웃
+            <SheetItem onClick={handleLogout}>로그아웃</SheetItem>
+          </>
+        )}
+
+        {type === "product" && (
+          <>
+            <SheetItem
+              onClick={() => {
+                onEdit?.();
+                closeSheet();
+              }}
+            >
+              수정
             </SheetItem>
+            <SheetItem onClick={handleDelete}>삭제</SheetItem>
+            <SheetItem onClick={handleMarkAsSold}>판매 완료</SheetItem>
           </>
         )}
 
@@ -96,9 +117,7 @@ export default function MoreMenu({
             >
               수정
             </SheetItem>
-            <SheetItem className="danger" onClick={handleDelete}>
-              삭제
-            </SheetItem>
+            <SheetItem onClick={handleDelete}>삭제</SheetItem>
           </>
         )}
 
@@ -173,6 +192,7 @@ export default function MoreMenu({
         onConfirm={{
           delete: onDelete,
           logout: onLogout,
+          sold: onMarkAsSold,
         }}
       />
     </>
