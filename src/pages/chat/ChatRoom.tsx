@@ -1,8 +1,10 @@
+import { useState, useEffect } from "react";
 import ProfileImg from "../../components/common/ProfileImg";
+import TextField from "../../components/common/TextField";
+import ImageUpButton from "../../components/common/imageUpload/UploadButton";
+import ImageContainer from "../../components/common/imageUpload/ImageContainer";
 
 import styled from "styled-components";
-
-
 
 interface ChatMessage {
     id: string;
@@ -14,7 +16,7 @@ interface ChatMessage {
 }
 
 const ChatContainer = styled.section`
-    max-height: 100%;
+    max-height: calc(100% - 20px);
     border: 1px solid;
     overflow-y: auto;
 `
@@ -63,10 +65,24 @@ const MyTime = styled.p`
     align-self: end;
     color: var(--color-gray-dark);
 `
+const ImageContainerWRapper = styled.div`
+    position:fixed;
+    bottom: 40px;
+`
 
 export default function ChatRoom() {
-
+    const [imgArr, setImgArr] = useState<File[]>([])
+    const [deleteIndex, setDeleteIdx] = useState<number|undefined>()
+    useEffect(()=>{
+        setImgArr(prev => prev.filter((_, i) => i !== deleteIndex));
+        //초기화
+        setDeleteIdx(undefined);
+    },[deleteIndex])
+    useEffect(()=>{
+        console.log(imgArr)
+    },[imgArr])
     return (
+        <>
         <ChatContainer>
             <YourChat>
                 <ProfileImg
@@ -103,5 +119,24 @@ export default function ChatRoom() {
                 </MyChatMessage>
             </MyChat>
         </ChatContainer>
+
+        <ImageContainerWRapper>
+            <ImageContainer imgArr={imgArr} setDeleteIdx={setDeleteIdx} />
+        </ImageContainerWRapper>
+        <div>
+
+
+        </div>
+        <TextField
+        left={<ImageUpButton
+            multiple={true}
+            colortype="gray"
+            size="small"
+            imgArr={imgArr}
+            setImgArr={setImgArr}
+        />}
+        placeholder="메시지 입력하기.."
+        ></TextField>
+        </>
     )
 }

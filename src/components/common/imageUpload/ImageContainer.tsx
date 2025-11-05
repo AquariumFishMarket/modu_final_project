@@ -1,6 +1,7 @@
 import { Dispatch, SetStateAction, useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import DeleteButton from "./DeleteButton";
+import DefaultButton from "../Button";
 import styled,{ css } from "styled-components";
 
 import useEmblaCarousel from "embla-carousel-react";
@@ -75,6 +76,43 @@ const ProductSlide = styled.div<{$length:number}>`
     object-fit: cover;
   }
 `
+const ChatWriteCont = styled.section`
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  z-index: 99;
+  background-color: #fff;
+  border-radius: 15px;
+  padding: 20px;
+  width: 300px;
+  max-height: 250px;
+`
+const ChatWrapper = styled.div`
+
+`
+const ChatSlide = styled.div<{$index:number, $keynum:number}>`
+  position: relative;
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  margin-bottom: ${({ $index, $keynum }) =>
+    $keynum === $index ? '0' : '10px'};
+`
+const ChatImgContainer = styled.div`
+  width: 70px;
+  height: 70px;
+  border-radius: 10px;
+  overflow: hidden;
+  > img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+`
+const ChatFileInfo = styled.div`
+  font-size: var(--font-size-md);
+`
 
 export default function ImageContainer({
   imgArr,
@@ -118,6 +156,7 @@ export default function ImageContainer({
   if(pathname.includes('post')) { isLocation = 'post' }
   else if(pathname.includes('profile')) { isLocation = 'profile' }
   else if(pathname.includes('product')) { isLocation = 'product' }
+  else if(pathname.includes('chat-room')) { isLocation = 'chatroom' }
 
   if(isLocation == 'product') {
     return (
@@ -164,5 +203,28 @@ export default function ImageContainer({
         )}
       </>
     );
+  }
+  if (isLocation == 'chatroom') {
+    return (
+      <ChatWriteCont>
+        <ChatWrapper>
+          {imgArr.map((imgele, i) => (
+            <ChatSlide key={i} $keynum={i+1} $index={imgArr.length}>
+              <ChatImgContainer>
+                <img src={URL.createObjectURL(imgele)} alt={`preview-${i}`}></img>
+              </ChatImgContainer>
+              <ChatFileInfo>
+                <p>{imgele.name}</p>
+                <p style={{ marginTop: '5px' }}>{Math.round(imgele.size / 1024)} KB</p>
+              </ChatFileInfo>
+              <DeleteButton data-index={i} setDeleteIdx={setDeleteIdx} />
+            </ChatSlide>
+          ))}
+          <div style={{ marginTop: '15px' }}>
+            <DefaultButton height="medium" text="전송하기" />
+          </div>
+        </ChatWrapper>
+      </ChatWriteCont>
+    )
   }
 }

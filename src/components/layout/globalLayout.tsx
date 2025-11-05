@@ -137,6 +137,7 @@ function LayoutContent() {
     "/profile/setup",
     "/profile/edit",
     "/product/add",
+    "/chat-room"
   ];
 
   // 현재 경로가 숨김 목록에 있는지 확인
