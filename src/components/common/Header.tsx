@@ -90,6 +90,20 @@ function Header() {
         </Section>
       )}
 
+      {/* 상품 상세 */}
+      {config.type === "detail" && (
+        <Section>
+          <IconButton onClick={config.onBackClick}>
+            <img src="/img/icon-arrow-left.svg" alt="이전 페이지로 이동" />
+          </IconButton>
+          <MoreMenu
+            type="product"
+            onSettings={() => console.log("설정")}
+            onLogout={() => console.log("로그아웃")}
+          />
+        </Section>
+      )}
+
       {/* 게시글 작성 */}
       {config.type === "post" && (
         <Section>

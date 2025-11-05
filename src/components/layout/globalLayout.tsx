@@ -119,6 +119,29 @@ function LayoutContent() {
       return;
     }
 
+    // 상품 상세
+    if (path.match(/^\/product\/[^/]+$/)) {
+      setHeaderConfig({
+        show: true,
+        type: "detail",
+        onBackClick: () => navigate("/"),
+        onMoreClick: () => console.log("더보기"),
+      });
+      return;
+    }
+
+    // 상품 수정 (상품 상세보다 뒤에 위치)
+    if (path.match(/^\/product\/[^/]+\/edit$/)) {
+      setHeaderConfig({
+        show: true,
+        type: "edit",
+        inputState: true,
+        onBackClick: () => navigate(-1),
+        onButtonClick: () => console.log("상품 수정 완료"),
+      });
+      return;
+    }
+
     // 기본 (피드)
     setHeaderConfig({
       show: true,
