@@ -7,11 +7,9 @@ export const GalleryContainer = styled.div`
   width: 100%;
   max-width: 39rem;
   margin: 0 auto;
-  padding: 0 1rem 2rem 1rem;
 
   @media (max-width: 768px) {
     gap: 0.5rem;
-    padding: 0 0.5rem 2rem 0.5rem;
   }
 `;
 
