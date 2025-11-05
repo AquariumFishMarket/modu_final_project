@@ -23,6 +23,7 @@ const Delete = styled.button`
 export default function DeleteButton({"data-index":i,setDeleteIdx}:Deleteinterface) {
     const handleDelete = (e:React.MouseEvent<HTMLButtonElement>):void => {
         setDeleteIdx(Number(e.currentTarget.dataset.index))
+
     }
 
     return (

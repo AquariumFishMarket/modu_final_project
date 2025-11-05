@@ -1,7 +1,6 @@
 import { Dispatch, SetStateAction, useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import DeleteButton from "./DeleteButton";
-import DefaultButton from "../Button";
 import styled,{ css } from "styled-components";
 
 import useEmblaCarousel from "embla-carousel-react";
@@ -77,16 +76,7 @@ const ProductSlide = styled.div<{$length:number}>`
   }
 `
 const ChatWriteCont = styled.section`
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%,-50%);
-  z-index: 99;
-  background-color: #fff;
-  border-radius: 15px;
-  padding: 20px;
-  width: 300px;
-  max-height: 250px;
+
 `
 const ChatWrapper = styled.div`
 
@@ -116,7 +106,7 @@ const ChatFileInfo = styled.div`
 
 export default function ImageContainer({
   imgArr,
-  setDeleteIdx,
+  setDeleteIdx
 }: ContainerType) {
 
   const [emblaRef, emblaApi] = useEmblaCarousel({ watchDrag: false });
@@ -220,9 +210,7 @@ export default function ImageContainer({
               <DeleteButton data-index={i} setDeleteIdx={setDeleteIdx} />
             </ChatSlide>
           ))}
-          <div style={{ marginTop: '15px' }}>
-            <DefaultButton height="medium" text="전송하기" />
-          </div>
+
         </ChatWrapper>
       </ChatWriteCont>
     )
