@@ -16,7 +16,7 @@ const LayoutContainer = styled.div<{ $isProfile?: boolean }>`
   border: 1px solid #eeeeee;
 `;
 
-const MainContent = styled.main<{ $hasFooter: boolean; $isProfile?: boolean }>`
+const MainContent = styled.main<{ $hasFooter: boolean; $isProfile?: boolean, $isChatRoom?: boolean }>`
   padding-top: 68px;
   padding-left: 15px;
   padding-right: 15px;
@@ -27,7 +27,7 @@ const MainContent = styled.main<{ $hasFooter: boolean; $isProfile?: boolean }>`
     if (props.$isProfile) return "0";
     return props.$hasFooter ? "110px" : "50px";
   }};
-  background-color: #fff;
+  background-color: ${(props) => props.$isChatRoom ? 'var(--color-gray-light)' : '#fff'};
 `;
 
 function LayoutContent() {
@@ -145,11 +145,12 @@ function LayoutContent() {
   );
 
   const isProfilePage = location.pathname === "/profile";
+  const isChatRoomPage = location.pathname === "/chat-room"
 
   return (
     <LayoutContainer $isProfile={isProfilePage}>
       <Header />
-      <MainContent $hasFooter={!shouldHideNav} $isProfile={isProfilePage}>
+      <MainContent $hasFooter={!shouldHideNav} $isProfile={isProfilePage} $isChatRoom={isChatRoomPage}>
         <Outlet />
       </MainContent>
       {!shouldHideNav && <FooterNav />}
