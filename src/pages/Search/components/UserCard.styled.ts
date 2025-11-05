@@ -1,24 +1,30 @@
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 
-export const UserCard = styled(Link)`
+export const UserCard = styled.div`
   width: 100%;
   display: flex;
-  justify-content: flex-start;
+  justify-content: space-between;
   align-items: center;
-  background: none;
-  border: none;
-  cursor: pointer;
-  text-align: left;
-  text-decoration: none;
-  color: inherit;
+  gap: 1.6rem;
+  padding: 0.8rem 0;
 
   &:hover {
     background-color: rgba(0, 0, 0, 0.02);
   }
+`;
 
-  &:active {
-    background-color: rgba(0, 0, 0, 0.05);
+export const UserProfileLink = styled(Link)`
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  flex: 1;
+  text-decoration: none;
+  color: inherit;
+  min-width: 0; /* flex 아이템 overflow 방지 */
+
+  &:hover {
+    text-decoration: none;
   }
 `;
 

@@ -1,12 +1,13 @@
 import { BrowserRouter } from "react-router-dom";
 import RootRoute from "./rootRoute";
+import { SearchProvider } from "./contexts/SearchContext";
 
 function App() {
   return (
     <BrowserRouter>
-
-      <RootRoute />
-
+      <SearchProvider>
+        <RootRoute />
+      </SearchProvider>
     </BrowserRouter>
   );
 }

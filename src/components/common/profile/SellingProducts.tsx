@@ -15,6 +15,7 @@ import {
   ErrorMessage,
 } from "./SellingProducts.styled";
 import type { Product } from "../../../types/product";
+import { dummyProducts } from "../../../data/dummyProducts";
 
 interface SellingProductsProps {
   isLastSection?: boolean;
@@ -38,10 +39,9 @@ function SellingProducts({ isLastSection = false }: SellingProductsProps) {
   const scrollLeftRef = useRef(0);
   const dragDistanceRef = useRef(0); // 드래그 이동량 추적 (성능 최적화)
 
-  /**
-   * API: 판매 중인 상품 목록 가져오기
-   * TODO: API 연동 시 주석 해제
-   */
+  //  API: 판매 중인 상품 목록 가져오기
+  //  API 연동 시 주석 해제
+
   useEffect(() => {
     const controller = new AbortController();
 
@@ -50,7 +50,7 @@ function SellingProducts({ isLastSection = false }: SellingProductsProps) {
         setIsLoading(true);
         setError(null);
 
-        // TODO: API 연동 시 주석 해제
+        // API 연동 시 주석 해제
         // const response = await fetch('/api/products/selling', {
         //   signal: controller.signal
         // });
@@ -58,8 +58,8 @@ function SellingProducts({ isLastSection = false }: SellingProductsProps) {
         // const data = await response.json();
         // setProducts(data.products);
 
-        // 임시: API 연동 전까지 빈 배열
-        setProducts([]);
+        // 임시: API 연동 전까지 더미 데이터 사용
+        setProducts(dummyProducts);
       } catch (error) {
         if (error instanceof Error && error.name === "AbortError") {
           return;
@@ -180,7 +180,7 @@ function SellingProducts({ isLastSection = false }: SellingProductsProps) {
   return (
     <ProductSection $isLastSection={isLastSection}>
       <ProductTitle>판매 중인 상품</ProductTitle>
-      {(
+      {
         <ProductListContainer
           ref={scrollContainerRef}
           $isDragging={isDragging}
@@ -217,7 +217,7 @@ function SellingProducts({ isLastSection = false }: SellingProductsProps) {
             </ProductCard>
           ))}
         </ProductListContainer>
-      )}
+      }
     </ProductSection>
   );
 }

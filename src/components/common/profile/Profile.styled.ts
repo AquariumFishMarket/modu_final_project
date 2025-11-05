@@ -150,7 +150,7 @@ export const PostListContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 1.6rem;
-  padding: 0 1.6rem 2rem 1.6rem;
+  padding: 1.6rem 2.1rem;
 `;
 
 export const EmptyPostMessage = styled.p`

@@ -27,31 +27,17 @@ import type { UserProfile } from "../../../types/user";
 import PostCard from "../postCard/PostCard";
 import PostStateBar from "../PostStateBar";
 import PostGallery from "./PostGallery";
+import { dummyPosts, type Post } from "../../../data/dummyPosts";
 
-/**
- * Profile 컴포넌트
- * - 내 프로필과 다른 유저의 프로필을 조건부 렌더링
- * - isMyProfile = (profileData.id === currentUserId)로 구분
- *
- * API 연동 예정:
- * - fetchProfileData: 프로필 정보 가져오기
- * - fetchUserPosts: 사용자 게시글 목록 가져오기
- * - handleFollowToggle: 팔로우/언팔로우 처리
- * - handleLikeToggle: 게시글 좋아요 처리
- */
+//  Profile 컴포넌트
+//  - 내 프로필과 다른 유저의 프로필을 조건부 렌더링
+//  - isMyProfile = (profileData.id === currentUserId)로 구분
 
-// 게시글 타입 정의
-interface Post {
-  postId: string;
-  content: string;
-  imageSrc?: string;
-  imageAlt?: string;
-  dateTime: string;
-  dateText: string;
-  likeCount: number;
-  commentCount: number;
-  isLiked: boolean;
-}
+//  API 연동 예정:
+//  - fetchProfileData: 프로필 정보 가져오기
+//  - fetchUserPosts: 사용자 게시글 목록 가져오기
+//  - handleFollowToggle: 팔로우/언팔로우 처리
+//  - handleLikeToggle: 게시글 좋아요 처리
 
 function Profile() {
   const navigate = useNavigate();
@@ -59,7 +45,7 @@ function Profile() {
   // URL 파라미터에서 userId 가져오기 (동적 라우팅 대비)
   const { userId: paramUserId } = useParams<{ userId?: string }>();
 
-  // TODO: 실제 로그인된 사용자 ID는 Context API 또는 Redux에서 가져오기
+  // 실제 로그인된 사용자 ID는 Context API 또는 Redux에서 가져오기
   const [currentUserId] = useState<string>("");
 
   // URL 파라미터가 있으면 해당 유저, 없으면 내 프로필
@@ -84,7 +70,7 @@ function Profile() {
   const [userPosts, setUserPosts] = useState<Post[]>([]);
 
   // 포스트 상태 관리 (리스트 / 갤러리)
-  const [postState, setPostState] = useState<'list' | 'gallery'>('list');
+  const [postState, setPostState] = useState<"list" | "gallery">("list");
 
   // 내 프로필인지 다른 사람 프로필인지 구분
   const isMyProfile = profileData.id && profileData.id === currentUserId;
@@ -92,10 +78,9 @@ function Profile() {
   // 팔로우 처리 중 상태 (중복 클릭 방지)
   const [isFollowLoading, setIsFollowLoading] = useState(false);
 
-  /**
-   * API: 프로필 데이터 가져오기
-   * TODO: API 연동 시 주석 해제
-   */
+  //  API: 프로필 데이터 가져오기
+  //  API 연동 시 주석 해제
+
   // const fetchProfileData = async (
   //   accountname: string
   // ): Promise<UserProfile | null> => {
@@ -114,10 +99,9 @@ function Profile() {
   //   }
   // };
 
-  /**
-   * API: 사용자 게시글 피드 가져오기
-   * TODO: API 연동 시 주석 해제
-   */
+  //  API: 사용자 게시글 피드 가져오기
+  //  API 연동 시 주석 해제
+
   // const fetchUserPosts = async (
   //   userId: string
   // ): Promise<Post[] | null> => {
@@ -132,10 +116,9 @@ function Profile() {
   //   }
   // };
 
-  /**
-   * API: 팔로우/언팔로우 처리 (낙관적 업데이트)
-   * TODO: API 연동 시 주석 해제된 부분 활성화
-   */
+  // API: 팔로우/언팔로우 처리 (낙관적 업데이트)
+  //  API 연동 시 주석 해제된 부분 활성화
+
   const handleFollowToggle = async (): Promise<void> => {
     if (isFollowLoading) return;
 
@@ -154,7 +137,7 @@ function Profile() {
 
     setIsFollowLoading(true);
     try {
-      // TODO: API 연동 시 주석 해제
+      // API 연동 시 주석 해제
       // const response = await fetch(`/api/users/${profileData.id}/follow`, {
       //   method: newFollowState ? 'POST' : 'DELETE',
       // });
@@ -167,10 +150,9 @@ function Profile() {
     }
   };
 
-  /**
-   * 채팅 버튼 클릭 핸들러
-   * TODO: 채팅 페이지 라우팅 구현
-   */
+  // 채팅 버튼 클릭 핸들러
+  // 채팅 페이지 라우팅 구현
+
   const handleChatClick = (): void => {
     console.log("채팅 페이지로 이동");
     // navigate(`/chat/${profileData.id}`);
@@ -203,10 +185,9 @@ function Profile() {
     navigate("/product/upload");
   };
 
-  /**
-   * API: 게시글 좋아요 토글 핸들러 (낙관적 업데이트)
-   * TODO: API 연동 시 주석 해제된 부분 활성화
-   */
+  // 게시글 좋아요 토글 핸들러 (낙관적 업데이트)
+  //  API 연동 시 주석 해제된 부분 활성화
+
   const handleLikeToggle = async (postId: string): Promise<void> => {
     const prevPosts = userPosts;
 
@@ -224,7 +205,7 @@ function Profile() {
     );
 
     try {
-      // TODO: API 연동 시 주석 해제
+      // API 연동 시 주석 해제
       // const response = await fetch(`/api/posts/${postId}/like`, {
       //   method: "POST",
       // });
@@ -235,10 +216,9 @@ function Profile() {
     }
   };
 
-  /**
-   * 프로필 공유 버튼 클릭 핸들러
-   * TODO: Web Share API 또는 클립보드 복사 기능 구현
-   */
+  //  프로필 공유 버튼 클릭 핸들러
+  // Web Share API 또는 클립보드 복사 기능 구현
+
   // const handleShareClick = async (): Promise<void> => {
   //   const profileUrl = `${window.location.origin}/profile/${profileData.userId}`;
   //   try {
@@ -257,10 +237,9 @@ function Profile() {
   //   }
   // };
 
-  /**
-   * 컴포넌트 마운트 시 프로필 데이터 및 게시글 로드
-   * TODO: API 연동 시 주석 해제
-   */
+  // 컴포넌트 마운트 시 프로필 데이터 및 게시글 로드
+  //  API 연동 시 주석 해제
+
   useEffect(() => {
     // const loadProfileAndPosts = async (): Promise<void> => {
     //   setIsLoading(true);
@@ -285,7 +264,8 @@ function Profile() {
     //
     // loadProfileAndPosts();
 
-    // 임시: API 연동 전까지 로딩 상태 해제
+    // 임시: API 연동 전까지 더미 데이터 사용
+    setUserPosts(dummyPosts);
     setIsLoading(false);
   }, [targetUserId]);
 
@@ -397,7 +377,7 @@ function Profile() {
 
           {/* 피드 섹션 - 모든 프로필에서 표시 */}
           <MyFeedSection>
-            {postState === 'list' ? (
+            {postState === "list" ? (
               <PostListContainer>
                 {userPosts.map((post) => (
                   <PostCard
@@ -430,7 +410,7 @@ function Profile() {
                 posts={userPosts}
                 onPostClick={(postId) => {
                   // TODO: 게시글 상세 페이지로 이동
-                  console.log('Gallery post clicked:', postId);
+                  console.log("Gallery post clicked:", postId);
                 }}
               />
             )}

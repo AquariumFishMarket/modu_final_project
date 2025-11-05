@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 export const PostCardContainer = styled.article`
-  max-width: 35.8rem;
+  max-width: 100%;
   margin: 0 auto;
   margin-bottom: 2.4rem;
   background: white;
@@ -25,6 +25,7 @@ export const PostMain = styled.figure`
 
   figcaption {
     padding-right: 1.6rem;
+    line-height: 1.8rem;
   }
 
   img {
