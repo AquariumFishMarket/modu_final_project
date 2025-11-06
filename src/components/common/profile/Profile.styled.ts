@@ -134,9 +134,7 @@ export const LoadingText = styled.p`
 // 내 프로필 피드 섹션
 export const MyFeedSection = styled.section`
   width: calc(100% + 30px);
-  margin-left: -15px;
-  margin-right: -15px;
-  background-color: #ffffff;
+  margin-inline: -1.5rem;
 `;
 
 export const MyFeedTitle = styled.h2`

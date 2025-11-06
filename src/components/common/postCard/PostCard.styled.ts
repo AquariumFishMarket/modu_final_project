@@ -21,16 +21,15 @@ export const PostMain = styled.figure`
   gap: 1.6rem;
   margin: 0;
   border: none;
-  padding-left: 5.4rem;
+  padding: 0 1.6rem;
 
   figcaption {
-    padding-right: 1.6rem;
     line-height: 1.8rem;
   }
 
   img {
     max-width: 100%;
-    width: 30.4rem;
+    width: 100%;
     height: auto;
     aspect-ratio: 304 / 228;
     object-fit: cover;
@@ -43,9 +42,7 @@ export const PostFooter = styled.footer`
   display: flex;
   flex-direction: column;
   gap: 1.6rem;
-  padding-top: 1.2rem;
-  padding-left: 5.4rem;
-  padding-right: 1.6rem;
+  padding: 1.2rem 1.6rem 0;
 `;
 
 export const PostActions = styled.div`

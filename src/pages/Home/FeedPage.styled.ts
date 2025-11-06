@@ -16,12 +16,13 @@ export const LogoImage = styled.img`
 `;
 
 export const FeedSection = styled.section`
-  /* 추가 스타일 */
+  width: calc(100% + 30px);
+  margin-inline: -1.5rem;
+  background-color: #ffffff;
 `;
 
 export const FeedItemWrapper = styled.div`
-  display: flex;
-  justify-content: center;
+  width: 100%;
 `;
 
 export const LoadingText = styled.p`

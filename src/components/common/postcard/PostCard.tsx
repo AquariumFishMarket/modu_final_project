@@ -128,7 +128,6 @@ function PostCard({
             <img
               src={postImageSrc}
               alt={imageAlt || "게시글 이미지"}
-              style={{ width: "304px", height: "228px" }}
               onError={handlePostImageError}
             />
           )}
