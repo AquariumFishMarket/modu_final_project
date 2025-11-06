@@ -1,6 +1,9 @@
+import { useNavigate } from "react-router-dom";
 import CommonForm, {
   FormSubmissionData,
 } from "../../components/common/CommonForm";
+import { useHeader } from "../../contexts/HeaderContext";
+import { useState, useEffect, useRef } from "react";
 
 // 유효성 검사 함수 -> profile 유효성만 따로 분리
 const validateUsername = (username: string): string | null => {
@@ -65,17 +68,57 @@ const profileFields = [
 ];
 
 export default function ProfileEdit() {
+  const navigate = useNavigate();
+  const { setHeaderConfig } = useHeader();
+  const formRef = useRef<{ submitForm: () => void }>(null);
+  const [isFormValid, setIsFormValid] = useState(false);
+
+  useEffect(() => {
+    setHeaderConfig({
+      show: true,
+      type: "edit",
+      title: "프로필 수정",
+      inputState: isFormValid,
+      onBackClick: () => navigate("/profile"),
+      onButtonClick: () => {
+        // 실제 폼 제출 로직
+        if (formRef.current && isFormValid) {
+          formRef.current.submitForm();
+        }
+      },
+    });
+
+    // 컴포넌트 언마운트 시 헤더 초기화
+    return () => {
+      setHeaderConfig({ show: false });
+    };
+  }, [isFormValid]);
+
+  // 폼 유효성 변경 핸들러
+  const handleValidationChange = (isValid: boolean) => {
+    setIsFormValid(isValid);
+  };
+
+  // 폼 제출 핸들러
   const handleSubmit = (data: FormSubmissionData) => {
     console.log("프로필 수정 완료:", data);
-    // 실제 수정 API 호출 로직
+    console.log("사용자 이름:", data.formValues.username);
+    console.log("계정 ID:", data.formValues.accountId);
+    console.log("소개:", data.formValues.introduction);
+    console.log("프로필 이미지:", data.imageFiles);
+
+    // 수정 완료 후 프로필 페이지로 이동
+    navigate("/profile");
   };
 
   return (
     <CommonForm
+      ref={formRef}
       formType="profile"
       fields={profileFields}
-      showButton={false} // ProfileEdit는 버튼 없음 (메뉴 버튼으로 대체)
+      showButton={false}
       onSubmit={handleSubmit}
+      onValidationChange={handleValidationChange}
     />
   );
 }

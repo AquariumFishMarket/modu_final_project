@@ -127,6 +127,7 @@ function Header() {
           <DefaultButton
             text="등록"
             width={90}
+            height="medium"
             disabled={!config.inputState}
             onClick={config.onButtonClick}
           />

@@ -1,4 +1,9 @@
-import React, { useState, useImperativeHandle, forwardRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useImperativeHandle,
+  forwardRef,
+} from "react";
 import styled from "styled-components";
 import DefaultButton from "./Button";
 import ImageContainer from "./imageUpload/ImageContainer";
@@ -9,7 +14,7 @@ import ImageUpButton from "./imageUpload/UploadButton";
  * 프로필, 상품 등록 페이지에서 공통으로 쓰일 입력폼 컴포넌트
  */
 
-// 🆕 ref로 노출할 메서드 타입 정의
+// ref로 노출할 메서드 타입 정의
 export interface CommonFormRef {
   submitForm: () => void;
 }
@@ -20,6 +25,7 @@ export interface CommonFormProps {
   fields: FormFieldConfig[];
   showButton?: boolean;
   onSubmit?: (data: FormSubmissionData) => void;
+  onValidationChange?: (isValid: boolean) => void;
 }
 
 export interface FormFieldConfig {
@@ -90,9 +96,22 @@ const InputGroup = styled.div`
     padding: 15px 8px;
     line-height: 1.5;
     border: 1px solid var(--color-gray-medium);
+    outline: none;
     border-radius: 10px;
     background: transparent;
     resize: none; /* textarea 리사이즈 비활성화 */
+
+    &:focus {
+      border-color: var(--color-primary-600);
+    }
+
+    &.error {
+      border-color: var(--color-error);
+    }
+
+    &::placeholder {
+      color: var(--color-gray-medium);
+    }
   }
 `;
 
@@ -140,9 +159,12 @@ const FormBtnContainer = styled.div<{ $formType: "profile" | "product" }>`
   `}
 `;
 
-// 🆕 forwardRef로 감싸고 ref 타입 지정
+// forwardRef로 감싸고 ref 타입 지정
 const CommonForm = forwardRef<CommonFormRef, CommonFormProps>(
-  ({ formType, fields, showButton = true, onSubmit }, ref) => {
+  (
+    { formType, fields, showButton = true, onSubmit, onValidationChange },
+    ref
+  ) => {
     // 폼 상태 관리
     const initialValues = fields.reduce((acc, field) => {
       acc[field.name] = "";
@@ -165,6 +187,23 @@ const CommonForm = forwardRef<CommonFormRef, CommonFormProps>(
       }
     }, [deleteIdx, imgFiles]);
 
+    // 버튼 활성화 조건
+    const isFormValid = () => {
+      const requiredFields = fields.filter((field) => field.required);
+      const allRequiredFilled = requiredFields.every((field) =>
+        formValues[field.name]?.trim()
+      );
+      const hasNoErrors = Object.values(errors).every((error) => !error);
+
+      return allRequiredFilled && hasNoErrors;
+    };
+
+    // 🆕 폼 유효성이 변경될 때마다 부모에게 알림
+    useEffect(() => {
+      const isValid = isFormValid();
+      onValidationChange?.(isValid);
+    }, [formValues, errors, onValidationChange]);
+
     // 입력값 변경 핸들러
     const handleInputChange = (fieldName: string, value: string) => {
       setFormValues((prev) => ({ ...prev, [fieldName]: value }));
@@ -186,7 +225,7 @@ const CommonForm = forwardRef<CommonFormRef, CommonFormProps>(
       }
     };
 
-    // 🆕 폼 제출 로직 (버튼 클릭과 외부 호출 모두 사용)
+    // 폼 제출 로직 (버튼 클릭과 외부 호출 모두 사용)
     const performSubmit = async () => {
       // 전체 유효성 검사
       const newErrors: ValidationErrors = {};
@@ -234,12 +273,12 @@ const CommonForm = forwardRef<CommonFormRef, CommonFormProps>(
       return false; // 실패
     };
 
-    // 🆕 외부에서 호출할 수 있는 제출 함수
+    // 외부에서 호출할 수 있는 제출 함수
     const submitForm = async () => {
       await performSubmit();
     };
 
-    // 🆕 ref를 통해 submitForm 메서드 노출
+    // ref를 통해 submitForm 메서드 노출
     useImperativeHandle(ref, () => ({
       submitForm,
     }));
@@ -252,17 +291,6 @@ const CommonForm = forwardRef<CommonFormRef, CommonFormProps>(
     // 버튼 클릭 핸들러
     const handleButtonClick = async () => {
       await performSubmit();
-    };
-
-    // 버튼 활성화 조건
-    const isFormValid = () => {
-      const requiredFields = fields.filter((field) => field.required);
-      const allRequiredFilled = requiredFields.every((field) =>
-        formValues[field.name]?.trim()
-      );
-      const hasNoErrors = Object.values(errors).every((error) => !error);
-
-      return allRequiredFilled && hasNoErrors;
     };
 
     return (
@@ -295,7 +323,7 @@ const CommonForm = forwardRef<CommonFormRef, CommonFormProps>(
 
             <FormBtnContainer $formType={formType}>
               <ImageUpButton
-                multiple={formType === "product"} // 🆕 상품은 다중 이미지 가능
+                multiple={formType === "product"} // 상품은 다중 이미지 가능
                 colortype="color"
                 size="small"
                 imgArr={imgFiles}
@@ -346,10 +374,10 @@ const CommonForm = forwardRef<CommonFormRef, CommonFormProps>(
             </InputGroup>
           ))}
 
-          {/* 🆕 조건부 버튼 렌더링 */}
-          {showButton && (
+          {/* 프로필 등록만 하단 버튼 */}
+          {showButton && formType === "profile" && (
             <DefaultButton
-              text={formType === "profile" ? "저장" : "등록"}
+              text="저장"
               disabled={!isFormValid()}
               onClick={handleButtonClick}
             />
