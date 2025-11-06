@@ -65,9 +65,12 @@ button {
   border: none;
 }
 
-input {
+input,
+textarea {
   border: none;
   outline: none;
+  font-size: var(--font-size-md);
+  padding-bottom: 8px;
 }
 
 /* 변수 CSS */
