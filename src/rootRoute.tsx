@@ -12,6 +12,9 @@ import PostWrite from "./pages/post/PostWrite";
 import FeedPage from "./pages/Home/FeedPage";
 import ProductAdd from "./pages/product/ProductAdd";
 import ErrPage from "./pages/errPage/ErrPage";
+import ChatRoom from "./pages/chat/ChatRoom";
+import ProductDetail from "./pages/product/ProductDetail";
+
 export default function RootRoute() {
   return (
     <AnimatePresence>
@@ -31,12 +34,12 @@ export default function RootRoute() {
           {/* 상품 */}
           <Route path="/product/add" element={<ProductAdd />} />
           <Route path="/product/edit/:id" /> {/* 상품 수정 */}
-          <Route path="/product/:id" /> {/* 상품 상세보기 */}
+          <Route path="/product/:id" element={<ProductDetail />} />
           {/* 게시글 */}
           <Route path="/post" element={<PostWrite />} />
           {/* 채팅 */}
           <Route path="/chat-list" />
-          <Route path="/chat-room" />
+          <Route path="/chat-room" element={<ChatRoom />}/>
           {/* 에러 페이지 */}
           <Route path="/404" element={<ErrPage />} />
         </Route>
