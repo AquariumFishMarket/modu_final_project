@@ -119,6 +119,8 @@ export default function AuthForm({
       <Form onSubmit={handleSubmit}>
         <Fieldset>
           <legend className="sr-only">로그인 정보 입력</legend>
+
+          {/* 입력 필드들 */}
           {fields.map((field) => (
             <InputGroup key={field.name}>
               <Label htmlFor={field.name}>{field.label}</Label>

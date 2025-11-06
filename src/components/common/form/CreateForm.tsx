@@ -4,184 +4,30 @@ import React, {
   useImperativeHandle,
   forwardRef,
 } from "react";
-import styled from "styled-components";
-import DefaultButton from "./Button";
-import ImageContainer from "./imageUpload/ImageContainer";
-import ProfileImg from "./ProfileImg";
-import ImageUpButton from "./imageUpload/UploadButton";
+import DefaultButton from "../Button";
+import ImageContainer from "../imageUpload/ImageContainer";
+import ProfileImg from "../ProfileImg";
+import ImageUpButton from "../imageUpload/UploadButton";
+import { CommonFormRef, CreateFormProps, ValidationErrors } from "./types";
+import {
+  InputForm,
+  InputGroup,
+  ErrorMessage,
+  FormImgContainer,
+  FormBtnContainer,
+  RequiredCheck,
+} from "./Form.styled";
 
-/**
- * 프로필, 상품 등록 페이지에서 공통으로 쓰일 입력폼 컴포넌트
- */
-
-// ref로 노출할 메서드 타입 정의
-export interface CommonFormRef {
-  submitForm: () => void;
-}
-
-// 타입
-export interface CommonFormProps {
-  formType: "profile" | "product";
-  fields: FormFieldConfig[];
-  showButton?: boolean;
-  onSubmit?: (data: FormSubmissionData) => void;
-  onValidationChange?: (isValid: boolean) => void;
-  initialValues?: { [key: string]: string }; // 🆕 추가
-  initialImages?: File[]; // 🆕 추가
-  existingImageUrls?: string[]; // 🆕 기존 이미지 URL 배열
-}
-
-export interface FormFieldConfig {
-  name: string;
-  label: string;
-  placeholder: string;
-  required?: boolean;
-  validator?: (value: string) => Promise<string | null> | string | null;
-  type?: "input" | "textarea";
-  maxLength?: number;
-}
-
-export interface FormSubmissionData {
-  formData: FormData;
-  imageFiles: File[];
-  formValues: Record<string, string>;
-}
-
-interface ValidationErrors {
-  [key: string]: string;
-}
-
-// Styled
-const InputForm = styled.form`
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding: 30px 19px;
-
-  // 버튼 위 여백 30px
-  > *:last-child {
-    margin-top: 14px;
-  }
-`;
-
-const InputGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-
-  label {
-    font-size: var(--font-size-sm);
-    font-weight: 500;
-    vertical-align: bottom;
-    margin-bottom: 10px;
-    color: var(--color-gray-dark);
-  }
-
-  input {
-    padding: 8px;
-    border-bottom: 1px solid var(--color-gray-medium);
-    outline: none;
-    background: transparent;
-    &:focus {
-      border-bottom-color: var(--color-primary-600);
-    }
-
-    &.error {
-      border-bottom-color: var(--color-error);
-    }
-
-    &::placeholder {
-      color: var(--color-gray-medium);
-    }
-  }
-
-  textarea {
-    min-height: 200px;
-    padding: 15px 8px;
-    line-height: 1.5;
-    border: 1px solid var(--color-gray-medium);
-    outline: none;
-    border-radius: 10px;
-    background: transparent;
-    resize: none; /* textarea 리사이즈 비활성화 */
-
-    &:focus {
-      border-color: var(--color-primary-600);
-    }
-
-    &.error {
-      border-color: var(--color-error);
-    }
-
-    &::placeholder {
-      color: var(--color-gray-medium);
-    }
-  }
-`;
-
-const ErrorMessage = styled.span`
-  font-size: var(--font-size-sm);
-  color: var(--color-error);
-  margin-top: 6px;
-  display: block;
-`;
-
-const FormImgContainer = styled.div<{
-  $formType: "profile" | "product";
-  $hasSelectedImage: boolean;
-}>`
-  margin: 0 auto;
-  position: relative;
-  margin-bottom: 30px;
-  width: ${(props) => (props.$formType === "profile" ? "150px" : "100%")};
-  height: ${(props) => (props.$formType === "profile" ? "150px" : "auto")};
-  /* 상품 이미지 */
-  ${(props) =>
-    props.$formType === "product" &&
-    `
-    aspect-ratio: 322 / 204;
-    min-height: 204px;
-    border-radius: 10px;
-  `}
-  ${(props) =>
-    !props.$hasSelectedImage &&
-    props.$formType === "product" &&
-    `
-    border: 1px solid var(--color-gray-medium);
-    `}
-`;
-
-const FormBtnContainer = styled.div<{ $formType: "profile" | "product" }>`
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  ${(props) =>
-    props.$formType === "product" &&
-    `
-    bottom: 10px;
-    right: 10px;
-  `}
-`;
-
-// forwardRef로 감싸고 ref 타입 지정
-const CommonForm = forwardRef<CommonFormRef, CommonFormProps>(
+const CreateForm = forwardRef<CommonFormRef, CreateFormProps>(
   (
-    {
-      formType,
-      fields,
-      showButton = true,
-      onSubmit,
-      onValidationChange,
-      initialValues = {}, // 🆕 추가
-      initialImages = [], // 🆕 추가
-    },
+    { formType, fields, showButton = true, onSubmit, onValidationChange },
     ref
   ) => {
-    // 🆕 초기값을 활용한 폼 상태 초기화 (기존 코드 수정)
+    // 초기값은 모두 빈 문자열
     const [formValues, setFormValues] = useState(() => {
       const initial: Record<string, string> = {};
       fields.forEach((field) => {
-        // initialValues가 있으면 사용, 없으면 빈 문자열
-        initial[field.name] = initialValues[field.name] || "";
+        initial[field.name] = "";
       });
       return initial;
     });
@@ -189,30 +35,9 @@ const CommonForm = forwardRef<CommonFormRef, CommonFormProps>(
     const [errors, setErrors] = useState<ValidationErrors>({});
     const [imgFiles, setImgFiles] = useState<File[]>([]);
     const [deleteIdx, setDeleteIdx] = useState<number | undefined>();
+    const [hasUserInteraction, setHasUserInteraction] = useState(false);
 
     const hasSelectedImage = imgFiles.length > 0;
-
-    // 🆕 초기값이 변경될 때 폼 상태 업데이트 (선택사항 - 동적 업데이트가 필요한 경우)
-    useEffect(() => {
-      if (Object.keys(initialValues).length > 0) {
-        setFormValues((prev) => {
-          const updated = { ...prev };
-          fields.forEach((field) => {
-            if (initialValues[field.name] !== undefined) {
-              updated[field.name] = initialValues[field.name];
-            }
-          });
-          return updated;
-        });
-      }
-    }, [initialValues]); // initialValues가 변경될 때만 실행
-
-    // 🆕 초기 이미지가 변경될 때 업데이트 (선택사항)
-    useEffect(() => {
-      if (initialImages.length > 0) {
-        setImgFiles(initialImages);
-      }
-    }, [initialImages]);
 
     // 이미지 삭제 처리
     React.useEffect(() => {
@@ -240,11 +65,19 @@ const CommonForm = forwardRef<CommonFormRef, CommonFormProps>(
       onValidationChange?.(isValid);
     }, [formValues, errors, onValidationChange]);
 
-    // 입력값 변경 핸들러
+    // 입력 변경 핸들러
     const handleInputChange = (fieldName: string, value: string) => {
-      setFormValues((prev) => ({ ...prev, [fieldName]: value }));
+      const field = fields.find((f) => f.name === fieldName);
 
-      // 에러 메시지 초기화
+      let formattedValue = value;
+      if (field?.formatter) {
+        formattedValue = field.formatter(value);
+      }
+
+      setFormValues((prev) => ({ ...prev, [fieldName]: formattedValue }));
+      setHasUserInteraction(true);
+
+      // 기존 에러 제거
       if (errors[fieldName]) {
         setErrors((prev) => ({ ...prev, [fieldName]: "" }));
       }
@@ -252,6 +85,8 @@ const CommonForm = forwardRef<CommonFormRef, CommonFormProps>(
 
     // 포커스 아웃 시 유효성 검사
     const handleBlur = async (fieldName: string, value: string) => {
+      if (!hasUserInteraction) return;
+
       const field = fields.find((f) => f.name === fieldName);
       if (field?.validator && value.trim()) {
         const errorMessage = await field.validator(value);
@@ -354,12 +189,16 @@ const CommonForm = forwardRef<CommonFormRef, CommonFormProps>(
 
             {/* 상품용 이미지 렌더링 */}
             {formType === "product" && (
-              <ImageContainer imgArr={imgFiles} setDeleteIdx={setDeleteIdx} />
+              <ImageContainer
+                key={`product-images-${imgFiles.length}`}
+                imgArr={imgFiles}
+                setDeleteIdx={setDeleteIdx}
+              />
             )}
 
             <FormBtnContainer $formType={formType}>
               <ImageUpButton
-                multiple={formType === "product"} // 상품은 다중 이미지 가능
+                multiple={formType === "product"}
                 colortype="color"
                 size="small"
                 imgArr={imgFiles}
@@ -371,7 +210,10 @@ const CommonForm = forwardRef<CommonFormRef, CommonFormProps>(
           {/* 입력 필드들 */}
           {fields.map((field) => (
             <InputGroup key={field.name}>
-              <label htmlFor={field.name}>{field.label}</label>
+              <label htmlFor={field.name}>
+                {field.label}
+                {field.required && <RequiredCheck>*</RequiredCheck>}
+              </label>
 
               {/* 🆕 조건부 렌더링 - textarea vs input */}
               {field.type === "textarea" ? (
@@ -410,7 +252,6 @@ const CommonForm = forwardRef<CommonFormRef, CommonFormProps>(
             </InputGroup>
           ))}
 
-          {/* 프로필 등록만 하단 버튼 */}
           {showButton && formType === "profile" && (
             <DefaultButton
               text="저장"
@@ -424,7 +265,5 @@ const CommonForm = forwardRef<CommonFormRef, CommonFormProps>(
   }
 );
 
-// 🆕 displayName 설정 (디버깅용)
-CommonForm.displayName = "CommonForm";
-
-export default CommonForm;
+CreateForm.displayName = "CreateForm";
+export default CreateForm;

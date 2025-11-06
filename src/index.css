@@ -16,7 +16,6 @@ body {
   background-color: #fafafa;
 }
 
-
 /* 스크린리더 전용 */
 .sr-only {
   position: absolute;
@@ -58,9 +57,12 @@ button {
   border: none;
 }
 
-input {
+input,
+textarea {
   border: none;
   outline: none;
+  font-size: var(--font-size-md);
+  padding-bottom: 8px;
 }
 
 /* 변수 CSS */

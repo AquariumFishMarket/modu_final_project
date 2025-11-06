@@ -35,7 +35,6 @@ export const Input = styled.input<{ $hasError?: boolean }>`
   border-top: none;
   border-left: none;
   border-right: none;
-  padding: 8px 0;
   background: transparent;
   font-size: 14px;
 
@@ -48,6 +47,10 @@ export const Input = styled.input<{ $hasError?: boolean }>`
   &::placeholder {
     color: var(--color-gray-medium);
   }
+`;
+
+export const RequiredCheck = styled.span`
+  color: red;
 `;
 
 export const ErrorMessage = styled.span`

@@ -1,92 +1,17 @@
 import { useNavigate } from "react-router-dom";
-import CommonForm, {
-  FormSubmissionData,
-  FormFieldConfig,
-} from "../../components/common/CommonForm";
+import CreateForm from "../../components/common/form/CreateForm";
+import { FormSubmissionData } from "../../components/common/form/types";
 import { useHeader } from "../../contexts/HeaderContext";
 import { useEffect, useRef, useState } from "react";
-
-/* 유효성 검사 */
-// 상품명
-const validateProductName = (productName: string): string | null => {
-  if (productName.length < 2) {
-    return "상품명은 2자 이상 입력해주세요.";
-  }
-
-  if (productName.length > 10) {
-    return "상품명은 10자 이하로 입력해주세요.";
-  }
-
-  return null;
-};
-
-// 가격
-const validatePrice = (price: string): string | null => {
-  // 숫자만 추출 (콤마 제거)
-  const numbersOnly = price.replace(/[^\d]/g, "");
-
-  if (!numbersOnly) {
-    return "가격을 입력해주세요.";
-  }
-  const numericPrice = parseInt(numbersOnly);
-
-  if (numericPrice === 0) {
-    return "0원보다 높은 가격을 입력해주세요.";
-  }
-
-  return null;
-};
-
-// 상품 설명
-const validateDescription = (description: string): string | null => {
-  if (description.length < 10) {
-    return "상품 설명은 10자 이상 입력해주세요.";
-  }
-
-  if (description.length > 500) {
-    return "상품 설명은 500자 이하로 입력해주세요.";
-  }
-
-  return null;
-};
-
-const productFields: FormFieldConfig[] = [
-  {
-    name: "productname",
-    label: "상품명",
-    placeholder: "2-10자 이내여야 합니다.",
-    required: true,
-    validator: validateProductName,
-  },
-  {
-    name: "price",
-    label: "가격",
-    placeholder: "숫자만 입력 가능합니다.",
-    required: true,
-    validator: validatePrice,
-  },
-  {
-    name: "link",
-    label: "판매 링크",
-    placeholder: "URL을 입력해 주세요.",
-    required: false,
-  },
-  {
-    name: "description",
-    label: "상품 설명",
-    placeholder: "상품에 대한 자세한 설명을 입력해주세요.",
-    required: true,
-    validator: validateDescription,
-    type: "textarea" as const,
-    maxLength: 500,
-  },
-];
+import { getProductFields } from "../../utils/validation/productValidation";
 
 export default function ProductAdd() {
   const navigate = useNavigate();
   const { setHeaderConfig } = useHeader();
   const formRef = useRef<{ submitForm: () => void }>(null);
   const [isFormValid, setIsFormValid] = useState(false); // 폼 유효성 상태
+
+  const productFields = getProductFields();
 
   useEffect(() => {
     setHeaderConfig({
@@ -103,7 +28,6 @@ export default function ProductAdd() {
       },
     });
 
-    // 🆕 컴포넌트 언마운트 시 헤더 초기화
     return () => {
       setHeaderConfig({ show: false });
     };
@@ -128,11 +52,10 @@ export default function ProductAdd() {
     navigate("/");
   };
   return (
-    <CommonForm
+    <CreateForm
       ref={formRef}
       formType="product"
       fields={productFields}
-      showButton={false}
       onSubmit={handleSubmit}
       onValidationChange={handleValidationChange}
     />
