@@ -16,6 +16,8 @@ import {
   FormImgContainer,
   FormBtnContainer,
   RequiredCheck,
+  ProfileImageOverlay,
+  ProfileImageWrapper,
 } from "./Form.styled";
 
 const CreateForm = forwardRef<CommonFormRef, CreateFormProps>(
@@ -38,6 +40,13 @@ const CreateForm = forwardRef<CommonFormRef, CreateFormProps>(
     const [hasUserInteraction, setHasUserInteraction] = useState(false);
 
     const hasSelectedImage = imgFiles.length > 0;
+
+    // 🆕 프로필 이미지 클릭 시 삭제 핸들러
+    const handleProfileImageClick = () => {
+      if (hasSelectedImage) {
+        setImgFiles([]); // 이미지 삭제하여 기본 이미지로 되돌리기
+      }
+    };
 
     // 이미지 삭제 처리
     React.useEffect(() => {
@@ -122,20 +131,24 @@ const CreateForm = forwardRef<CommonFormRef, CreateFormProps>(
         });
 
         // 이미지 파일 추가
-        if (imgFiles.length > 0) {
-          if (formType === "profile") {
+        if (formType === "profile") {
+          if (imgFiles.length > 0) {
             formData.append("profileImage", imgFiles[0]);
           } else {
-            imgFiles.forEach((file, index) => {
-              formData.append(`productImage_${index}`, file);
-            });
+            formData.append("DefaultImage", "true");
           }
+        } else if (formType === "product") {
+          imgFiles.forEach((file, index) => {
+            formData.append(`productImage_${index}`, file);
+          });
         }
 
         onSubmit?.({
           formData,
           imageFiles: imgFiles,
           formValues,
+          hasCustomImage: imgFiles.length > 0, // 🆕 커스텀 이미지 여부
+          useDefaultImage: imgFiles.length === 0, // 🆕 기본 이미지 사용 여부
         });
 
         return true; // 성공
@@ -175,16 +188,24 @@ const CreateForm = forwardRef<CommonFormRef, CreateFormProps>(
           >
             {/* 프로필용 이미지 렌더링 */}
             {formType === "profile" && (
-              <>
+              <ProfileImageWrapper
+                $hasImage={hasSelectedImage}
+                onClick={handleProfileImageClick}
+                title={hasSelectedImage ? "클릭하여 기본 이미지로 변경" : ""}
+              >
                 {!hasSelectedImage ? (
                   <ProfileImg width={150} thumbimg={false} imgSrc={undefined} />
                 ) : (
-                  <ImageContainer
-                    imgArr={imgFiles}
-                    setDeleteIdx={setDeleteIdx}
-                  />
+                  <>
+                    <ProfileImg
+                      width={150}
+                      thumbimg={true}
+                      imgSrc={URL.createObjectURL(imgFiles[0])}
+                    />
+                    <ProfileImageOverlay>클릭하여 삭제</ProfileImageOverlay>
+                  </>
                 )}
-              </>
+              </ProfileImageWrapper>
             )}
 
             {/* 상품용 이미지 렌더링 */}

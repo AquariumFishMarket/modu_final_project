@@ -19,6 +19,8 @@ export interface FormSubmissionData {
   formData: FormData;
   imageFiles: File[];
   formValues: Record<string, string>;
+  hasCustomImage?: boolean;
+  useDefaultImage?: boolean;
 }
 
 export interface ValidationErrors {

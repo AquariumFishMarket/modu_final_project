@@ -97,6 +97,58 @@ export const FormImgContainer = styled.div<{
     `}
 `;
 
+// 프로필 이미지 컨테이너
+export const ProfileImageWrapper = styled.div<{ $hasImage: boolean }>`
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  ${(props) =>
+    props.$hasImage &&
+    `
+        &: hover {
+            opacity: 0.8;
+            transform: scale(0.98);
+        }
+
+        &:hover:after {
+            content: '클릭하여 기본 이미지로 변경';
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translate(-50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: var(--font-size-sm);
+            white-space: nowrap;
+            z-index: 10;
+        }
+    `}
+`;
+
+// 🆕 프로필 이미지 오버레이 (호버 시 표시)
+export const ProfileImageOverlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+`;
+
 // 수정용 폼에서만 사용하는 스타일
 export const EditImagesContainer = styled.div`
   display: flex;
