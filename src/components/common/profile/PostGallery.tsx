@@ -4,6 +4,7 @@ import {
   GalleryItem,
   GalleryImage,
   EmptyGalleryMessage,
+  MultiImageIndicator,
 } from "./PostGallery.styled";
 
 interface Post {
@@ -16,6 +17,7 @@ interface Post {
   likeCount: number;
   commentCount: number;
   isLiked: boolean;
+  imageCount?: number;
 }
 
 interface PostGalleryProps {
@@ -68,6 +70,7 @@ function PostGallery({ posts, onPostClick }: PostGalleryProps) {
             alt={post.imageAlt || post.content}
             onError={handleImageError}
           />
+          {post.imageCount && post.imageCount > 1 && <MultiImageIndicator />}
         </GalleryItem>
       ))}
     </GalleryContainer>

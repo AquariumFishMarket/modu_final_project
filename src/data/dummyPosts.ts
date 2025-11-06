@@ -12,6 +12,7 @@ export interface Post {
   content: string;
   imageSrc?: string;
   imageAlt?: string;
+  imageCount?: number; // 이미지가 여러 장일 경우 총 개수
   dateTime: string; // ISO 8601 형식
   dateText: string; // 사용자에게 표시될 날짜 텍스트
   likeCount: number;
@@ -29,6 +30,7 @@ export const dummyPosts: Post[] = [
     content: "오늘 잡은 신선한 니모입니다! 회로 드시면 안돼요",
     imageSrc: "/img/basic-img.png",
     imageAlt: "신선한 광어",
+    imageCount: 3,
     dateTime: "2025-11-04T10:30:00",
     dateText: "30분 전",
     likeCount: 42,
@@ -74,6 +76,7 @@ export const dummyPosts: Post[] = [
     content: "",
     imageSrc: "/img/basic-img.png",
     imageAlt: "오징어 손질",
+    imageCount: 5,
     dateTime: "2025-11-01T14:45:00",
     dateText: "11/01",
     likeCount: 128,
@@ -104,6 +107,7 @@ export const dummyPosts: Post[] = [
     content: "킹크랩 들어왔습니다!🦀",
     imageSrc: "/img/basic-img.png",
     imageAlt: "킹크랩",
+    imageCount: 2,
     dateTime: "2025-10-30T16:30:00",
     dateText: "10/30",
     likeCount: 205,
@@ -162,6 +166,7 @@ export const dummyPosts: Post[] = [
     content: "",
     imageSrc: "/img/basic-img.png",
     imageAlt: "갈치조림",
+    imageCount: 4,
     dateTime: "2025-10-26T12:25:00",
     dateText: "10/26",
     likeCount: 178,
@@ -189,7 +194,7 @@ export const dummyPosts: Post[] = [
     userId: "@kim_fish",
     avatarSrc: "/img/fish_profile.png",
     avatarAlt: "김수산 프로필",
-    content: "",
+    content: "오늘도 신선한 해산물과 함께! 감사합니다 🙏",
     imageSrc: "/img/basic-img.png",
     imageAlt: "해산물",
     dateTime: "2025-10-24T17:15:00",
