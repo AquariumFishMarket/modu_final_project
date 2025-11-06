@@ -26,6 +26,9 @@ export interface CommonFormProps {
   showButton?: boolean;
   onSubmit?: (data: FormSubmissionData) => void;
   onValidationChange?: (isValid: boolean) => void;
+  initialValues?: { [key: string]: string }; // 🆕 추가
+  initialImages?: File[]; // 🆕 추가
+  existingImageUrls?: string[]; // 🆕 기존 이미지 URL 배열
 }
 
 export interface FormFieldConfig {
@@ -162,21 +165,54 @@ const FormBtnContainer = styled.div<{ $formType: "profile" | "product" }>`
 // forwardRef로 감싸고 ref 타입 지정
 const CommonForm = forwardRef<CommonFormRef, CommonFormProps>(
   (
-    { formType, fields, showButton = true, onSubmit, onValidationChange },
+    {
+      formType,
+      fields,
+      showButton = true,
+      onSubmit,
+      onValidationChange,
+      initialValues = {}, // 🆕 추가
+      initialImages = [], // 🆕 추가
+    },
     ref
   ) => {
-    // 폼 상태 관리
-    const initialValues = fields.reduce((acc, field) => {
-      acc[field.name] = "";
-      return acc;
-    }, {} as Record<string, string>);
+    // 🆕 초기값을 활용한 폼 상태 초기화 (기존 코드 수정)
+    const [formValues, setFormValues] = useState(() => {
+      const initial: Record<string, string> = {};
+      fields.forEach((field) => {
+        // initialValues가 있으면 사용, 없으면 빈 문자열
+        initial[field.name] = initialValues[field.name] || "";
+      });
+      return initial;
+    });
 
-    const [formValues, setFormValues] = useState(initialValues);
     const [errors, setErrors] = useState<ValidationErrors>({});
     const [imgFiles, setImgFiles] = useState<File[]>([]);
     const [deleteIdx, setDeleteIdx] = useState<number | undefined>();
 
     const hasSelectedImage = imgFiles.length > 0;
+
+    // 🆕 초기값이 변경될 때 폼 상태 업데이트 (선택사항 - 동적 업데이트가 필요한 경우)
+    useEffect(() => {
+      if (Object.keys(initialValues).length > 0) {
+        setFormValues((prev) => {
+          const updated = { ...prev };
+          fields.forEach((field) => {
+            if (initialValues[field.name] !== undefined) {
+              updated[field.name] = initialValues[field.name];
+            }
+          });
+          return updated;
+        });
+      }
+    }, [initialValues]); // initialValues가 변경될 때만 실행
+
+    // 🆕 초기 이미지가 변경될 때 업데이트 (선택사항)
+    useEffect(() => {
+      if (initialImages.length > 0) {
+        setImgFiles(initialImages);
+      }
+    }, [initialImages]);
 
     // 이미지 삭제 처리
     React.useEffect(() => {
