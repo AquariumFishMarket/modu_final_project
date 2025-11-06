@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import SocialButton from "../../components/common/SocialButton";
 
 const LoginContainer = styled.section`
@@ -80,8 +81,28 @@ function Login() {
     console.log("페이스북 로그인 클릭!");
   };
 
+  // 페이지 전환 애니메이션
+  const pageVariants = {
+    initial: { opacity: 0, y: 10 },
+    animate: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] }
+    },
+    exit: {
+      opacity: 0,
+      transition: { duration: 0.3 }
+    }
+  };
+
   return (
-    <LoginContainer>
+    <motion.div
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      variants={pageVariants}
+    >
+      <LoginContainer>
       <LogoArea>
         {" "}
         <LogoImage src="/src/assets/icons/fish-logo.svg" alt="생선마켓 로고" />
@@ -121,6 +142,7 @@ function Login() {
         </EmailLoginSignup>
       </LoginSection>
     </LoginContainer>
+    </motion.div>
   );
 }
 

@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence } from "motion/react";
 import GlobalLayout from "./components/layout/globalLayout";
 import Login from "./pages/login/Login";
@@ -12,12 +12,21 @@ import PostWrite from "./pages/post/PostWrite";
 import FeedPage from "./pages/Home/FeedPage";
 import ProductAdd from "./pages/product/ProductAdd";
 import ErrPage from "./pages/errPage/ErrPage";
+import ChatRoom from "./pages/chat/ChatRoom";
+import ProductDetail from "./pages/product/ProductDetail";
+
 export default function RootRoute() {
+  const location = useLocation();
+
   return (
-    <AnimatePresence>
-      <Routes>
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        {/* 스플래시 - 앱 진입점 */}
+        <Route path="/" element={<Splash />} />
+
         <Route element={<GlobalLayout />}>
-          <Route path="/" element={<FeedPage />} />
+          {/* 피드 */}
+          <Route path="/feed" element={<FeedPage />} />
           {/* 로그인, 회원가입 */}
           <Route path="/login" element={<Login />} />
           <Route path="/login/email" element={<LoginEmail />} />
@@ -36,7 +45,7 @@ export default function RootRoute() {
           <Route path="/post" element={<PostWrite />} />
           {/* 채팅 */}
           <Route path="/chat-list" />
-          <Route path="/chat-room" />
+          <Route path="/chat-room" element={<ChatRoom />}/>
           {/* 에러 페이지 */}
           <Route path="/404" element={<ErrPage />} />
         </Route>
