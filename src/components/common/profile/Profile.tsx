@@ -325,14 +325,14 @@ function Profile() {
               {/* 내 프로필: 프로필 수정 + 상품 등록 버튼 */}
               <DefaultButton
                 text="프로필 수정"
-                variant="secondary"
+                variant="white"
                 width={120}
                 height="medium"
                 onClick={handleEditProfile}
               />
               <DefaultButton
                 text="상품 등록"
-                variant="secondary"
+                variant="white"
                 width={120}
                 height="medium"
                 onClick={handleUploadProduct}

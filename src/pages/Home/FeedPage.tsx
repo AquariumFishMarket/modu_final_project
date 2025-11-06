@@ -11,6 +11,8 @@ import {
   EndMessageText,
   InitialLoadingSection,
 } from "./FeedPage.styled";
+import { dummyPosts } from "../../data/dummyPosts";
+import PostCard from "../../components/common/postCard/PostCard";
 
 const FeedPage = () => {
   const navigate = useNavigate();
@@ -45,9 +47,34 @@ const FeedPage = () => {
   // API 연결 부분
 
   const fetchFeed = async (pageNum: number): Promise<Feed[]> => {
-    // 실제 API 연결
+    // 더미 데이터 사용 (임시)
+    // 실제 API 연결 시 아래 코드로 교체
 
-    return [];
+    // 페이지당 5개씩 반환
+    const itemsPerPage = 5;
+    const startIndex = (pageNum - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+
+    // 더미 데이터를 Feed 타입으로 변환
+    const convertedPosts = dummyPosts
+      .slice(startIndex, endIndex)
+      .map((post) => ({
+        id: post.postId,
+        profileImg: post.avatarSrc,
+        userName: post.userName,
+        userId: post.userId,
+        content: post.content,
+        image: post.imageSrc,
+        isLiked: post.isLiked,
+        likeCount: post.likeCount,
+        commentCount: post.commentCount,
+        createdAt: post.dateText,
+      }));
+
+    // 로딩 시뮬레이션 (500ms)
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    return convertedPosts;
   };
 
   const handleLikeToggle = (feedId: string): void => {
@@ -102,12 +129,12 @@ const FeedPage = () => {
     animate: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.5 }
+      transition: { duration: 0.5 },
     },
     exit: {
       opacity: 0,
-      transition: { duration: 0.3 }
-    }
+      transition: { duration: 0.3 },
+    },
   };
 
   // 초기 로딩 중
@@ -165,8 +192,22 @@ const FeedPage = () => {
         {/* 피드 목록 렌더링 */}
         {feedList.map((feed) => (
           <FeedItemWrapper key={feed.id}>
-            {/* FeedCard 컴포넌트 추가 */}
-            {/* <FeedCard feed={feed} onLikeToggle={handleLikeToggle} /> */}
+            <PostCard
+              postId={feed.id}
+              userName={feed.userName}
+              userId={feed.userId}
+              avatarSrc={feed.profileImg}
+              avatarAlt={`${feed.userName} 프로필`}
+              content={feed.content}
+              imageSrc={feed.image}
+              imageAlt="게시글 이미지"
+              dateTime={feed.createdAt}
+              dateText={feed.createdAt}
+              likeCount={feed.likeCount}
+              commentCount={feed.commentCount}
+              isLiked={feed.isLiked}
+              onLikeClick={() => handleLikeToggle(feed.id)}
+            />
           </FeedItemWrapper>
         ))}
 

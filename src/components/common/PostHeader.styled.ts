@@ -1,9 +1,11 @@
 import styled from "styled-components";
 
-export const PostHeader = styled.header`
+export const PostHeader = styled.section`
+  position: relative;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 0 1.6rem;
 `;
 
 export const UserInfo = styled.div`
@@ -25,16 +27,15 @@ export const UserDetails = styled.div`
 `;
 
 export const UserName = styled.strong`
-  font-size: 15px;
+  font-size: 1.4rem;
   font-weight: 700;
-  color: #0f1419;
   display: block;
   margin-bottom: 2px;
 `;
 
 export const UserId = styled.p`
-  font-size: 14px;
-  color: #536471;
+  font-size: 1.2rem;
+  color: var(--color-gray-dark);
   margin: 0;
 `;
 
