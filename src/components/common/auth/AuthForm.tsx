@@ -8,7 +8,10 @@ import {
   Input,
   ErrorMessage,
 } from "./AuthForm.styled";
-import { validateEmail, validatePassword } from "./AuthForm.utils";
+import {
+  validateEmail,
+  validatePassword,
+} from "../../../utils/validation/AuthValidation";
 
 interface FormField {
   type: "email" | "password";

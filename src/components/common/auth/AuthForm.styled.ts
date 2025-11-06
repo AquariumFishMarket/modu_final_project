@@ -22,9 +22,11 @@ export const InputGroup = styled.div`
 `;
 
 export const Label = styled.label`
-  font-size: 12px;
-  color: var(--color-gray-dark);
+  font-size: var(--font-size-sm);
   font-weight: 500;
+  color: var(--color-gray-dark);
+  vertical-align: bottom;
+  margin-bottom: 10px;
 `;
 
 export const Input = styled.input<{ $hasError?: boolean }>`
@@ -36,7 +38,7 @@ export const Input = styled.input<{ $hasError?: boolean }>`
   border-left: none;
   border-right: none;
   background: transparent;
-  font-size: 14px;
+  font-size: var(--font-size-md);
 
   &:focus {
     outline: none;
@@ -49,12 +51,8 @@ export const Input = styled.input<{ $hasError?: boolean }>`
   }
 `;
 
-export const RequiredCheck = styled.span`
-  color: red;
-`;
-
 export const ErrorMessage = styled.span`
   color: var(--color-error);
-  font-size: 12px;
+  font-size: var(--font-size-sm);
   margin-top: 6px;
 `;
