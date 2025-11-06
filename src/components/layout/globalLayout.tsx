@@ -4,30 +4,27 @@ import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { HeaderProvider, useHeader } from "../../contexts/HeaderContext";
 import { useEffect } from "react";
-import { motion } from "framer-motion";
-import { AnimatePresence } from "motion/react";
+import { motion, AnimatePresence } from "framer-motion";
+
 import { relative } from "path";
 
 
 const LayoutContainer = styled.div<{ $isProfile?: boolean }>`
   max-width: 600px;
   width: 100%;
-  height: ${(props) => (props.$isProfile ? "auto" : "100vh")};
+  height: 100vh;
   min-height: ${(props) => (props.$isProfile ? "100vh" : "auto")};
   margin: 0 auto;
-  overflow-x: hidden;
-  overflow-y: ${(props) => (props.$isProfile ? "visible" : "hidden")};
+  overflow: hidden;
   background-color: #fff;
   border: 1px solid #eeeeee;
 `;
 
 const MainContent = styled.main<{ $hasFooter: boolean; $isProfile?: boolean, $isChatRoom?: boolean }>`
-  padding-top: 68px;
-  padding-left: 15px;
-  padding-right: 15px;
-  height: ${(props) => (props.$isProfile ? "auto" : "100vh")};
+  height: 100%;
+  padding: 68px 15px 0;
   overflow-x: hidden;
-  overflow-y: ${(props) => (props.$isProfile ? "visible" : "auto")};
+  overflow-y: auto;
   padding-bottom: ${(props) => {
     if (props.$isProfile) return "0";
     return props.$hasFooter ? "110px" : "50px";
@@ -39,6 +36,7 @@ function LayoutContent() {
   const location = useLocation();
   const { setHeaderConfig } = useHeader();
   const navigate = useNavigate();
+
 
   // 경로별 헤더 자동 설정
   useEffect(() => {
@@ -172,10 +170,10 @@ function LayoutContent() {
   return (
     <LayoutContainer $isProfile={isProfilePage}>
       <AnimatePresence mode="wait">
-        <motion.div initial={{ x: 40, opacity: 0 }}
-          animate={{ x: 0, opacity: 1}}
-          transition={{ duration: 0.3, ease: "easeOut" }}
-          style={{ position: 'relative', height: '100%' }}
+        <motion.div initial={{ opacity: 0 }}
+          animate={{ opacity: 1}}
+          style={{ height: '100%' }}
+          transition={{ duration: 0.26, ease: "easeOut" }}
           key={location.pathname}
           >
           <Header />

@@ -3,7 +3,6 @@ import ProfileImg from "../../components/common/ProfileImg"
 import ImageUpButton from "../../components/common/imageUpload/UploadButton"
 import ImageContainer from "../../components/common/imageUpload/ImageContainer"
 import styled from "styled-components"
-import { motion } from "motion/react"
 
 const PostContainer = styled.div`
     height: 100%;
