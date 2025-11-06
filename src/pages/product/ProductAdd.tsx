@@ -4,7 +4,7 @@ import CommonForm, {
   FormFieldConfig,
 } from "../../components/common/CommonForm";
 import { useHeader } from "../../contexts/HeaderContext";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 /* 유효성 검사 */
 // 상품명
@@ -86,14 +86,15 @@ export default function ProductAdd() {
   const navigate = useNavigate();
   const { setHeaderConfig } = useHeader();
   const formRef = useRef<{ submitForm: () => void }>(null);
+  const [isFormValid, setIsFormValid] = useState(false); // 폼 유효성 상태
 
-  // 페이지에서 직접 헤더 설정?
   useEffect(() => {
     setHeaderConfig({
       show: true,
       type: "productAdd",
       title: "상품 등록",
-      onBackClick: () => navigate("/"),
+      inputState: isFormValid,
+      onBackClick: () => navigate(-1),
       onButtonClick: () => {
         // 실제 폼 제출 로직
         if (formRef.current) {
@@ -106,7 +107,12 @@ export default function ProductAdd() {
     return () => {
       setHeaderConfig({ show: false });
     };
-  }, []);
+  }, [isFormValid]);
+
+  // 폼 유효성 변경 핸들러
+  const handleValidationChange = (isValid: boolean) => {
+    setIsFormValid(isValid);
+  };
 
   // 폼 제출 핸들러 정의
   const handleSubmit = (data: FormSubmissionData) => {
@@ -128,6 +134,7 @@ export default function ProductAdd() {
       fields={productFields}
       showButton={false}
       onSubmit={handleSubmit}
+      onValidationChange={handleValidationChange}
     />
   );
 }

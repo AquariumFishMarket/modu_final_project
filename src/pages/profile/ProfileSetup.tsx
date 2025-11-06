@@ -99,6 +99,7 @@ export default function ProfileSetup() {
       <CommonForm
         formType="profile"
         fields={profileFields}
+        showButton={true}
         onSubmit={handleSubmit}
       />
     </>

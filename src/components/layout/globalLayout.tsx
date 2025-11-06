@@ -65,14 +65,12 @@ function LayoutContent() {
     //   return;
     // }
 
-    // 프로필 수정 (정확한 경로를 먼저 체크)
+    // 프로필 수정 -> 경로 체크
     if (path === "/profile/edit") {
       setHeaderConfig({
         show: true,
         type: "edit",
-        inputState: true,
         onBackClick: () => navigate(-1),
-        onButtonClick: () => console.log("저장"),
       });
       return;
     }
@@ -93,9 +91,7 @@ function LayoutContent() {
       setHeaderConfig({
         show: true,
         type: "post",
-        inputState: true,
         onBackClick: () => navigate(-1),
-        onButtonClick: () => console.log("업로드"),
       });
       return;
     }
@@ -115,9 +111,7 @@ function LayoutContent() {
       setHeaderConfig({
         show: true,
         type: "productAdd",
-        inputState: true,
         onBackClick: () => navigate(-1),
-        onButtonClick: () => console.log("상품 등록"),
       });
       return;
     }
@@ -133,14 +127,14 @@ function LayoutContent() {
       return;
     }
 
-    // 상품 수정 (상품 상세보다 뒤에 위치)
+    // 🆕 상품 수정 - 폼 관련 설정 제거 (상품 상세보다 뒤에 위치)
     if (path.match(/^\/product\/[^/]+\/edit$/)) {
       setHeaderConfig({
         show: true,
         type: "edit",
-        inputState: true,
+        inputState: true, // 삭제
         onBackClick: () => navigate(-1),
-        onButtonClick: () => console.log("상품 수정 완료"),
+        onButtonClick: () => console.log("상품 수정 완료"), // 삭제
       });
       return;
     }
