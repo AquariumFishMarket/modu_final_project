@@ -19,7 +19,7 @@ const Container = styled.div`
   bottom: 0;
   padding: 12px 16px;
   border-top: 1px solid var(--color-gray-medium);
-  z-index: 1000;
+  z-index: 55;
 `
 const ContainerInner = styled.div`
   position:relative;

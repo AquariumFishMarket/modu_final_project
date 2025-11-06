@@ -17,6 +17,7 @@ interface ChatMessage {
 }
 
 const ChatContainer = styled.section`
+    position: relative;
     max-height: calc(100% - 20px);
     overflow-y: auto;
 `
@@ -46,7 +47,7 @@ const YourChatMessage = styled(DefaultChatMessage)`
         max-width: 100%;
     }
 `
-const YourTime = styled.p`
+const YourTime = styled.div`
     font-size: 1rem;
     align-self: end;
     color: var(--color-gray-dark);
@@ -63,7 +64,7 @@ const MyChatMessage = styled(DefaultChatMessage)`
         color: #fff;
     }
 `
-const MyTime = styled.p`
+const MyTime = styled.div`
     font-size: 1rem;
     align-self: end;
     color: var(--color-gray-dark);
@@ -79,12 +80,39 @@ const ImageContainerWRapper = styled.div`
     padding: 20px;
     width: 300px;
     max-height: 250px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    z-index: 101;
+`
+const Background = styled.div`
+    position: fixed;
+    top:0;
+    left:0;
+    width:100vw;
+    height:100vh;
+    background-color: rgba(0,0,0,0.2);
+    z-index: 100;
 `
 
 export default function ChatRoom() {
     const [imgArr, setImgArr] = useState<File[]>([])
     const [deleteIndex, setDeleteIdx] = useState<number|undefined>()
     const [imgModalState, setImgModalState] = useState<boolean>(false)
+
+
+    // useEffect(()=>{
+    //     const socket = new WebSocket("ws://example.com/websocket");
+
+    //     socket.onopen = () => console.log("연결됨");
+    //     socket.onmessage = (event) => {
+    //         // const newMessage = JSON.parse(event.data);
+    //         // setMessages((prev) => [...prev, newMessage])
+    //     }
+    //     socket.onerror = (err) => console.error("오류:", err);
+    //     socket.onclose = () => console.log("연결 종료");
+
+    //     // 컴포넌트 언마운트 시 연결 종료
+    //     return () => socket.close();
+    // },[])
 
 
     useEffect(()=>{
@@ -96,12 +124,14 @@ export default function ChatRoom() {
     useEffect(()=>{
         if(imgArr.length > 0) {
             setImgModalState(true)
+        } else {
+            setImgModalState(false)
         }
+
     },[imgArr])
 
     const handleSubmitImage = () => {
-        setImgModalState(false)
-        setImgArr([])
+        handleClose();
         //이미지 파일 전송 코드 삽입 위치
 
     }
@@ -109,9 +139,15 @@ export default function ChatRoom() {
         //text 자료 전송 코드 삽입 위치
     }
 
+    const handleClose = () => {
+        setImgModalState(false)
+        setImgArr([])
+    }
+
     return (
         <>
         <ChatContainer>
+            <h2 className="sr-only">ooo님의 채팅룸</h2>
             <YourChat>
                 <ProfileImg
                     thumbimg={false}
@@ -168,15 +204,23 @@ export default function ChatRoom() {
         </ChatContainer>
 
         {imgModalState && (
+            <>
+            <Background></Background>
             <ImageContainerWRapper>
                 <ImageContainer
                 imgArr={imgArr}
                 setDeleteIdx={setDeleteIdx}
                 />
-                <div style={{ marginTop: '15px' }}>
-                    <DefaultButton height="medium" text="전송하기" onClick={handleSubmitImage}></DefaultButton>
+                <div style={{ marginTop: '25px', display: 'flex', gap: '10px' }}>
+                    <div style={{ flexBasis: '50%' }}>
+                        <DefaultButton height="medium" text="전송하기" onClick={handleSubmitImage} />
+                    </div>
+                    <div style={{ flexBasis : '50%' }}>
+                        <DefaultButton height="medium" text="닫기" variant="secondary" onClick={handleClose} />
+                    </div>
                 </div>
             </ImageContainerWRapper>
+            </>
         )}
 
 

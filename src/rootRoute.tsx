@@ -50,7 +50,7 @@ export default function RootRoute() {
           <Route path="/post" element={<PostWrite />} />
           {/* 채팅 */}
           <Route path="/chat-list" />
-          {/* <Route path="/chat-room" element={<ChatRoom />} /> */}
+          <Route path="/chat-room" element={<ChatRoom />} />
           {/* 에러 페이지 */}
           <Route path="/404" element={<ErrPage />} />
         </Route>
