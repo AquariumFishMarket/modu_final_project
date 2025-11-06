@@ -4,36 +4,39 @@ import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { HeaderProvider, useHeader } from "../../contexts/HeaderContext";
 import { useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+
+import { relative } from "path";
+
 
 const LayoutContainer = styled.div<{ $isProfile?: boolean }>`
   max-width: 600px;
   width: 100%;
-  height: ${(props) => (props.$isProfile ? "auto" : "100vh")};
+  height: 100vh;
   min-height: ${(props) => (props.$isProfile ? "100vh" : "auto")};
   margin: 0 auto;
-  overflow-y: ${(props) => (props.$isProfile ? "visible" : "hidden")};
+  overflow: hidden;
   background-color: #fff;
   border: 1px solid #eeeeee;
 `;
 
-const MainContent = styled.main<{ $hasFooter: boolean; $isProfile?: boolean }>`
-  padding-top: 68px;
-  padding-left: 15px;
-  padding-right: 15px;
-  height: ${(props) => (props.$isProfile ? "auto" : "100vh")};
+const MainContent = styled.main<{ $hasFooter: boolean; $isProfile?: boolean, $isChatRoom?: boolean }>`
+  height: 100%;
+  padding: 68px 15px 0;
   overflow-x: hidden;
-  overflow-y: ${(props) => (props.$isProfile ? "visible" : "auto")};
+  overflow-y: auto;
   padding-bottom: ${(props) => {
     if (props.$isProfile) return "0";
     return props.$hasFooter ? "110px" : "50px";
   }};
-  background-color: #fff;
+  background-color: ${(props) => props.$isChatRoom ? 'var(--color-gray-light)' : '#fff'};
 `;
 
 function LayoutContent() {
   const location = useLocation();
   const { setHeaderConfig } = useHeader();
   const navigate = useNavigate();
+
 
   // 경로별 헤더 자동 설정
   useEffect(() => {
@@ -67,7 +70,7 @@ function LayoutContent() {
       setHeaderConfig({
         show: true,
         type: "edit",
-        onBackClick: () => navigate("/profile"),
+        onBackClick: () => navigate(-1),
       });
       return;
     }
@@ -77,7 +80,7 @@ function LayoutContent() {
       setHeaderConfig({
         show: true,
         type: "profile",
-        onBackClick: () => navigate("/"),
+        onBackClick: () => navigate(-1),
         onMoreClick: () => console.log("더보기"),
       });
       return;
@@ -88,7 +91,7 @@ function LayoutContent() {
       setHeaderConfig({
         show: true,
         type: "post",
-        onBackClick: () => navigate("/"),
+        onBackClick: () => navigate(-1),
       });
       return;
     }
@@ -98,7 +101,7 @@ function LayoutContent() {
       setHeaderConfig({
         show: true,
         type: "search",
-        onBackClick: () => navigate("/"),
+        onBackClick: () => navigate(-1),
       });
       return;
     }
@@ -108,7 +111,7 @@ function LayoutContent() {
       setHeaderConfig({
         show: true,
         type: "productAdd",
-        onBackClick: () => navigate("/"),
+        onBackClick: () => navigate(-1),
       });
       return;
     }
@@ -145,23 +148,34 @@ function LayoutContent() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
 
+
   // Nav 있을 부분
   const shouldShowNav = (): boolean => {
     const path = location.pathname;
 
-    const showNavPaths = ["/", "/search", "/profile", "/chat"];
+    const showNavPaths = ["/", "/feed", "/search", "/profile", "/chat"];
 
     return showNavPaths.includes(path);
   };
 
   const isProfilePage = location.pathname === "/profile";
+  const isChatRoomPage = location.pathname === "/chat-room"
 
   return (
     <LayoutContainer $isProfile={isProfilePage}>
-      <Header />
-      <MainContent $hasFooter={shouldShowNav()} $isProfile={isProfilePage}>
-        <Outlet />
-      </MainContent>
+      <AnimatePresence mode="wait">
+        <motion.div initial={{ opacity: 0 }}
+          animate={{ opacity: 1}}
+          style={{ height: '100%' }}
+          transition={{ duration: 0.26, ease: "easeOut" }}
+          key={location.pathname}
+          >
+          <Header />
+          <MainContent $hasFooter={shouldShowNav()} $isProfile={isProfilePage}>
+            <Outlet />
+          </MainContent>
+        </motion.div>
+      </AnimatePresence>
       {shouldShowNav() && <FooterNav />}
     </LayoutContainer>
   );

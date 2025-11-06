@@ -1,14 +1,14 @@
 import React from "react";
 import { Player } from "@lottiefiles/react-lottie-player";
 import { NavLinkRenderProps } from "react-router-dom";
-import HOME from '../../json/home.json'
-import HOMEACTIVE from '../../json/home-active.json'
-import CHAT from '../../json/chat.json'
-import CHATACTIVE from '../../json/chat-active.json'
-import WRITE from '../../json/write.json'
-import WRITEACTIVE from '../../json/write-active.json'
-import PROFILE from '../../json/profile.json'
-import PROFILEACTIVE from '../../json/profile-active.json'
+import HOME from "../../json/home.json";
+import HOMEACTIVE from "../../json/home-active.json";
+import CHAT from "../../json/chat.json";
+import CHATACTIVE from "../../json/chat-active.json";
+import WRITE from "../../json/write.json";
+import WRITEACTIVE from "../../json/write-active.json";
+import PROFILE from "../../json/profile.json";
+import PROFILEACTIVE from "../../json/profile-active.json";
 
 import {
   NavContainer,
@@ -22,14 +22,14 @@ import {
 interface NavItemType {
   label: string;
   path: string;
-  icon: Record<string,any>;
-  activeIcon?: Record<string,any>;
+  icon: Record<string, any>;
+  activeIcon?: Record<string, any>;
 }
 
 const navItems: NavItemType[] = [
   {
     label: "홈",
-    path: "/",
+    path: "/feed",
     icon: HOME,
     activeIcon: HOMEACTIVE,
   },
@@ -43,7 +43,7 @@ const navItems: NavItemType[] = [
     label: "게시물 작성",
     path: "/post" /* 수정 필요 */,
     icon: WRITE,
-    activeIcon: WRITEACTIVE
+    activeIcon: WRITEACTIVE,
   },
   {
     label: "프로필",
@@ -63,11 +63,11 @@ const FooterNav = () => {
               {({ isActive }: NavLinkRenderProps): React.ReactNode => (
                 <>
                   <IconWrapper>
-                  <Player
-                  src={isActive ? item.activeIcon || item.icon : item.icon}
-                  autoplay={isActive ? true : false}
-                  style={{ width: '30px', height: '30px' }}
-                  />
+                    <Player
+                      src={isActive ? item.activeIcon || item.icon : item.icon}
+                      autoplay={isActive ? true : false}
+                      style={{ width: "30px", height: "30px" }}
+                    />
                   </IconWrapper>
                   <NavLabel>{item.label}</NavLabel>
                 </>

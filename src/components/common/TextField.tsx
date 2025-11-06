@@ -5,6 +5,7 @@ import ButtonTextField from "./Buttons/ButtonTextField";
 interface textfield {
   left: React.ReactNode;
   placeholder: string;
+  onClick?:()=>void;
 }
 
 const Container = styled.div`

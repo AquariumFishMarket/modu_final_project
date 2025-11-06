@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import DefaultButton from "../../components/common/Button";
 import {
   EmptyFeedSection,
@@ -95,24 +96,48 @@ const FeedPage = () => {
   // 무한스크롤 부분
   // useInfiniteScroll 훅 추가 예정
 
+  // 페이지 전환 애니메이션
+  const pageVariants = {
+    initial: { opacity: 0, y: 10 },
+    animate: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.5 }
+    },
+    exit: {
+      opacity: 0,
+      transition: { duration: 0.3 }
+    }
+  };
+
   // 초기 로딩 중
   if (isInitialLoading) {
     return (
-      <>
+      <motion.div
+        initial="initial"
+        animate="animate"
+        exit="exit"
+        variants={pageVariants}
+      >
         <main>
           <InitialLoadingSection>
             {/* 애니메이션 넣기? 스피너? */}
             <p>불러오는 중...</p>
           </InitialLoadingSection>
         </main>
-      </>
+      </motion.div>
     );
   }
 
   // 피드 없을 때 (빈 피드)
   if (feedList.length === 0) {
     return (
-      <>
+      <motion.div
+        initial="initial"
+        animate="animate"
+        exit="exit"
+        variants={pageVariants}
+      >
         <main>
           <EmptyFeedSection>
             <LogoImage src="/img/fish-logo-GB.svg" alt="물고기마켓 로고" />
@@ -124,13 +149,18 @@ const FeedPage = () => {
             />
           </EmptyFeedSection>
         </main>
-      </>
+      </motion.div>
     );
   }
 
   // 피드 있을 때 (메인 피드 목록)
   return (
-    <>
+    <motion.div
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      variants={pageVariants}
+    >
       <FeedSection>
         {/* 피드 목록 렌더링 */}
         {feedList.map((feed) => (
@@ -156,7 +186,7 @@ const FeedPage = () => {
           </EndMessageText>
         )}
       </FeedSection>
-    </>
+    </motion.div>
   );
 };
 
