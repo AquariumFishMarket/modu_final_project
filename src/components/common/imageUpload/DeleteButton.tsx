@@ -17,11 +17,13 @@ const Delete = styled.button`
     z-index: 20;
     background-color: #fff;
     border-radius: 100%;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2)
 `
 
 export default function DeleteButton({"data-index":i,setDeleteIdx}:Deleteinterface) {
     const handleDelete = (e:React.MouseEvent<HTMLButtonElement>):void => {
         setDeleteIdx(Number(e.currentTarget.dataset.index))
+
     }
 
     return (

@@ -1,5 +1,6 @@
 import { Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence } from "motion/react";
+
 import GlobalLayout from "./components/layout/globalLayout";
 import Login from "./pages/login/Login";
 import LoginEmail from "./pages/login/LoginEmail";
@@ -12,9 +13,12 @@ import PostWrite from "./pages/post/PostWrite";
 import FeedPage from "./pages/Home/FeedPage";
 import ProductAdd from "./pages/product/ProductAdd";
 import ErrPage from "./pages/errPage/ErrPage";
-// import ChatRoom from "./pages/chat/ChatRoom";
-// import ProductDetail from "./pages/product/ProductDetail";
+
 import Splash from "./pages/splash/Splash";
+
+import ChatRoom from "./pages/chat/ChatRoom";
+import ProductDetail from "./pages/product/ProductDetail";
+
 
 export default function RootRoute() {
   const location = useLocation();

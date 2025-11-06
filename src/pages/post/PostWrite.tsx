@@ -3,7 +3,6 @@ import ProfileImg from "../../components/common/ProfileImg"
 import ImageUpButton from "../../components/common/imageUpload/UploadButton"
 import ImageContainer from "../../components/common/imageUpload/ImageContainer"
 import styled from "styled-components"
-import { motion } from "motion/react"
 
 const PostContainer = styled.div`
     height: 100%;
@@ -88,41 +87,32 @@ export default function PostWrite() {
     },[deleteIndex])
 
     return (
-        <div style={{ height: '100%', overflow: 'hidden' }}>
-            <motion.div initial={{ y: '100%', opacity: 0 }}
-            animate={{ y: 0, opacity: 1}}
-            exit={{ y: "100%", opacity: 0 }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
-            style={{ height: '100%' }}
-            >
-                <PostContainer>
-                    <ImageUploadContainer>
-                        <ImageUpButtonContainer>
-                            <ImageUpButton
-                            multiple={true}
-                            colortype="color"
-                            size="small"
-                            imgArr={imgArr}
-                            setImgArr={setImgArr}
-                            />
-                            <p>{imgArr.length}/10</p>
-                        </ImageUpButtonContainer>
-                        <ImageContainer imgArr={imgArr} setDeleteIdx={setDeleteIdx} />
-                    </ImageUploadContainer>
-                    <Contents>
-                        <ProfileImg width={42} thumbimg={false}></ProfileImg>
-                        <WriteZone>
-                            <TextArea
-                            ref={textAreaRef}
-                            placeholder={textPlaceholder}
-                            value={textHeight}
-                            onChange={handleTextChange}
-                            />
-                        </WriteZone>
-                    </Contents>
+        <PostContainer>
+            <ImageUploadContainer>
+                <ImageUpButtonContainer>
+                    <ImageUpButton
+                    multiple={true}
+                    colortype="color"
+                    size="small"
+                    imgArr={imgArr}
+                    setImgArr={setImgArr}
+                    />
+                    <p>{imgArr.length}/10</p>
+                </ImageUpButtonContainer>
+                <ImageContainer imgArr={imgArr} setDeleteIdx={setDeleteIdx} />
+            </ImageUploadContainer>
+            <Contents>
+                <ProfileImg width={42} thumbimg={false}></ProfileImg>
+                <WriteZone>
+                    <TextArea
+                    ref={textAreaRef}
+                    placeholder={textPlaceholder}
+                    value={textHeight}
+                    onChange={handleTextChange}
+                    />
+                </WriteZone>
+            </Contents>
 
-                </PostContainer>
-            </motion.div>
-        </div>
+        </PostContainer>
     )
 }

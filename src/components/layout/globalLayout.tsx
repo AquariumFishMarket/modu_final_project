@@ -4,36 +4,39 @@ import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { HeaderProvider, useHeader } from "../../contexts/HeaderContext";
 import { useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+
+import { relative } from "path";
+
 
 const LayoutContainer = styled.div<{ $isProfile?: boolean }>`
   max-width: 600px;
   width: 100%;
-  height: ${(props) => (props.$isProfile ? "auto" : "100vh")};
+  height: 100vh;
   min-height: ${(props) => (props.$isProfile ? "100vh" : "auto")};
   margin: 0 auto;
-  overflow-y: ${(props) => (props.$isProfile ? "visible" : "hidden")};
+  overflow: hidden;
   background-color: #fff;
   border: 1px solid #eeeeee;
 `;
 
-const MainContent = styled.main<{ $hasFooter: boolean; $isProfile?: boolean }>`
-  padding-top: 68px;
-  padding-left: 15px;
-  padding-right: 15px;
-  height: ${(props) => (props.$isProfile ? "auto" : "100vh")};
+const MainContent = styled.main<{ $hasFooter: boolean; $isProfile?: boolean, $isChatRoom?: boolean }>`
+  height: 100%;
+  padding: 68px 15px 0;
   overflow-x: hidden;
-  overflow-y: ${(props) => (props.$isProfile ? "visible" : "auto")};
+  overflow-y: auto;
   padding-bottom: ${(props) => {
     if (props.$isProfile) return "0";
     return props.$hasFooter ? "110px" : "50px";
   }};
-  background-color: #fff;
+  background-color: ${(props) => props.$isChatRoom ? 'var(--color-gray-light)' : '#fff'};
 `;
 
 function LayoutContent() {
   const location = useLocation();
   const { setHeaderConfig } = useHeader();
   const navigate = useNavigate();
+
 
   // 경로별 헤더 자동 설정
   useEffect(() => {
@@ -68,7 +71,7 @@ function LayoutContent() {
         show: true,
         type: "edit",
         inputState: true,
-        onBackClick: () => navigate("/profile"),
+        onBackClick: () => navigate(-1),
         onButtonClick: () => console.log("저장"),
       });
       return;
@@ -79,7 +82,7 @@ function LayoutContent() {
       setHeaderConfig({
         show: true,
         type: "profile",
-        onBackClick: () => navigate("/"),
+        onBackClick: () => navigate(-1),
         onMoreClick: () => console.log("더보기"),
       });
       return;
@@ -91,7 +94,7 @@ function LayoutContent() {
         show: true,
         type: "post",
         inputState: true,
-        onBackClick: () => navigate("/"),
+        onBackClick: () => navigate(-1),
         onButtonClick: () => console.log("업로드"),
       });
       return;
@@ -102,7 +105,7 @@ function LayoutContent() {
       setHeaderConfig({
         show: true,
         type: "search",
-        onBackClick: () => navigate("/"),
+        onBackClick: () => navigate(-1),
       });
       return;
     }
@@ -111,10 +114,33 @@ function LayoutContent() {
     if (path === "/product/add") {
       setHeaderConfig({
         show: true,
+        type: "productAdd",
+        inputState: true,
+        onBackClick: () => navigate(-1),
+        onButtonClick: () => console.log("상품 등록"),
+      });
+      return;
+    }
+
+    // 상품 상세
+    if (path.match(/^\/product\/[^/]+$/)) {
+      setHeaderConfig({
+        show: true,
+        type: "productDetail",
+        onBackClick: () => navigate("/"),
+        onMoreClick: () => console.log("더보기"),
+      });
+      return;
+    }
+
+    // 상품 수정 (상품 상세보다 뒤에 위치)
+    if (path.match(/^\/product\/[^/]+\/edit$/)) {
+      setHeaderConfig({
+        show: true,
         type: "edit",
         inputState: true,
-        onBackClick: () => navigate("/"),
-        onButtonClick: () => console.log("상품 등록"),
+        onBackClick: () => navigate(-1),
+        onButtonClick: () => console.log("상품 수정 완료"),
       });
       return;
     }
@@ -128,31 +154,35 @@ function LayoutContent() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
 
-  // FooterNav를 숨길 경로들
-  const hideNavPaths = [
-    "/post",
-    "/signup",
-    "/login",
-    "/login/email",
-    "/profile/setup",
-    "/profile/edit",
-    "/product/add",
-  ];
 
-  // 현재 경로가 숨김 목록에 있는지 확인
-  const shouldHideNav = hideNavPaths.some((path) =>
-    location.pathname.startsWith(path)
-  );
+  // Nav 있을 부분
+  const shouldShowNav = (): boolean => {
+    const path = location.pathname;
+
+    const showNavPaths = ["/", "/search", "/profile", "/chat"];
+
+    return showNavPaths.includes(path);
+  };
 
   const isProfilePage = location.pathname === "/profile";
+  const isChatRoomPage = location.pathname === "/chat-room"
 
   return (
     <LayoutContainer $isProfile={isProfilePage}>
-      <Header />
-      <MainContent $hasFooter={!shouldHideNav} $isProfile={isProfilePage}>
-        <Outlet />
-      </MainContent>
-      {!shouldHideNav && <FooterNav />}
+      <AnimatePresence mode="wait">
+        <motion.div initial={{ opacity: 0 }}
+          animate={{ opacity: 1}}
+          style={{ height: '100%' }}
+          transition={{ duration: 0.26, ease: "easeOut" }}
+          key={location.pathname}
+          >
+          <Header />
+          <MainContent $hasFooter={shouldShowNav()} $isProfile={isProfilePage}>
+            <Outlet />
+          </MainContent>
+        </motion.div>
+      </AnimatePresence>
+      {shouldShowNav() && <FooterNav />}
     </LayoutContainer>
   );
 }
