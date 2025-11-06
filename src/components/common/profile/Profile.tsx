@@ -46,20 +46,21 @@ function Profile() {
   const { userId: paramUserId } = useParams<{ userId?: string }>();
 
   // 실제 로그인된 사용자 ID는 Context API 또는 Redux에서 가져오기
-  const [currentUserId] = useState<string>("");
+  // 임시: 더미 사용자 ID 설정
+  const [currentUserId] = useState<string>("my_user_id");
 
   // URL 파라미터가 있으면 해당 유저, 없으면 내 프로필
   const targetUserId = paramUserId || currentUserId;
 
   // 프로필 데이터 상태 관리
   const [profileData, setProfileData] = useState<UserProfile>({
-    id: "",
-    userName: "",
-    userId: "",
+    id: "my_user_id", // 임시: 내 프로필로 표시되도록 currentUserId와 동일하게 설정
+    userName: "물고기마켓",
+    userId: "@fishmarket",
     profileImage: "/img/fish_profile.png",
-    description: "",
-    followerCount: 0,
-    followingCount: 0,
+    description: "안녕하세요! 물고기마켓입니다.",
+    followerCount: 128,
+    followingCount: 52,
     isFollowing: false,
   });
 

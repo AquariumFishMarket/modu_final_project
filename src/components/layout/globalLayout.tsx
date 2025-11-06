@@ -68,7 +68,7 @@ function LayoutContent() {
         show: true,
         type: "edit",
         inputState: true,
-        onBackClick: () => navigate("/profile"),
+        onBackClick: () => navigate(-1),
         onButtonClick: () => console.log("저장"),
       });
       return;
@@ -79,7 +79,7 @@ function LayoutContent() {
       setHeaderConfig({
         show: true,
         type: "profile",
-        onBackClick: () => navigate("/"),
+        onBackClick: () => navigate(-1),
         onMoreClick: () => console.log("더보기"),
       });
       return;
@@ -91,7 +91,7 @@ function LayoutContent() {
         show: true,
         type: "post",
         inputState: true,
-        onBackClick: () => navigate("/"),
+        onBackClick: () => navigate(-1),
         onButtonClick: () => console.log("업로드"),
       });
       return;
@@ -102,7 +102,7 @@ function LayoutContent() {
       setHeaderConfig({
         show: true,
         type: "search",
-        onBackClick: () => navigate("/"),
+        onBackClick: () => navigate(-1),
       });
       return;
     }
@@ -113,7 +113,7 @@ function LayoutContent() {
         show: true,
         type: "edit",
         inputState: true,
-        onBackClick: () => navigate("/"),
+        onBackClick: () => navigate(-1),
         onButtonClick: () => console.log("상품 등록"),
       });
       return;
