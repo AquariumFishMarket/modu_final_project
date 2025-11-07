@@ -1,7 +1,5 @@
-import { useParams } from "react-router-dom"
 import ProfileImg from "../../components/common/ProfileImg"
 import styled from "styled-components"
-
 
 const ContentsWrapper = styled.section`
     position: relative;
@@ -36,7 +34,7 @@ const TextContainer = styled.div`
     }
 `
 const UserName = styled.p`
-    font-size: var(-font-size-md);
+    font-size: var(--font-size-md);
     font-weight: 700;
     margin-bottom: 7px;
 `
@@ -59,13 +57,12 @@ interface ChatData {
     username: string;
     message: string;
     date: string;
-    onClick?:()=>void;
 }
 
-export default function ChatContent({id,imgSrc,username,message,date,onClick}:ChatData){
+export default function ChatContent({id,imgSrc,username,message,date}:ChatData){
 
     return(
-        <ContentsWrapper onClick={onClick}>
+        <ContentsWrapper>
             <ImageContainer>
                 <ProfileImg thumbimg={false}
                     width={42}

@@ -155,7 +155,7 @@ function LayoutContent() {
   const shouldShowNav = (): boolean => {
     const path = location.pathname;
 
-    const showNavPaths = ["/", "/feed", "/search", "/profile", "/chat"];
+    const showNavPaths = ["/", "/feed", "/search", "/profile", "/chat-list"];
 
     return showNavPaths.includes(path);
   };
