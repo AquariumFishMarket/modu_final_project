@@ -33,7 +33,7 @@ export const PostMain = styled.figure`
     height: auto;
     aspect-ratio: 304 / 228;
     object-fit: cover;
-    border: 0.5px solid #dbdbdb;
+    border: 1px solid var(--color-gray-medium);
     border-radius: 1rem;
   }
 `;

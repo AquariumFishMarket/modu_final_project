@@ -400,10 +400,10 @@ function Profile() {
                     commentCount={post.commentCount}
                     isLiked={post.isLiked}
                     onLikeClick={() => handleLikeToggle(post.postId)}
-                    onCommentClick={() => {
-                      // TODO: 댓글 페이지 연동
-                      // 댓글 페이지로 넘어가기 -> 상세 게시글?
-                      navigate(`/post/${post.postId}`);
+
+                    onCommentClick={() => navigate(`/post/${post.postId}`)}
+                    onMoreClick={() => {
+
                     }}
                   />
                 ))}

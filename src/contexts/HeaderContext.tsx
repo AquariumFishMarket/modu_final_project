@@ -8,6 +8,7 @@ export type HeaderType =
   | "profile"
   | "edit"
   | "post"
+  | "postDetail" // 게시글 상세
   | "chatList"
   | "chat"
   | "productAdd" // 상품 등록

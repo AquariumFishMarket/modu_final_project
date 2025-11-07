@@ -19,13 +19,11 @@ const LayoutContainer = styled.div<{ $isProfile?: boolean }>`
   border: 1px solid #eeeeee;
 `;
 
-const MainContent = styled.main<{
-  $hasFooter: boolean;
-  $isProfile?: boolean;
-  $isChatRoom?: boolean;
-}>`
+
+const MainContent = styled.main<{ $hasFooter: boolean; $isProfile?: boolean, $isChatRoom?: boolean, $isPostDetail?: boolean }>`
+
   height: 100%;
-  padding: 68px 15px 0;
+  padding: ${(props) => props.$isPostDetail ? '68px 25px 0' : '68px 15px 0'};
   overflow-x: hidden;
   overflow-y: auto;
   padding-bottom: ${(props) => {
@@ -83,6 +81,17 @@ function LayoutContent() {
       setHeaderConfig({
         show: true,
         type: "profile",
+        onBackClick: () => navigate(-1),
+        onMoreClick: () => console.log("더보기"),
+      });
+      return;
+    }
+
+    // 게시글 상세 (게시글 작성보다 먼저 체크)
+    if (path.match(/^\/post\/[^/]+$/)) {
+      setHeaderConfig({
+        show: true,
+        type: "postDetail",
         onBackClick: () => navigate(-1),
         onMoreClick: () => console.log("더보기"),
       });
@@ -161,7 +170,10 @@ function LayoutContent() {
   };
 
   const isProfilePage = location.pathname === "/profile";
-  // const isChatRoomPage = location.pathname === "/chat-room"
+
+  const isChatRoomPage = location.pathname === "/chat-room"
+  const isPostDetailPage = location.pathname.match(/^\/post\/[^/]+$/);
+
 
   return (
     <LayoutContainer $isProfile={isProfilePage}>
@@ -174,7 +186,7 @@ function LayoutContent() {
           key={location.pathname}
         >
           <Header />
-          <MainContent $hasFooter={shouldShowNav()} $isProfile={isProfilePage}>
+          <MainContent $hasFooter={shouldShowNav()} $isProfile={isProfilePage} $isPostDetail={!!isPostDetailPage}>
             <Outlet />
           </MainContent>
         </motion.div>

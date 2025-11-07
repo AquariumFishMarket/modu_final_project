@@ -3,9 +3,11 @@ import styled from "styled-components"
 import ButtonTextField from "./Buttons/ButtonTextField";
 
 interface textfield {
-  left: React.ReactNode;
+  left?: React.ReactNode;
   placeholder: string;
+
   onClick:(text:string, refObj:React.RefObject<HTMLTextAreaElement | null>)=>void;
+
 }
 
 const Container = styled.div`
@@ -52,7 +54,9 @@ const TextArea = styled.textarea`
     }
 `
 
+
 export default function TextField({left,placeholder,onClick}:textfield) {
+
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null)
   const [textValue,setTextValue] = useState<string>('')
   const [btnColor,setBtnColor] = useState(false)
@@ -61,6 +65,11 @@ export default function TextField({left,placeholder,onClick}:textfield) {
         const target = e.target;
         target.style.height = 'auto';
         target.style.height = target.scrollHeight - 19.5 + 'px';
+
+        // 외부 onChange가 있으면 호출
+        if (onChange) {
+          onChange(e);
+        }
 
         if(textAreaRef.current?.value !=='') {
           setBtnColor(true)
@@ -71,13 +80,18 @@ export default function TextField({left,placeholder,onClick}:textfield) {
         }
     }
 
+
+
   return (
         <Container>
           <ContainerInner>
-            <Left>
-            {left}
-            </Left>
+            {left && (
+              <Left>
+                {left}
+              </Left>
+            )}
             <TextArea
+
             placeholder={placeholder}
             onChange={handleTextChange}
             ref={textAreaRef} />
@@ -85,6 +99,7 @@ export default function TextField({left,placeholder,onClick}:textfield) {
               if(!textAreaRef.current) return;
               onClick(textValue,textAreaRef)
             }}/></Right>
+
           </ContainerInner>
         </Container>
     )

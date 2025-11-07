@@ -207,6 +207,7 @@ const FeedPage = () => {
               commentCount={feed.commentCount}
               isLiked={feed.isLiked}
               onLikeClick={() => handleLikeToggle(feed.id)}
+              onCommentClick={() => navigate(`/post/${feed.id}`)}
             />
           </FeedItemWrapper>
         ))}
