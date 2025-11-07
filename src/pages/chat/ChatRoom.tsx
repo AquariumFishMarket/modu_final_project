@@ -97,7 +97,6 @@ export default function ChatRoom() {
     // 이미지 파일 저장 공간
     const [imgArr, setImgArr] = useState<File[]>([])
     // 텍스트 메시지 저장 공간
-    const [text, setText] = useState<string>('')
     const [deleteIndex, setDeleteIdx] = useState<number|undefined>()
     const [imgModalState, setImgModalState] = useState<boolean>(false)
 
@@ -117,8 +116,6 @@ export default function ChatRoom() {
     //     // 컴포넌트 언마운트 시 연결 종료
     //     return () => socketRef.current.close();
     // },[])
-
-    useEffect(()=>{console.log(text)},[text])
 
     useEffect(()=>{
         setImgArr(prev => prev.filter((_, i) => i !== deleteIndex));
@@ -156,9 +153,13 @@ export default function ChatRoom() {
     }
 
     //텍스트 전송 함수
-    const handleSendText = (text: string) => {
+    const handleSendText = (text: string, refObj:React.RefObject<HTMLTextAreaElement | null>) => {
         //text 자료 전송 코드 삽입 위치
         console.log(text)
+        //전송 후 입력필드 초기화 함수
+        if(refObj.current) {
+            refObj.current.value = ''
+        }
     }
 
     const handleClose = () => {
@@ -255,7 +256,6 @@ export default function ChatRoom() {
         />}
         placeholder="메시지 입력하기.."
         onClick={handleSendText}
-
         ></TextField>
         </>
     )

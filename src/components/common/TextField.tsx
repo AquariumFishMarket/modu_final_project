@@ -5,7 +5,7 @@ import ButtonTextField from "./Buttons/ButtonTextField";
 interface textfield {
   left: React.ReactNode;
   placeholder: string;
-  onClick:(text:string)=>void;
+  onClick:(text:string, refObj:React.RefObject<HTMLTextAreaElement | null>)=>void;
 }
 
 const Container = styled.div`
@@ -81,7 +81,10 @@ export default function TextField({left,placeholder,onClick}:textfield) {
             placeholder={placeholder}
             onChange={handleTextChange}
             ref={textAreaRef} />
-            <Right><ButtonTextField textcolor={btnColor} onClick={()=>onClick(textValue)}/></Right>
+            <Right><ButtonTextField textcolor={btnColor} onClick={()=>{
+              if(!textAreaRef.current) return;
+              onClick(textValue,textAreaRef)
+            }}/></Right>
           </ContainerInner>
         </Container>
     )
