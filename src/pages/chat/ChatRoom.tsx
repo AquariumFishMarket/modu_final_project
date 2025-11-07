@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useParams } from "react-router-dom";
 import ProfileImg from "../../components/common/ProfileImg";
 import TextField from "../../components/common/TextField";
 import ImageUpButton from "../../components/common/imageUpload/UploadButton";
@@ -92,6 +93,8 @@ interface ChatMessage {
 }
 
 export default function ChatRoom() {
+    //채팅 방 번호
+    const { roomId } = useParams();
     //소켓 저장
     const socketRef = useRef<WebSocket | null>(null)
     // 이미지 파일 저장 공간

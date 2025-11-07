@@ -1,12 +1,15 @@
+import { useParams } from "react-router-dom"
 import ProfileImg from "../../components/common/ProfileImg"
 import styled from "styled-components"
 
 
 const ContentsWrapper = styled.section`
     position: relative;
+    margin-bottom: 20px;
     display: flex;
     gap: 12px;
     align-items: center;
+    cursor: pointer;
 `
 const ImageContainer = styled.div`
     position: relative;
@@ -22,7 +25,6 @@ const Alert = styled.span`
     left: 0;
     z-index: 5;
 `
-
 const TextContainer = styled.div`
     width: calc(100% - 55px);
     p {
@@ -33,7 +35,6 @@ const TextContainer = styled.div`
         text-overflow: ellipsis;
     }
 `
-
 const UserName = styled.p`
     font-size: var(-font-size-md);
     font-weight: 700;
@@ -52,9 +53,19 @@ const Date = styled.p`
     color: var(--color-gray-medium)
 `
 
-export default function ChatContent(){
+interface ChatData {
+    id: number;
+    onClick?:()=>void;
+    // profileImg: string;
+    // username: string;
+    // chatmessage: string;
+    // date: string
+}
+
+export default function ChatContent({id,onClick}:ChatData){
+
     return(
-        <ContentsWrapper>
+        <ContentsWrapper onClick={onClick}>
             <ImageContainer>
                 <ProfileImg thumbimg={false}
                     width={42}
@@ -64,7 +75,7 @@ export default function ChatContent(){
             </ImageContainer>
             <TextContainer>
                 <UserName>잉어킹</UserName>
-                <ChatMessage>채팅내용채팅내용채팅내용채팅내용채팅내용채팅내용채팅내용채팅내용채팅내용채팅내용채팅내용채팅내용</ChatMessage>
+                <ChatMessage>살려주세요잡아먹지마세요살려주세요잡아먹지마세요살려주세요잡아먹지마세요살려주세요잡아먹지마세요</ChatMessage>
             </TextContainer>
             <Date>2025.08.12</Date>
         </ContentsWrapper>
