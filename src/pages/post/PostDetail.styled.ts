@@ -10,5 +10,8 @@ export const PostDetailContainer = styled.section`
 
 export const CommentsSection = styled.section`
   border-top: 1px solid var(--color-gray-medium);
-  padding: 0 1.6rem;
+  padding: 0;
+  margin: 0 -25px;
+  padding-left: 25px;
+  padding-right: 25px;
 `;

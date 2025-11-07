@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 export const CommentContainer = styled.article`
-  padding: 1.2rem 0;
+  padding: 1.2rem 1.6rem;
 `;
 
 export const CommentContent = styled.p`

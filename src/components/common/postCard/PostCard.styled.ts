@@ -12,7 +12,12 @@ export const PostCardContainer = styled.article`
 `;
 
 export const PostContent = styled.div`
-  padding-left: 0;
+  padding-left: 5.4rem;
+
+  @media (min-width: 768px) {
+    padding-left: 5.4rem;
+    padding-right: 0;
+  }
 `;
 
 export const PostMain = styled.figure`
@@ -21,20 +26,35 @@ export const PostMain = styled.figure`
   gap: 1.6rem;
   margin: 0;
   border: none;
-  padding: 0 1.6rem;
+  padding: 0 1.6rem 0 0;
 
   figcaption {
     line-height: 1.8rem;
+    font-size: 1.4rem;
   }
 
   img {
-    max-width: 100%;
-    width: 100%;
-    height: auto;
-    aspect-ratio: 304 / 228;
+    width: 30.4rem;
+    height: 22.8rem;
     object-fit: cover;
     border: 1px solid var(--color-gray-medium);
     border-radius: 1rem;
+  }
+
+  @media (min-width: 768px) {
+    padding: 0;
+
+    figcaption {
+      font-size: 1.6rem;
+      line-height: 2.4rem;
+    }
+
+    img {
+      width: 100%;
+      max-width: 100%;
+      height: auto;
+      aspect-ratio: 16 / 9;
+    }
   }
 `;
 
@@ -42,7 +62,11 @@ export const PostFooter = styled.footer`
   display: flex;
   flex-direction: column;
   gap: 1.6rem;
-  padding: 1.2rem 1.6rem 0;
+  padding: 1.2rem 1.6rem 0 0;
+
+  @media (min-width: 768px) {
+    padding: 1.2rem 0 0 0;
+  }
 `;
 
 export const PostActions = styled.div`
