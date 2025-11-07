@@ -35,7 +35,7 @@ const navItems: NavItemType[] = [
   },
   {
     label: "채팅",
-    path: "/chat" /* 수정 필요 */,
+    path: "/chat-list" /* 수정 필요 */,
     icon: CHAT,
     activeIcon: CHATACTIVE,
   },
