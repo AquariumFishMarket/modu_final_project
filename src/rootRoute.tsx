@@ -17,6 +17,7 @@ import ErrPage from "./pages/errPage/ErrPage";
 import Splash from "./pages/splash/Splash";
 
 import ChatRoom from "./pages/chat/ChatRoom";
+import ChatList from "./pages/chat/ChatList";
 import ProductDetail from "./pages/product/ProductDetail";
 import ProductEdit from "./pages/product/ProductEdit";
 
@@ -49,7 +50,7 @@ export default function RootRoute() {
           {/* 게시글 */}
           <Route path="/post" element={<PostWrite />} />
           {/* 채팅 */}
-          <Route path="/chat-list" />
+          <Route path="/chat-list" element={<ChatList />}/>
           <Route path="/chat-room" element={<ChatRoom />} />
           {/* 에러 페이지 */}
           <Route path="/404" element={<ErrPage />} />
