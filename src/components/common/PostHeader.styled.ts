@@ -5,7 +5,7 @@ export const PostHeader = styled.section`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 1.6rem;
+  padding: 0;
 `;
 
 export const UserInfo = styled.div`
@@ -14,9 +14,9 @@ export const UserInfo = styled.div`
   align-items: center;
 `;
 
-export const UserAvatar = styled.img`
-  width: 4.2rem;
-  height: 4.2rem;
+export const UserAvatar = styled.img<{ $variant?: "post" | "comment" }>`
+  width: ${(props) => (props.$variant === "comment" ? "3.6rem" : "4.2rem")};
+  height: ${(props) => (props.$variant === "comment" ? "3.6rem" : "4.2rem")};
   border-radius: 50%;
   object-fit: cover;
 `;
@@ -30,7 +30,7 @@ export const UserName = styled.strong`
   font-size: 1.4rem;
   font-weight: 700;
   display: block;
-  margin-bottom: 2px;
+  margin-bottom: 0.2rem;
 `;
 
 export const UserId = styled.p`
@@ -43,8 +43,8 @@ export const MoreButton = styled.button`
   background: none;
   border: none;
   cursor: pointer;
-  padding: 8px;
-  margin: -8px;
+  padding: 0.8rem;
+  margin: -0.8rem;
   border-radius: 50%;
   transition: background-color 0.2s;
 

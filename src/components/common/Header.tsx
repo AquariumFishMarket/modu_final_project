@@ -164,6 +164,20 @@ function Header() {
         </Section>
       )}
 
+      {/* 게시글 상세 */}
+      {config.type === "postDetail" && (
+        <Section>
+          <IconButton onClick={config.onBackClick}>
+            <img src="/img/icon-arrow-left.svg" alt="이전 페이지로 이동" />
+          </IconButton>
+          <MoreMenu
+            type="post"
+            onSettings={() => console.log("설정")}
+            onLogout={() => console.log("로그아웃")}
+          />
+        </Section>
+      )}
+
       {/* 채팅 */}
       {config.type === "chat" && (
         <Section>

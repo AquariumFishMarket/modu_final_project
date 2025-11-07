@@ -3,8 +3,11 @@ import styled from "styled-components"
 import ButtonTextField from "./Buttons/ButtonTextField";
 
 interface textfield {
-  left: React.ReactNode;
+  left?: React.ReactNode;
   placeholder: string;
+  value?: string;
+  onChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  onSubmit?: () => void;
   onClick?:()=>void;
 }
 
@@ -52,7 +55,7 @@ const TextArea = styled.textarea`
     }
 `
 
-export default function TextField({left,placeholder}:textfield) {
+export default function TextField({left, placeholder, value, onChange, onSubmit}:textfield) {
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null)
   const [btnColor,setBtnColor] = useState(false)
 
@@ -61,23 +64,55 @@ export default function TextField({left,placeholder}:textfield) {
         target.style.height = 'auto';
         target.style.height = target.scrollHeight - 19.5 + 'px';
 
+        // 외부 onChange가 있으면 호출
+        if (onChange) {
+          onChange(e);
+        }
+
         if(textAreaRef.current?.value !=='') {
           setBtnColor(true)
         } else {
           setBtnColor(false)
         }
     }
+
+    const handleSubmit = () => {
+      if (onSubmit && textAreaRef.current?.value.trim()) {
+        onSubmit();
+        // 제출 후 높이 초기화
+        if (textAreaRef.current) {
+          textAreaRef.current.style.height = '36px';
+        }
+      }
+    }
+
+    const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        handleSubmit();
+      }
+    }
+
   return (
         <Container>
           <ContainerInner>
-            <Left>
-            {left}
-            </Left>
+            {left && (
+              <Left>
+                {left}
+              </Left>
+            )}
             <TextArea
-            placeholder={placeholder}
-            onChange={handleTextChange}
-            ref={textAreaRef} />
-            <Right><ButtonTextField textcolor={btnColor}/></Right>
+              placeholder={placeholder}
+              value={value}
+              onChange={handleTextChange}
+              onKeyPress={handleKeyPress}
+              ref={textAreaRef}
+            />
+            <Right>
+              <div onClick={handleSubmit}>
+                <ButtonTextField textcolor={btnColor}/>
+              </div>
+            </Right>
           </ContainerInner>
         </Container>
     )

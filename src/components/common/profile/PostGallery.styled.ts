@@ -18,7 +18,7 @@ export const GalleryItem = styled.div`
   position: relative;
   width: 100%;
   padding-bottom: 100%;
-  background-color: var(--color-gray-light, #f5f5f5);
+  background-color: var(--color-gray-light);
   cursor: pointer;
   overflow: hidden;
 
@@ -48,12 +48,12 @@ export const GalleryPlaceholder = styled.div`
   align-items: center;
   justify-content: center;
   background-color: var(--color-gray-light);
-  color: var(--color-gray-500);
+  color: var(--color-gray-medium);
   font-size: var(--font-size-sm);
 `;
 
 export const EmptyGalleryMessage = styled.p`
-  color: var(--color-gray-500);
+  color: var(--color-gray-medium);
   text-align: center;
   padding: 2rem 0;
   grid-column: 1 / -1;

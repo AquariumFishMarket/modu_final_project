@@ -1,9 +1,9 @@
 import styled from "styled-components";
 
 export const ProductSection = styled.section<{ $isLastSection?: boolean }>`
-  width: calc(100% + 30px);
-  margin-left: -15px;
-  margin-right: -15px;
+  width: calc(100% + 3rem);
+  margin-left: -1.5rem;
+  margin-right: -1.5rem;
   background-color: #ffffff;
   margin-bottom: ${(props) => (props.$isLastSection ? "0" : "0.6rem")};
   padding: 2rem 1.6rem;
@@ -52,9 +52,9 @@ export const ProductImageBox = styled.div`
   width: 14rem;
   height: 9rem;
   border-radius: 0.8rem;
-  box-shadow: inset 0 0 0 0.5px #dbdbdb;
+  box-shadow: inset 0 0 0 0.5px var(--color-gray-medium);
   overflow: hidden;
-  background-color: #f5f5f5;
+  background-color: var(--color-gray-light);
 `;
 
 export const ProductImage = styled.img`
@@ -81,19 +81,19 @@ export const ProductPrice = styled.p`
 `;
 
 export const EmptyMessage = styled.p`
-  color: var(--color-gray-500, #999);
+  color: var(--color-gray-500);
   text-align: center;
   padding: 2rem 0;
 `;
 
 export const LoadingMessage = styled.p`
-  color: var(--color-gray-500, #999);
+  color: var(--color-gray-500);
   text-align: center;
   padding: 2rem 0;
 `;
 
 export const ErrorMessage = styled.p`
-  color: var(--color-error, #e53e3e);
+  color: var(--color-error);
   text-align: center;
   padding: 2rem 0;
 `;

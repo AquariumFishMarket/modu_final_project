@@ -11,18 +11,19 @@ export const EmptyFeedSection = styled.section`
 `;
 
 export const LogoImage = styled.img`
-  width: 100px;
-  height: 100px;
+  width: 10rem;
+  height: 10rem;
 `;
 
 export const FeedSection = styled.section`
-  width: calc(100% + 30px);
+  width: calc(100% + 3rem);
   margin-inline: -1.5rem;
   background-color: #ffffff;
 `;
 
 export const FeedItemWrapper = styled.div`
   width: 100%;
+  padding: 0 1.5rem;
 `;
 
 export const LoadingText = styled.p`

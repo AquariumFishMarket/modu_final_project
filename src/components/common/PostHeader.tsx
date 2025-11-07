@@ -18,6 +18,9 @@ interface PostHeaderProps {
   avatarSrc: string;
   avatarAlt: string;
   postId: string;
+  variant?: "post" | "comment";
+  dateTime?: string;
+  dateText?: string;
   onMoreClick?: (postId: string) => void;
 
   // API 연동 준비 (추후 사용)
@@ -30,6 +33,9 @@ function PostHeader({
   avatarSrc,
   avatarAlt,
   postId,
+  variant = "post",
+  dateTime,
+  dateText,
   onMoreClick,
 }: PostHeaderProps) {
   const [imgSrc, setImgSrc] = useState(avatarSrc);
@@ -46,19 +52,31 @@ function PostHeader({
 
   return (
     <StyledPostHeader>
-      <h2 className="sr-only">게시자 정보</h2>
+      <h2 className="sr-only">{variant === "comment" ? "댓글 작성자 정보" : "게시자 정보"}</h2>
       <UserInfo>
         <UserAvatar
           src={imgSrc || "/img/fish-logo-GB.png"}
           alt={avatarAlt}
           onError={handleImageError}
+          $variant={variant}
         />
-        <UserDetails>
-          <UserName>{userName}</UserName>
-          <UserId>{userId}</UserId>
-        </UserDetails>
+        {variant === "comment" ? (
+          <>
+            <UserName>{userName}</UserName>
+            {dateTime && dateText && (
+              <time dateTime={dateTime} style={{ fontSize: "1rem", color: "var(--color-gray-dark)", marginLeft: "0.6rem" }}>
+                {dateText}
+              </time>
+            )}
+          </>
+        ) : (
+          <UserDetails>
+            <UserName>{userName}</UserName>
+            <UserId>{userId}</UserId>
+          </UserDetails>
+        )}
       </UserInfo>
-      <MoreButton aria-label="게시글 더보기" onClick={handleMoreClick}>
+      <MoreButton aria-label={variant === "comment" ? "댓글 더보기" : "게시글 더보기"} onClick={handleMoreClick}>
         <img src="/img/icon-more-vertical.svg" alt="" />
       </MoreButton>
 

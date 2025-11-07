@@ -1,11 +1,11 @@
 import styled from "styled-components";
 
 export const ProfileSection = styled.section`
-  width: calc(100% + 30px);
-  margin-left: -15px;
-  margin-right: -15px;
-  margin-top: -68px;
-  padding-top: 68px;
+  width: calc(100% + 3rem);
+  margin-left: -1.5rem;
+  margin-right: -1.5rem;
+  margin-top: -6.8rem;
+  padding-top: 6.8rem;
   background-color: #ffffff;
   padding-bottom: 2.4rem;
   margin-bottom: 0.6rem;
@@ -112,7 +112,7 @@ export const IconButton = styled.button<{ $iconUrl: string }>`
   height: 3.4rem;
   background: url(${(props) => props.$iconUrl}) no-repeat center center;
   background-size: 2rem 2rem;
-  border: 1px solid #dbdbdb;
+  border: 1px solid var(--color-gray-medium);
   border-radius: 50%;
   cursor: pointer;
   transition: all 0.2s;
@@ -133,7 +133,7 @@ export const LoadingText = styled.p`
 
 // 내 프로필 피드 섹션
 export const MyFeedSection = styled.section`
-  width: calc(100% + 30px);
+  width: calc(100% + 3rem);
   margin-inline: -1.5rem;
 `;
 

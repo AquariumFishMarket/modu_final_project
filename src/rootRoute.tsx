@@ -10,6 +10,7 @@ import Profile from "./components/common/profile/Profile";
 import ProfileEdit from "./pages/profile/ProfileEdit";
 import SearchPage from "./pages/Search/SearchPage";
 import PostWrite from "./pages/post/PostWrite";
+import PostDetail from "./pages/post/PostDetail";
 import FeedPage from "./pages/Home/FeedPage";
 import ProductAdd from "./pages/product/ProductAdd";
 import ErrPage from "./pages/errPage/ErrPage";
@@ -48,6 +49,8 @@ export default function RootRoute() {
           {/* <Route path="/product/:id" element={<ProductDetail />} /> */}
           {/* 게시글 */}
           <Route path="/post" element={<PostWrite />} />
+          {/* 상세게시글 */}
+          <Route path="/post/:postId" element={<PostDetail />} />
           {/* 채팅 */}
           <Route path="/chat-list" />
           {/* <Route path="/chat-room" element={<ChatRoom />} /> */}
