@@ -5,7 +5,9 @@ export const ProductSection = styled.section<{ $isLastSection?: boolean }>`
   margin-left: -15px;
   margin-right: -15px;
   background-color: #ffffff;
-  margin-bottom: ${(props) => (props.$isLastSection ? "0" : "0.6rem")};
+  /* margin-bottom: ${(props) => (props.$isLastSection ? "0" : "0.6rem")}; */
+  border-bottom: ${(props) =>
+    props.$isLastSection ? "none" : "6px solid var(--color-gray-light)"};
   padding: 2rem 1.6rem;
   display: flex;
   flex-direction: column;

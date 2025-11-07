@@ -43,7 +43,7 @@ export default function RootRoute() {
           {/* 메인 피드, 검색 */}
           <Route path="/search" element={<SearchPage />} />
           {/* 상품 */}
-          <Route path="/product/add" element={<ProductAdd />} />
+          <Route path="/product/upload" element={<ProductAdd />} />
           <Route path="/product/:id/edit" element={<ProductEdit />} />
           <Route path="/product/:id" element={<ProductDetail />} />
           {/* 게시글 */}

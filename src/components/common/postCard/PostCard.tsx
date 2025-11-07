@@ -30,7 +30,6 @@ interface PostCardProps {
   isLiked: boolean;
   onLikeClick?: () => void;
   onCommentClick?: () => void;
-  onMoreClick?: (postId: string) => void;
 
   // API 연동 준비 (추후 사용)
   // post: Post;
@@ -54,12 +53,10 @@ function PostCard({
   isLiked,
   onLikeClick,
   onCommentClick,
-  onMoreClick,
 }: PostCardProps) {
   const [liked, setLiked] = useState(isLiked);
   const [likes, setLikes] = useState(likeCount);
   const [postImageSrc, setPostImageSrc] = useState(imageSrc);
-
 
   // 낙관적 업데이트
   const handleLikeClick = () => {
@@ -114,7 +111,6 @@ function PostCard({
         avatarSrc={avatarSrc}
         avatarAlt={avatarAlt}
         postId={postId}
-        onMoreClick={onMoreClick}
       />
 
       {/* API 연동 준비 (추후 사용) */}

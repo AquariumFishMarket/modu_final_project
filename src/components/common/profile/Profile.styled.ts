@@ -8,7 +8,7 @@ export const ProfileSection = styled.section`
   padding-top: 68px;
   background-color: #ffffff;
   padding-bottom: 2.4rem;
-  margin-bottom: 0.6rem;
+  border-bottom: 6px solid var(--color-gray-light);
 `;
 
 export const ProfileContainer = styled.div`

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   PostHeader as StyledPostHeader,
   UserInfo,
@@ -6,8 +7,9 @@ import {
   UserDetails,
   UserName,
   UserId,
-  MoreButton,
+  // MoreButton,
 } from "./PostHeader.styled";
+import MoreMenu from "./MoreMenu";
 
 // API 연동 준비 (추후 사용)
 // import { Author } from "../../types/post";
@@ -17,8 +19,9 @@ interface PostHeaderProps {
   userId: string;
   avatarSrc: string;
   avatarAlt: string;
-  postId: string;
-  onMoreClick?: (postId: string) => void;
+  postId?: string;
+  onEditPost?: () => void;
+  onDeletePost?: () => void;
 
   // API 연동 준비 (추후 사용)
   // author: Author;
@@ -30,18 +33,22 @@ function PostHeader({
   avatarSrc,
   avatarAlt,
   postId,
-  onMoreClick,
 }: PostHeaderProps) {
+  const navigate = useNavigate();
   const [imgSrc, setImgSrc] = useState(avatarSrc);
-
-  const handleMoreClick = () => {
-    if (onMoreClick) {
-      onMoreClick(postId);
-    }
-  };
 
   const handleImageError = () => {
     setImgSrc("/img/fish-logo-GB.png");
+  };
+
+  // 게시글 액션 핸들러들
+  const handleEditPost = () => {
+    console.log("게시글 수정:", postId);
+    navigate(`/post/${postId}/edit`);
+  };
+
+  const handleDeletePost = () => {
+    console.log("게시글 삭제:", postId);
   };
 
   return (
@@ -58,9 +65,12 @@ function PostHeader({
           <UserId>{userId}</UserId>
         </UserDetails>
       </UserInfo>
-      <MoreButton aria-label="게시글 더보기" onClick={handleMoreClick}>
-        <img src="/img/icon-more-vertical.svg" alt="" />
-      </MoreButton>
+
+      <MoreMenu
+        type="post"
+        onEdit={handleEditPost}
+        onDelete={handleDeletePost}
+      />
 
       {/* API 연동 준비 (추후 사용) */}
       {/* <UserInfo>
