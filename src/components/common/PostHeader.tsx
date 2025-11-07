@@ -7,7 +7,7 @@ import {
   UserDetails,
   UserName,
   UserId,
-  // MoreButton,
+  MoreButton,
 } from "./PostHeader.styled";
 import MoreMenu from "./MoreMenu";
 
@@ -87,7 +87,7 @@ function PostHeader({
         )}
       </UserInfo>
 
-      <MoreButton aria-label={variant === "comment" ? "댓글 더보기" : "게시글 더보기"} onClick={handleMoreClick}>
+      <MoreButton aria-label={variant === "comment" ? "댓글 더보기" : "게시글 더보기"} onClick={() => onMoreClick?.(postId)}>
         <img src="/img/icon-more-vertical.svg" alt="" />
       </MoreButton>
 

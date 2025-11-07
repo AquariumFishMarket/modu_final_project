@@ -101,7 +101,7 @@ const FeedPage = () => {
   // 피드 로딩
   useEffect(() => {
     const loadFeed = async (): Promise<void> => {
-      if (!hasMore) return;
+      if (!hasMore || isLoading) return;
       setIsLoading(true);
       try {
         const newFeed: Feed[] = await fetchFeed(page);
@@ -109,7 +109,12 @@ const FeedPage = () => {
         if (newFeed.length === 0) {
           setHasMore(false); // 더 이상 불러올 피드가 없음
         } else {
-          setFeedList((prev: Feed[]) => [...prev, ...newFeed]); // 기존 피드에 추가
+          setFeedList((prev: Feed[]) => {
+            // 중복 제거: 이미 존재하는 ID는 추가하지 않음
+            const existingIds = new Set(prev.map(feed => feed.id));
+            const uniqueNewFeed = newFeed.filter(feed => !existingIds.has(feed.id));
+            return [...prev, ...uniqueNewFeed];
+          });
         }
       } finally {
         setIsLoading(false);
