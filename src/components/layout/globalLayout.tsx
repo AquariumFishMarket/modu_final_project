@@ -151,6 +151,27 @@ function LayoutContent() {
       return;
     }
 
+    // 채팅 리스트
+    if(path === '/chat-list') {
+      setHeaderConfig({
+          show: true,
+          type: "chatList",
+          onBackClick: () => navigate(-1),
+        });
+        return;
+    }
+
+    // 채팅 방
+    if(path.includes('/chat-room')) {
+      setHeaderConfig({
+          show: true,
+          type: "chat",
+          userName:'잉어킹',
+          onBackClick: () => navigate(-1),
+        });
+        return;
+    }
+
     // 기본 (피드)
     setHeaderConfig({
       show: true,

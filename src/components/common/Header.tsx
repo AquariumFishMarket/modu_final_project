@@ -178,8 +178,8 @@ function Header() {
         </Section>
       )}
 
-      {/* 채팅 */}
-      {config.type === "chat" && (
+      {/* 채팅 목록*/}
+      {config.type === "chatList" && (
         <Section>
           <IconButton onClick={config.onBackClick}>
             <img src="/img/icon-arrow-left.svg" alt="이전 페이지로 이동" />
@@ -188,8 +188,8 @@ function Header() {
         </Section>
       )}
 
-      {/* 채팅 목록 */}
-      {config.type === "chatList" && (
+      {/* 채팅방 */}
+      {config.type === "chat" && (
         <Section>
           <ChatUserContainer>
             <IconButton onClick={config.onBackClick}>
