@@ -55,29 +55,29 @@ const Date = styled.p`
 
 interface ChatData {
     id: number;
+    imgSrc: string;
+    username: string;
+    message: string;
+    date: string;
     onClick?:()=>void;
-    // profileImg: string;
-    // username: string;
-    // chatmessage: string;
-    // date: string
 }
 
-export default function ChatContent({id,onClick}:ChatData){
+export default function ChatContent({id,imgSrc,username,message,date,onClick}:ChatData){
 
     return(
         <ContentsWrapper onClick={onClick}>
             <ImageContainer>
                 <ProfileImg thumbimg={false}
                     width={42}
-                    imgSrc=""
+                    imgSrc={imgSrc}
                 />
                 <Alert />
             </ImageContainer>
             <TextContainer>
-                <UserName>잉어킹</UserName>
-                <ChatMessage>살려주세요잡아먹지마세요살려주세요잡아먹지마세요살려주세요잡아먹지마세요살려주세요잡아먹지마세요</ChatMessage>
+                <UserName>{username}</UserName>
+                <ChatMessage>{message}</ChatMessage>
             </TextContainer>
-            <Date>2025.08.12</Date>
+            <Date>{date}</Date>
         </ContentsWrapper>
     )
 }
