@@ -19,7 +19,7 @@ const MoreButton = styled.button`
   background: none;
   border: none;
   outline: none;
-  padding: 8px;
+  /* padding: 8px; */
   cursor: pointer;
   display: flex;
   align-items: center;

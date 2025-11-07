@@ -5,7 +5,6 @@ export const PostHeader = styled.section`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 1.6rem;
 `;
 
 export const UserInfo = styled.div`
@@ -28,15 +27,17 @@ export const UserDetails = styled.div`
 
 export const UserName = styled.strong`
   font-size: 1.4rem;
-  font-weight: 700;
-  display: block;
+  font-weight: 500;
+  display: inline-block;
   margin-bottom: 2px;
+  vertical-align: bottom;
 `;
 
 export const UserId = styled.p`
   font-size: 1.2rem;
   color: var(--color-gray-dark);
   margin: 0;
+  vertical-align: bottom;
 `;
 
 export const MoreButton = styled.button`
