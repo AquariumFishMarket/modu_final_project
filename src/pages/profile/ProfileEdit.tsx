@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import CommonForm, {
-  FormSubmissionData,
-} from "../../components/common/CommonForm";
+import EditForm from "../../components/common/form/EditForm";
+import { FormSubmissionData } from "../../components/common/form/types";
 import { useHeader } from "../../contexts/HeaderContext";
 import { useState, useEffect, useRef } from "react";
 
@@ -112,11 +111,10 @@ export default function ProfileEdit() {
   };
 
   return (
-    <CommonForm
+    <EditForm
       ref={formRef}
       formType="profile"
       fields={profileFields}
-      showButton={false}
       onSubmit={handleSubmit}
       onValidationChange={handleValidationChange}
     />

@@ -19,7 +19,7 @@ import Splash from "./pages/splash/Splash";
 
 import ChatRoom from "./pages/chat/ChatRoom";
 import ProductDetail from "./pages/product/ProductDetail";
-
+import ProductEdit from "./pages/product/ProductEdit";
 
 export default function RootRoute() {
   const location = useLocation();
@@ -44,16 +44,16 @@ export default function RootRoute() {
           {/* 메인 피드, 검색 */}
           <Route path="/search" element={<SearchPage />} />
           {/* 상품 */}
-          <Route path="/product/add" element={<ProductAdd />} />
-          <Route path="/product/edit/:id" /> {/* 상품 수정 */}
-          {/* <Route path="/product/:id" element={<ProductDetail />} /> */}
+          <Route path="/product/upload" element={<ProductAdd />} />
+          <Route path="/product/:id/edit" element={<ProductEdit />} />
+          <Route path="/product/:id" element={<ProductDetail />} />
           {/* 게시글 */}
           <Route path="/post" element={<PostWrite />} />
           {/* 상세게시글 */}
           <Route path="/post/:postId" element={<PostDetail />} />
           {/* 채팅 */}
           <Route path="/chat-list" />
-          {/* <Route path="/chat-room" element={<ChatRoom />} /> */}
+          <Route path="/chat-room" element={<ChatRoom />} />
           {/* 에러 페이지 */}
           <Route path="/404" element={<ErrPage />} />
         </Route>

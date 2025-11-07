@@ -19,7 +19,7 @@ import {
   LoadingText,
   MyFeedSection,
   PostListContainer,
-  EmptyPostMessage,
+  // EmptyPostMessage,
 } from "./Profile.styled";
 import DefaultButton from "../Button";
 import SellingProducts from "./SellingProducts";
@@ -400,9 +400,10 @@ function Profile() {
                     commentCount={post.commentCount}
                     isLiked={post.isLiked}
                     onLikeClick={() => handleLikeToggle(post.postId)}
+
                     onCommentClick={() => navigate(`/post/${post.postId}`)}
                     onMoreClick={() => {
-                      // TODO: 더보기 메뉴 구현
+
                     }}
                   />
                 ))}

@@ -6,8 +6,7 @@ import { HeaderProvider, useHeader } from "../../contexts/HeaderContext";
 import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-import { relative } from "path";
-
+// import { relative } from "path";
 
 const LayoutContainer = styled.div<{ $isProfile?: boolean }>`
   max-width: 600px;
@@ -20,7 +19,9 @@ const LayoutContainer = styled.div<{ $isProfile?: boolean }>`
   border: 1px solid #eeeeee;
 `;
 
+
 const MainContent = styled.main<{ $hasFooter: boolean; $isProfile?: boolean, $isChatRoom?: boolean, $isPostDetail?: boolean }>`
+
   height: 100%;
   padding: ${(props) => props.$isPostDetail ? '68px 25px 0' : '68px 15px 0'};
   overflow-x: hidden;
@@ -29,14 +30,14 @@ const MainContent = styled.main<{ $hasFooter: boolean; $isProfile?: boolean, $is
     if (props.$isProfile) return "0";
     return props.$hasFooter ? "110px" : "50px";
   }};
-  background-color: ${(props) => props.$isChatRoom ? 'var(--color-gray-light)' : '#fff'};
+  background-color: ${(props) =>
+    props.$isChatRoom ? "var(--color-gray-light)" : "#fff"};
 `;
 
 function LayoutContent() {
   const location = useLocation();
   const { setHeaderConfig } = useHeader();
   const navigate = useNavigate();
-
 
   // 경로별 헤더 자동 설정
   useEffect(() => {
@@ -159,7 +160,6 @@ function LayoutContent() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
 
-
   // Nav 있을 부분
   const shouldShowNav = (): boolean => {
     const path = location.pathname;
@@ -170,18 +170,21 @@ function LayoutContent() {
   };
 
   const isProfilePage = location.pathname === "/profile";
+
   const isChatRoomPage = location.pathname === "/chat-room"
   const isPostDetailPage = location.pathname.match(/^\/post\/[^/]+$/);
+
 
   return (
     <LayoutContainer $isProfile={isProfilePage}>
       <AnimatePresence mode="wait">
-        <motion.div initial={{ opacity: 0 }}
-          animate={{ opacity: 1}}
-          style={{ height: '100%' }}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          style={{ height: "100%" }}
           transition={{ duration: 0.26, ease: "easeOut" }}
           key={location.pathname}
-          >
+        >
           <Header />
           <MainContent $hasFooter={shouldShowNav()} $isProfile={isProfilePage} $isPostDetail={!!isPostDetailPage}>
             <Outlet />
