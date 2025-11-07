@@ -1,11 +1,11 @@
-import { useRef, useState } from "react";
+import { Dispatch, SetStateAction, useRef, useState } from "react";
 import styled from "styled-components"
 import ButtonTextField from "./Buttons/ButtonTextField";
 
 interface textfield {
   left: React.ReactNode;
   placeholder: string;
-  onClick?:()=>void;
+  onClick:(text:string)=>void;
 }
 
 const Container = styled.div`
@@ -52,8 +52,9 @@ const TextArea = styled.textarea`
     }
 `
 
-export default function TextField({left,placeholder}:textfield) {
+export default function TextField({left,placeholder,onClick}:textfield) {
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null)
+  const [textValue,setTextValue] = useState<string>('')
   const [btnColor,setBtnColor] = useState(false)
 
     const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -63,10 +64,13 @@ export default function TextField({left,placeholder}:textfield) {
 
         if(textAreaRef.current?.value !=='') {
           setBtnColor(true)
+          setTextValue(target.value)
+
         } else {
           setBtnColor(false)
         }
     }
+
   return (
         <Container>
           <ContainerInner>
@@ -77,7 +81,7 @@ export default function TextField({left,placeholder}:textfield) {
             placeholder={placeholder}
             onChange={handleTextChange}
             ref={textAreaRef} />
-            <Right><ButtonTextField textcolor={btnColor}/></Right>
+            <Right><ButtonTextField textcolor={btnColor} onClick={()=>onClick(textValue)}/></Right>
           </ContainerInner>
         </Container>
     )

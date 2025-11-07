@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import ProfileImg from "../../components/common/ProfileImg";
 import TextField from "../../components/common/TextField";
 import ImageUpButton from "../../components/common/imageUpload/UploadButton";
@@ -6,15 +6,6 @@ import ImageContainer from "../../components/common/imageUpload/ImageContainer";
 import DefaultButton from "../../components/common/Button";
 
 import styled from "styled-components";
-
-interface ChatMessage {
-    id: string;
-    userId: string;
-    username: string;
-    content: string;
-    type: 'text' | 'image' | 'system';
-    timestamp: number;
-}
 
 const ChatContainer = styled.section`
     position: relative;
@@ -33,7 +24,6 @@ const DefaultChatMessage = styled.div`
     border-radius: 10px;
     border-top-left-radius: 0;
 `
-
 const YourChat = styled(DefaultChat)``
 
 const YourChatMessage = styled(DefaultChatMessage)`
@@ -52,7 +42,6 @@ const YourTime = styled.div`
     align-self: end;
     color: var(--color-gray-dark);
 `
-
 const MyChat = styled(DefaultChat)`
     justify-content: end;
 `
@@ -93,27 +82,43 @@ const Background = styled.div`
     z-index: 100;
 `
 
+interface ChatMessage {
+    id: string;
+    userId: string;
+    username: string;
+    content: string;
+    type: 'text' | 'image' | 'system';
+    timestamp: number;
+}
+
 export default function ChatRoom() {
+    //소켓 저장
+    const socketRef = useRef<WebSocket | null>(null)
+    // 이미지 파일 저장 공간
     const [imgArr, setImgArr] = useState<File[]>([])
+    // 텍스트 메시지 저장 공간
+    const [text, setText] = useState<string>('')
     const [deleteIndex, setDeleteIdx] = useState<number|undefined>()
     const [imgModalState, setImgModalState] = useState<boolean>(false)
 
-
+    //soket공간
+    const [message, setMessage] = useState<ChatMessage[]>([])
     // useEffect(()=>{
-    //     const socket = new WebSocket("ws://example.com/websocket");
+    //     socketRef.current = new WebSocket("ws://example.com/websocket");
 
-    //     socket.onopen = () => console.log("연결됨");
-    //     socket.onmessage = (event) => {
+    //     socketRef.current.onopen = () => console.log("연결됨");
+    //     socketRef.current.onmessage = (event) => {
     //         // const newMessage = JSON.parse(event.data);
     //         // setMessages((prev) => [...prev, newMessage])
     //     }
-    //     socket.onerror = (err) => console.error("오류:", err);
-    //     socket.onclose = () => console.log("연결 종료");
+    //     socketRef.current.onerror = (err) => console.error("오류:", err);
+    //     socketRef.current.onclose = () => console.log("연결 종료");
 
     //     // 컴포넌트 언마운트 시 연결 종료
-    //     return () => socket.close();
+    //     return () => socketRef.current.close();
     // },[])
 
+    useEffect(()=>{console.log(text)},[text])
 
     useEffect(()=>{
         setImgArr(prev => prev.filter((_, i) => i !== deleteIndex));
@@ -127,16 +132,33 @@ export default function ChatRoom() {
         } else {
             setImgModalState(false)
         }
-
     },[imgArr])
 
+    //이미지 전송 함수
     const handleSubmitImage = () => {
-        handleClose();
         //이미지 파일 전송 코드 삽입 위치
+        // if(imgArr.length > 0) {
+        //     const imageMessages = imgArr.map((img)=>({
+        //         type: "image",
+        //         fileName: img.name,
+        //         timestamp: new Date().toISOString()
+        //     }))
 
+        //     socketRef.current?.send(JSON.stringify(imageMessages))
+
+        //     socketRef.current?.onmessage = (event) => {
+        //         const data = JSON.parse(event.data);
+        //         if (data.type === "ack") {
+        //             handleClose(); // 전송 성공 시에만 닫기
+        //         }
+        //     };
+        // }
     }
-    const handleSubmit = () => {
+
+    //텍스트 전송 함수
+    const handleSendText = (text: string) => {
         //text 자료 전송 코드 삽입 위치
+        console.log(text)
     }
 
     const handleClose = () => {
@@ -223,7 +245,6 @@ export default function ChatRoom() {
             </>
         )}
 
-
         <TextField
         left={<ImageUpButton
             multiple={true}
@@ -233,7 +254,8 @@ export default function ChatRoom() {
             setImgArr={setImgArr}
         />}
         placeholder="메시지 입력하기.."
-        onClick={handleSubmit}
+        onClick={handleSendText}
+
         ></TextField>
         </>
     )
