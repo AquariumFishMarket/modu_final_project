@@ -104,6 +104,7 @@ const ChatFileInfo = styled.div`
   font-size: var(--font-size-md);
 `
 
+
 export default function ImageContainer({
   imgArr,
   setDeleteIdx

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import ProfileImg from "../../components/common/ProfileImg";
 import TextField from "../../components/common/TextField";
 import ImageUpButton from "../../components/common/imageUpload/UploadButton";
@@ -7,16 +7,8 @@ import DefaultButton from "../../components/common/Button";
 
 import styled from "styled-components";
 
-interface ChatMessage {
-    id: string;
-    userId: string;
-    username: string;
-    content: string;
-    type: 'text' | 'image' | 'system';
-    timestamp: number;
-}
-
 const ChatContainer = styled.section`
+    position: relative;
     max-height: calc(100% - 20px);
     overflow-y: auto;
 `
@@ -32,7 +24,6 @@ const DefaultChatMessage = styled.div`
     border-radius: 10px;
     border-top-left-radius: 0;
 `
-
 const YourChat = styled(DefaultChat)``
 
 const YourChatMessage = styled(DefaultChatMessage)`
@@ -46,12 +37,11 @@ const YourChatMessage = styled(DefaultChatMessage)`
         max-width: 100%;
     }
 `
-const YourTime = styled.p`
+const YourTime = styled.div`
     font-size: 1rem;
     align-self: end;
     color: var(--color-gray-dark);
 `
-
 const MyChat = styled(DefaultChat)`
     justify-content: end;
 `
@@ -63,7 +53,7 @@ const MyChatMessage = styled(DefaultChatMessage)`
         color: #fff;
     }
 `
-const MyTime = styled.p`
+const MyTime = styled.div`
     font-size: 1rem;
     align-self: end;
     color: var(--color-gray-dark);
@@ -79,13 +69,53 @@ const ImageContainerWRapper = styled.div`
     padding: 20px;
     width: 300px;
     max-height: 250px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    z-index: 101;
+`
+const Background = styled.div`
+    position: fixed;
+    top:0;
+    left:0;
+    width:100vw;
+    height:100vh;
+    background-color: rgba(0,0,0,0.2);
+    z-index: 100;
 `
 
+interface ChatMessage {
+    id: string;
+    userId: string;
+    username: string;
+    content: string;
+    type: 'text' | 'image' | 'system';
+    timestamp: number;
+}
+
 export default function ChatRoom() {
+    //소켓 저장
+    const socketRef = useRef<WebSocket | null>(null)
+    // 이미지 파일 저장 공간
     const [imgArr, setImgArr] = useState<File[]>([])
+    // 텍스트 메시지 저장 공간
     const [deleteIndex, setDeleteIdx] = useState<number|undefined>()
     const [imgModalState, setImgModalState] = useState<boolean>(false)
 
+    //soket공간
+    const [message, setMessage] = useState<ChatMessage[]>([])
+    // useEffect(()=>{
+    //     socketRef.current = new WebSocket("ws://example.com/websocket");
+
+    //     socketRef.current.onopen = () => console.log("연결됨");
+    //     socketRef.current.onmessage = (event) => {
+    //         // const newMessage = JSON.parse(event.data);
+    //         // setMessages((prev) => [...prev, newMessage])
+    //     }
+    //     socketRef.current.onerror = (err) => console.error("오류:", err);
+    //     socketRef.current.onclose = () => console.log("연결 종료");
+
+    //     // 컴포넌트 언마운트 시 연결 종료
+    //     return () => socketRef.current.close();
+    // },[])
 
     useEffect(()=>{
         setImgArr(prev => prev.filter((_, i) => i !== deleteIndex));
@@ -96,22 +126,51 @@ export default function ChatRoom() {
     useEffect(()=>{
         if(imgArr.length > 0) {
             setImgModalState(true)
+        } else {
+            setImgModalState(false)
         }
     },[imgArr])
 
+    //이미지 전송 함수
     const handleSubmitImage = () => {
+        //이미지 파일 전송 코드 삽입 위치
+        // if(imgArr.length > 0) {
+        //     const imageMessages = imgArr.map((img)=>({
+        //         type: "image",
+        //         fileName: img.name,
+        //         timestamp: new Date().toISOString()
+        //     }))
+
+        //     socketRef.current?.send(JSON.stringify(imageMessages))
+
+        //     socketRef.current?.onmessage = (event) => {
+        //         const data = JSON.parse(event.data);
+        //         if (data.type === "ack") {
+        //             handleClose(); // 전송 성공 시에만 닫기
+        //         }
+        //     };
+        // }
+    }
+
+    //텍스트 전송 함수
+    const handleSendText = (text: string, refObj:React.RefObject<HTMLTextAreaElement | null>) => {
+        //text 자료 전송 코드 삽입 위치
+        console.log(text)
+        //전송 후 입력필드 초기화 함수
+        if(refObj.current) {
+            refObj.current.value = ''
+        }
+    }
+
+    const handleClose = () => {
         setImgModalState(false)
         setImgArr([])
-        //이미지 파일 전송 코드 삽입 위치
-
-    }
-    const handleSubmit = () => {
-        //text 자료 전송 코드 삽입 위치
     }
 
     return (
         <>
         <ChatContainer>
+            <h2 className="sr-only">ooo님의 채팅룸</h2>
             <YourChat>
                 <ProfileImg
                     thumbimg={false}
@@ -168,17 +227,24 @@ export default function ChatRoom() {
         </ChatContainer>
 
         {imgModalState && (
+            <>
+            <Background></Background>
             <ImageContainerWRapper>
                 <ImageContainer
                 imgArr={imgArr}
                 setDeleteIdx={setDeleteIdx}
                 />
-                <div style={{ marginTop: '15px' }}>
-                    <DefaultButton height="medium" text="전송하기" onClick={handleSubmitImage}></DefaultButton>
+                <div style={{ marginTop: '25px', display: 'flex', gap: '10px' }}>
+                    <div style={{ flexBasis: '50%' }}>
+                        <DefaultButton height="medium" text="전송하기" onClick={handleSubmitImage} />
+                    </div>
+                    <div style={{ flexBasis : '50%' }}>
+                        <DefaultButton height="medium" text="닫기" variant="secondary" onClick={handleClose} />
+                    </div>
                 </div>
             </ImageContainerWRapper>
+            </>
         )}
-
 
         <TextField
         left={<ImageUpButton
@@ -189,7 +255,7 @@ export default function ChatRoom() {
             setImgArr={setImgArr}
         />}
         placeholder="메시지 입력하기.."
-        onClick={handleSubmit}
+        onClick={handleSendText}
         ></TextField>
         </>
     )
