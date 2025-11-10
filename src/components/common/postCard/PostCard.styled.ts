@@ -4,21 +4,30 @@ export const PostCardContainer = styled.article`
   width: 100%;
   max-width: 100%;
   margin: 0 auto;
-  margin-bottom: 24px;
+  /* margin-bottom: 24px; */
   background: white;
   display: flex;
   flex-direction: column;
   gap: 1.6rem;
   overflow: hidden;
+
+  @media (max-width: 389px) {
+    /* margin-bottom: 20px; */
+    gap: 1.2rem;
+  }
 `;
 
 export const PostContent = styled.div`
-  padding-left: 54px;
+  padding-left: 5.4rem;
 
-  /* @media (min-width: 768px) {
+  @media (max-width: 320px) {
+    padding-left: 0;
+  }
+
+  @media (min-width: 768px) {
     padding-left: 5.4rem;
     padding-right: 0;
-  } */
+  }
 `;
 
 export const PostMain = styled.figure`
@@ -27,7 +36,7 @@ export const PostMain = styled.figure`
   gap: 1.6rem;
   margin: 0;
   border: none;
-  padding: 0 1.6rem 0 0;
+  /* padding: 0 1.6rem 0 0; */
 
   figcaption {
     line-height: 1.8rem;
@@ -35,8 +44,11 @@ export const PostMain = styled.figure`
   }
 
   img {
-    width: 30.4rem;
-    height: 22.8rem;
+    /* width: 30.4rem;
+    height: 22.8rem; */
+    width: 100%;
+    height: auto;
+    min-height: 180px;
     aspect-ratio: 16 / 9;
     object-fit: cover;
     border: 1px solid var(--color-gray-medium);
@@ -52,10 +64,11 @@ export const PostMain = styled.figure`
     } */
 
     img {
-      width: 100%;
+      /* width: 100%;
       max-width: 100%;
       height: auto;
-      aspect-ratio: 16 / 9;
+      aspect-ratio: 16 / 9; */
+      min-height: 220px;
     }
   }
 `;
@@ -64,11 +77,12 @@ export const PostFooter = styled.footer`
   display: flex;
   flex-direction: column;
   gap: 1.6rem;
-  padding: 1.2rem 1.6rem 0 0;
+  /* padding: 1.2rem 1.6rem 0 0; */
+  padding-top: 12px;
 
-  @media (min-width: 768px) {
+  /* @media (min-width: 768px) {
     padding: 1.2rem 0 0 0;
-  }
+  } */
 `;
 
 export const PostActions = styled.div`
@@ -86,7 +100,7 @@ export const ActionButton = styled.button`
   padding: 0.4rem;
   margin: -0.4rem;
   color: var(--color-gray-dark);
-  font-size: var(--font-size-md);
+  font-size: var(--font-size-sm);
   transition: color 0.2s;
 
   &:hover {
@@ -104,6 +118,6 @@ export const ActionButton = styled.button`
 `;
 
 export const PostTime = styled.time`
-  font-size: var(--font-size-md);
+  font-size: var(--font-size-xs);
   color: var(--color-gray-dark);
 `;

@@ -154,7 +154,7 @@ export const MyFeedTitle = styled.h2`
 export const PostListContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 1.6rem;
+  gap: 2rem;
   padding: 16px 21px;
 `;
 
