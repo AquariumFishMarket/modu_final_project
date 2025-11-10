@@ -74,15 +74,19 @@ interface ChatData {
 
 export default function ChatItem({id,imgSrc,username,message,date}:ChatData){
     const startXRef = useRef(0);
+    const startTransRef = useRef(0);
     const currentXRef = useRef(0);
     const isDraggingRef = useRef(true);
+    const hasDraggedRef = useRef(false);
     const [boxTrans,setBoxTrans] = useState<number>(0)
 
-    const DRAG_THRESHOLD = 3;
+    const DRAG_THRESHOLD = 5;
     const MAX_SWIPE = -100;
 
     const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
         startXRef.current = e.clientX;
+        startTransRef.current = currentXRef.current;
+        hasDraggedRef.current = false; // 초기화
         document.addEventListener('mousemove', handleMouseMove);
         document.addEventListener('mouseup', handleMouseUp)
     }
@@ -92,13 +96,14 @@ export default function ChatItem({id,imgSrc,username,message,date}:ChatData){
 
         if (Math.abs(deltaX) > DRAG_THRESHOLD) {
             isDraggingRef.current = true;
+            hasDraggedRef.current = true; // 초기화
         }
 
-        if (isDraggingRef.current && deltaX < 0) {
-            // 왼쪽 드래그만 허용, MAX_SWIPE 이상 안 넘어가도록
-            const newTrans = Math.max(deltaX, MAX_SWIPE);
-            setBoxTrans(newTrans);
+        if (isDraggingRef.current) {
+            let newTrans = startTransRef.current + deltaX;
+            newTrans = Math.max(MAX_SWIPE, Math.min(0, newTrans));
             currentXRef.current = newTrans;
+            setBoxTrans(newTrans);
         }
     }
 
@@ -106,27 +111,31 @@ export default function ChatItem({id,imgSrc,username,message,date}:ChatData){
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
 
-
         // 스와이프 거리에 따라 삭제 버튼 보여줄지 결정
         if (isDraggingRef.current) {
-            if (currentXRef.current < -30) {
+            if (currentXRef.current < -50) {
                 // 절반 이상 스와이프하면 삭제 버튼 고정
                 setBoxTrans(MAX_SWIPE);
+                currentXRef.current = MAX_SWIPE;
             } else {
                 // 아니면 원위치
                 setBoxTrans(0);
+                currentXRef.current = 0;
             }
         }
 
         isDraggingRef.current = false;
     }
 
-    const handleClick = () => {
+    const handleClick = (e: React.MouseEvent) => {
         // 드래그가 아닐 때만 클릭 이벤트 처리
-        if (!isDraggingRef.current) {
-            console.log('채팅방 클릭');
-            // 채팅방 입장 로직
+        if (hasDraggedRef.current) {
+            e.preventDefault();
+            e.stopPropagation();
+            return;
         }
+        console.log('채팅방 클릭');
+            // 채팅방 입장 로직
     }
 
     return(
