@@ -64,12 +64,18 @@ export const ProfileImageBox = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+
+  width: 11rem;
+  height: 11rem;
+  border-radius: 100%;
+  overflow: hidden;
+  flex-shrink: 0;
 `;
 
 export const ProfileImage = styled.img`
-  width: 11rem;
-  height: 11rem;
-  border-radius: 50%;
+  width: 100%;
+  height: 100%;
+  border-radius: 100%;
   object-fit: cover;
 `;
 
@@ -89,15 +95,15 @@ export const UserName = styled.h3`
 `;
 
 export const UserId = styled.p`
-  font-size: var(--font-size-md);
-  color: var(--color-gray-semi-dark);
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-dark);
 `;
 
 export const UserDescription = styled.p`
   text-align: center;
   margin: 1.6rem 0 2.4rem 0;
-  font-size: 1.4rem;
-  color: var(--color-gray-semi-dark);
+  font-size: var(--font-size-md);
+  color: var(--color-gray-dark);
 `;
 
 export const ActionButtonsContainer = styled.div`
@@ -137,6 +143,7 @@ export const MyFeedSection = styled.section`
   margin-inline: -1.5rem;
 `;
 
+// 무슨 타이틀?
 export const MyFeedTitle = styled.h2`
   font-size: 1.6rem;
   font-weight: 700;
@@ -147,8 +154,8 @@ export const MyFeedTitle = styled.h2`
 export const PostListContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 1.6rem;
-  padding: 1.6rem 2.1rem;
+  /* gap: 2rem; */
+  padding: 16px;
 `;
 
 export const EmptyPostMessage = styled.p`

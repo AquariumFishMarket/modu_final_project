@@ -5,6 +5,7 @@ import AlertModal from "./modal/AlertModal";
 
 interface MoreMenuProps {
   type: "profile" | "post" | "comment" | "chat" | "chatList" | "product";
+  size?: "sm" | "md" | "lg";
   onEdit?: () => void;
   onDelete?: () => void;
   onReport?: () => void;
@@ -15,7 +16,30 @@ interface MoreMenuProps {
   onMarkAsSold?: () => void; // 상품 판매완료 함수 추가!
 }
 
-const MoreButton = styled.button`
+const getIconSrc = (size: "sm" | "md" | "lg") => {
+  switch (size) {
+    case "sm":
+      return "/img/s-icon-more-vertical.svg";
+    case "md":
+    case "lg":
+      return "/img/icon-more-vertical.svg";
+  }
+};
+
+const getIconSize = (size: "sm" | "md" | "lg") => {
+  switch (size) {
+    case "sm":
+      return "18px"; // 게시글 더보기
+    case "md":
+      return "20px"; // 댓글 더보기
+    case "lg":
+      return "24px"; // 앱 더보기
+    default:
+      return "24px";
+  }
+};
+
+const MoreButton = styled.button<{ $size: "sm" | "md" | "lg" }>`
   background: none;
   border: none;
   outline: none;
@@ -24,10 +48,16 @@ const MoreButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
+
+  img {
+    width: ${(props) => getIconSize(props.$size)};
+    height: ${(props) => getIconSize(props.$size)};
+  }
 `;
 
 export default function MoreMenu({
   type,
+  size = "lg",
   onEdit,
   onDelete,
   onReport,
@@ -71,8 +101,8 @@ export default function MoreMenu({
 
   return (
     <>
-      <MoreButton onClick={openSheet}>
-        <img src="/img/icon-more-vertical.svg" alt="더보기" />
+      <MoreButton $size={size} onClick={openSheet}>
+        <img src={getIconSrc(size)} alt="더보기" />
       </MoreButton>
 
       <BottomSheet isOpen={isSheetOpen} onClose={closeSheet}>
