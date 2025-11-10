@@ -7,7 +7,6 @@ import {
   UserDetails,
   UserName,
   UserId,
-  MoreButton,
 } from "./PostHeader.styled";
 import MoreMenu from "./MoreMenu";
 
@@ -24,7 +23,7 @@ interface PostHeaderProps {
   variant?: "post" | "comment";
   dateTime?: string;
   dateText?: string;
-  onMoreClick?: (postId: string) => void;
+  // onMoreClick?: (postId: string) => void;
 
   // API 연동 준비 (추후 사용)
   // author: Author;
@@ -40,8 +39,6 @@ function PostHeader({
   variant = "post",
   dateTime,
   dateText,
-  onMoreClick,
-
 }: PostHeaderProps) {
   const navigate = useNavigate();
   const [imgSrc, setImgSrc] = useState(avatarSrc);
@@ -62,7 +59,9 @@ function PostHeader({
 
   return (
     <StyledPostHeader>
-      <h2 className="sr-only">{variant === "comment" ? "댓글 작성자 정보" : "게시자 정보"}</h2>
+      <h2 className="sr-only">
+        {variant === "comment" ? "댓글 작성자 정보" : "게시자 정보"}
+      </h2>
       <UserInfo>
         <UserAvatar
           src={imgSrc || "/img/fish-logo-GB.png"}
@@ -74,7 +73,14 @@ function PostHeader({
           <>
             <UserName>{userName}</UserName>
             {dateTime && dateText && (
-              <time dateTime={dateTime} style={{ fontSize: "1rem", color: "var(--color-gray-dark)", marginLeft: "0.6rem" }}>
+              <time
+                dateTime={dateTime}
+                style={{
+                  fontSize: "1rem",
+                  color: "var(--color-gray-dark)",
+                  marginLeft: "0.6rem",
+                }}
+              >
                 {dateText}
               </time>
             )}
@@ -87,10 +93,25 @@ function PostHeader({
         )}
       </UserInfo>
 
-      <MoreButton aria-label={variant === "comment" ? "댓글 더보기" : "게시글 더보기"} onClick={() => onMoreClick?.(postId)}>
-        <img src="/img/icon-more-vertical.svg" alt="" />
-      </MoreButton>
+      {variant === "comment" ? (
+        <MoreMenu
+          type="comment"
+          size="md"
+          onEdit={handleEditPost}
+          onDelete={handleDeletePost}
+        />
+      ) : (
+        <MoreMenu
+          type="post"
+          size="sm"
+          onEdit={handleEditPost}
+          onDelete={handleDeletePost}
+        />
+      )}
 
+      {/* <MoreButton aria-label={variant === "comment" ? "댓글 더보기" : "게시글 더보기"} onClick={() => onMoreClick?.(postId)}>
+         <img src="/img/icon-more-vertical.svg" alt="" />
+       </MoreButton> */}
 
       {/* API 연동 준비 (추후 사용) */}
       {/* <UserInfo>

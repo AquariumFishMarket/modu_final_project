@@ -59,7 +59,7 @@ function Profile() {
     id: "my_user_id", // 임시: 내 프로필로 표시되도록 currentUserId와 동일하게 설정
     userName: "물고기마켓",
     userId: "@fishmarket",
-    profileImage: "/img/fish_profile.png",
+    profileImage: "/img/fish_profile.svg",
     description: "안녕하세요! 물고기마켓입니다.",
     followerCount: 128,
     followingCount: 52,
@@ -411,11 +411,7 @@ function Profile() {
                     commentCount={post.commentCount}
                     isLiked={post.isLiked}
                     onLikeClick={() => handleLikeToggle(post.postId)}
-
                     onCommentClick={() => navigate(`/post/${post.postId}`)}
-                    onMoreClick={() => {
-
-                    }}
                   />
                 ))}
               </PostListContainer>
