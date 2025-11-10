@@ -189,12 +189,15 @@ function LayoutContent() {
   const shouldShowNav = (): boolean => {
     const path = location.pathname;
 
-    const showNavPaths = ["/", "/feed", "/search", "/profile", "/chat-list"];
+    const showNavPaths = ["/", "/feed", "/search", "/chat-list"];
 
-    return showNavPaths.includes(path);
+    // 프로필 페이지인지 체크 (동적 라우트 포함)
+    const isProfilePath = path === "/profile" || path.match(/^\/profile\/[^/]+$/);
+
+    return showNavPaths.includes(path) || !!isProfilePath;
   };
 
-  const isProfilePage = location.pathname === "/profile";
+  const isProfilePage = location.pathname === "/profile" || !!location.pathname.match(/^\/profile\/[^/]+$/);
 
   const isChatRoomPage = location.pathname === "/chat-room";
   const isPostDetailPage = location.pathname.match(/^\/post\/[^/]+$/);
