@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import DefaultButton from "../../components/common/Button";
@@ -13,6 +13,7 @@ import {
 } from "./FeedPage.styled";
 import { dummyPosts } from "../../data/dummyPosts";
 import PostCard from "../../components/common/postCard/PostCard";
+import ScrollButton from "../../components/common/Buttons/ScrollButton";
 
 const FeedPage = () => {
   const navigate = useNavigate();
@@ -111,8 +112,10 @@ const FeedPage = () => {
         } else {
           setFeedList((prev: Feed[]) => {
             // 중복 제거: 이미 존재하는 ID는 추가하지 않음
-            const existingIds = new Set(prev.map(feed => feed.id));
-            const uniqueNewFeed = newFeed.filter(feed => !existingIds.has(feed.id));
+            const existingIds = new Set(prev.map((feed) => feed.id));
+            const uniqueNewFeed = newFeed.filter(
+              (feed) => !existingIds.has(feed.id)
+            );
             return [...prev, ...uniqueNewFeed];
           });
         }
@@ -127,6 +130,9 @@ const FeedPage = () => {
 
   // 무한스크롤 부분
   // useInfiniteScroll 훅 추가 예정
+
+  // 스크롤 버튼
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // 페이지 전환 애니메이션
   const pageVariants = {
@@ -193,7 +199,7 @@ const FeedPage = () => {
       exit="exit"
       variants={pageVariants}
     >
-      <FeedSection>
+      <FeedSection ref={scrollContainerRef}>
         {/* 피드 목록 렌더링 */}
         {feedList.map((feed) => (
           <FeedItemWrapper key={feed.id}>
@@ -233,6 +239,8 @@ const FeedPage = () => {
           </EndMessageText>
         )}
       </FeedSection>
+
+      <ScrollButton scrollContainerRef={scrollContainerRef} />
     </motion.div>
   );
 };

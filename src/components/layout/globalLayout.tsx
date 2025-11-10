@@ -31,6 +31,7 @@ const MainContent = styled.main<{
   padding: 68px 16px 0;
   overflow-x: hidden;
   overflow-y: auto;
+  position: relative; //스크롤 버튼을 위해
   padding-bottom: ${(props) => {
     if (props.$isProfile) return "0";
     return props.$hasFooter ? "110px" : "50px";
@@ -59,19 +60,7 @@ function LayoutContent() {
       return;
     }
 
-    // 프로필 셋업 (정확한 경로 체크)
-    // if (path === "/profile/setup") {
-    //   setHeaderConfig({
-    //     show: true,
-    //     type: "edit",
-    //     inputState: true,
-    //     onBackClick: () => navigate("/login"),
-    //     onButtonClick: () => console.log("프로필 설정 완료"),
-    //   });
-    //   return;
-    // }
-
-    // 프로필 수정 -> 경로 체크
+    // 프로필 수정 -> 경로 체크 id
     if (path === "/profile/edit") {
       setHeaderConfig({
         show: true,
@@ -81,7 +70,7 @@ function LayoutContent() {
       return;
     }
 
-    // 프로필 페이지 (edit 이후에 체크)
+    // 프로필 페이지
     if (path === "/profile") {
       setHeaderConfig({
         show: true,
