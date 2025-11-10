@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { Link } from "react-router-dom"
-import ChatContent from "./ChatContent"
+import ChatItems from "./ChatItem";
 
 const chatRoom = [
     {
@@ -19,19 +20,39 @@ const chatRoom = [
 ]
 
 export default function ChatList() {
+  const [chats, setChats] = useState(chatRoom);
+    const [draggingId,setDraggingId] = useState<number | null>(null)
+
+  const handleDelete = (id: number) => {
+    setChats((s) => s.filter((c) => c.id !== id));
+  };
 
     return(
         <>
-            {chatRoom.map((room)=>(
-                <Link key={room.id} to={`/chat-room/${room.id}`} style={{ color: '#000' }}>
-                    <ChatContent id={room.id}
+            {chats.map((room)=>(
+                    <ChatItems key={room.id} id={room.id}
+                    imgSrc={room.imgSrc}
+                    username={room.username}
+                    message={room.message}
+                    date={room.date}
+                    />
+            ))}
+            {/* {chats.map((room)=>(
+                <Link key={room.id}
+                to={`/chat-room/${room.id}`}
+                style={{ color: '#000' }}
+                onClick={(e) => {
+                    if (draggingId === room.id) e.preventDefault()
+                }}
+                >
+                    <ChatItems id={room.id}
                     imgSrc={room.imgSrc}
                     username={room.username}
                     message={room.message}
                     date={room.date}
                     />
                 </Link>
-            ))}
+            ))} */}
         </>
     )
 }
