@@ -87,6 +87,16 @@ function Header() {
         </SectionCombine>
       )}
 
+      {/* 팔로잉 목록 */}
+      {config.type === "following" && (
+        <SectionCombine>
+          <BackButton onClick={config.onBackClick}>
+            <img src="/img/icon-arrow-left.svg" alt="이전 페이지로 이동" />
+          </BackButton>
+          <SubTitle>{config.title || "Following"}</SubTitle>
+        </SectionCombine>
+      )}
+
       {/* 프로필 */}
       {config.type === "profile" && (
         <Section>

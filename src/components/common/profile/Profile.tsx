@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useHeader } from "../../../contexts/HeaderContext";
 import {
   ProfileSection,
   ProfileContainer,
@@ -41,6 +42,7 @@ import { dummyPosts, type Post } from "../../../data/dummyPosts";
 
 function Profile() {
   const navigate = useNavigate();
+  const { setHeaderConfig } = useHeader();
 
   // URL 파라미터에서 userId 가져오기 (동적 라우팅 대비)
   const { userId: paramUserId } = useParams<{ userId?: string }>();
@@ -242,6 +244,15 @@ function Profile() {
   //  API 연동 시 주석 해제
 
   useEffect(() => {
+    console.log("Profile 컴포넌트 마운트/업데이트:", { targetUserId });
+
+    // 헤더 설정
+    setHeaderConfig({
+      show: true,
+      type: "profile",
+      onBackClick: () => navigate("/feed"),
+    });
+
     // const loadProfileAndPosts = async (): Promise<void> => {
     //   setIsLoading(true);
     //   try {

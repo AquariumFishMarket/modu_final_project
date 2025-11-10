@@ -19,7 +19,7 @@ export default function ProductAdd() {
       type: "productAdd",
       title: "상품 등록",
       inputState: isFormValid,
-      onBackClick: () => navigate(-1),
+      onBackClick: () => navigate("/profile"),
       onButtonClick: () => {
         // 실제 폼 제출 로직
         if (formRef.current) {
@@ -27,10 +27,7 @@ export default function ProductAdd() {
         }
       },
     });
-
-    return () => {
-      setHeaderConfig({ show: false });
-    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isFormValid]);
 
   // 폼 유효성 변경 핸들러

@@ -66,11 +66,6 @@ export default function TextField({left,placeholder,onClick}:textfield) {
         target.style.height = 'auto';
         target.style.height = target.scrollHeight - 19.5 + 'px';
 
-        // 외부 onChange가 있으면 호출
-        if (onChange) {
-          onChange(e);
-        }
-
         if(textAreaRef.current?.value !=='') {
           setBtnColor(true)
           setTextValue(target.value)

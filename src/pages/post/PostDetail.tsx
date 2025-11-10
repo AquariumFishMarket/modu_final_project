@@ -111,9 +111,7 @@ function PostDetail() {
           />
         }
         placeholder="댓글 입력하기..."
-        value={commentText}
-        onChange={(e) => setCommentText(e.target.value)}
-        onSubmit={handleCommentSubmit}
+        onClick={handleCommentSubmit}
       />
     </PostDetailContainer>
   );
