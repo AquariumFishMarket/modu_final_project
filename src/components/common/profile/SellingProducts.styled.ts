@@ -8,7 +8,7 @@ export const ProductSection = styled.section<{ $isLastSection?: boolean }>`
   /* margin-bottom: ${(props) => (props.$isLastSection ? "0" : "0.6rem")}; */
   border-bottom: ${(props) =>
     props.$isLastSection ? "none" : "6px solid var(--color-gray-light)"};
-  padding: 2rem 1.6rem;
+  padding: 2rem 0 1.6rem 2rem;
   display: flex;
   flex-direction: column;
   gap: 1.6rem;
