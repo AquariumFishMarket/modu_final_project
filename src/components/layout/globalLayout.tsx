@@ -54,6 +54,11 @@ function LayoutContent() {
       return;
     }
 
+    // 팔로우 페이지 - 자체적으로 헤더 관리
+    if (path.match(/^\/profile\/[^/]+\/(followers|following)$/)) {
+      return;
+    }
+
     // 프로필 셋업 (정확한 경로 체크)
     // if (path === "/profile/setup") {
     //   setHeaderConfig({
@@ -76,14 +81,8 @@ function LayoutContent() {
       return;
     }
 
-    // 프로필 페이지 (edit 이후에 체크)
-    if (path === "/profile") {
-      setHeaderConfig({
-        show: true,
-        type: "profile",
-        onBackClick: () => navigate(-1),
-        onMoreClick: () => console.log("더보기"),
-      });
+    // 프로필 페이지 - 자체적으로 헤더 관리
+    if (path === "/profile" || path.match(/^\/profile\/[^/]+$/)) {
       return;
     }
 
@@ -198,19 +197,20 @@ function LayoutContent() {
 
   return (
     <LayoutContainer $isProfile={isProfilePage}>
+      <Header />
       <AnimatePresence mode="wait">
-        <motion.div
+        <MainContent
+          key={location.pathname}
+          $hasFooter={shouldShowNav()}
+          $isProfile={isProfilePage}
+          $isPostDetail={!!isPostDetailPage}
+          as={motion.main}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          style={{ height: "100%" }}
           transition={{ duration: 0.26, ease: "easeOut" }}
-          key={location.pathname}
         >
-          <Header />
-          <MainContent $hasFooter={shouldShowNav()} $isProfile={isProfilePage} $isPostDetail={!!isPostDetailPage}>
-            <Outlet />
-          </MainContent>
-        </motion.div>
+          <Outlet />
+        </MainContent>
       </AnimatePresence>
       {shouldShowNav() && <FooterNav />}
     </LayoutContainer>

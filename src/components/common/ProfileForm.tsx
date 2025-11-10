@@ -259,14 +259,13 @@ export default function ProfileForm({
             <ProfileImg width={150} thumbimg={false} imgSrc={undefined} />
           ) : (
             <ImageContainer
-              type="profile"
               imgArr={imgFiles}
               setDeleteIdx={setDeleteIdx}
             />
           )}
           <BtnContainer>
             <ImageUpButton
-              imgArrType="singular"
+              multiple={false}
               colortype="color"
               size="small"
               imgArr={imgFiles}

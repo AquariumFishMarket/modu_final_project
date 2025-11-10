@@ -1,10 +1,11 @@
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, useCallback, ReactNode } from "react";
 
 // Header 타입 정의
 export type HeaderType =
   | "feed"
   | "search"
   | "followers"
+  | "following"
   | "profile"
   | "edit"
   | "post"
@@ -43,9 +44,9 @@ export const HeaderProvider = ({ children }: { children: ReactNode }) => {
     type: "feed",
   });
 
-  const setHeaderConfig = (newConfig: Partial<HeaderConfig>) => {
+  const setHeaderConfig = useCallback((newConfig: Partial<HeaderConfig>) => {
     setConfig((prev) => ({ ...prev, ...newConfig }));
-  };
+  }, []);
 
   return (
     <HeaderContext.Provider value={{ config, setHeaderConfig }}>

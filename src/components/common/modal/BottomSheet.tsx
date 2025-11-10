@@ -89,11 +89,11 @@ const backdropVariants = {
 const sheetVariants = {
   hidden: {
     y: "100%",
-    transition: { duration: 0.3, ease: "easeOut" },
+    transition: { duration: 0.3 },
   },
   visible: {
     y: 0,
-    transition: { duration: 0.3, ease: "easeOut" },
+    transition: { duration: 0.3 },
   },
 };
 

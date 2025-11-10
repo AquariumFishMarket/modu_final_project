@@ -21,6 +21,7 @@ import ChatRoom from "./pages/chat/ChatRoom";
 import ChatList from "./pages/chat/ChatList";
 import ProductDetail from "./pages/product/ProductDetail";
 import ProductEdit from "./pages/product/ProductEdit";
+import Follow from "./pages/follow/follow";
 
 export default function RootRoute() {
   const location = useLocation();
@@ -40,8 +41,16 @@ export default function RootRoute() {
           <Route path="/signup" element={<Signup />} />
           {/* 프로필 */}
           <Route path="/profile/setup" element={<ProfileSetup />} />
-          <Route path="/profile" element={<Profile />} />
           <Route path="/profile/edit" element={<ProfileEdit />} />
+          <Route
+            path="/profile/:userId/:type"
+            element={<Follow key={location.pathname} />}
+          />
+          <Route
+            path="/profile/:userId"
+            element={<Profile key={location.pathname} />}
+          />
+          <Route path="/profile" element={<Profile key={location.pathname} />} />
           {/* 메인 피드, 검색 */}
           <Route path="/search" element={<SearchPage />} />
           {/* 상품 */}

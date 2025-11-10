@@ -30,6 +30,7 @@ interface PostCardProps {
   isLiked: boolean;
   onLikeClick?: () => void;
   onCommentClick?: () => void;
+  onMoreClick?: () => void;
 
   // API 연동 준비 (추후 사용)
   // post: Post;

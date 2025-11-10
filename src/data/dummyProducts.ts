@@ -10,6 +10,8 @@ export const dummyProducts: Product[] = [
     itemName: "니모",
     price: 35000,
     itemImage: "/img/basic-img.png",
+    description: "귀여운 니모입니다",
+    status: "selling" as const,
     link: "/product/prod-001",
   },
   {
@@ -17,6 +19,8 @@ export const dummyProducts: Product[] = [
     itemName: "니모 친구",
     price: 28000,
     itemImage: "/img/basic-img.png",
+    description: "니모의 친구들",
+    status: "selling" as const,
     link: "/product/prod-002",
   },
   {
@@ -24,6 +28,8 @@ export const dummyProducts: Product[] = [
     itemName: "거북이",
     price: 42000,
     itemImage: "/img/basic-img.png",
+    description: "느긋한 거북이",
+    status: "selling" as const,
     link: "/product/prod-003",
   },
   {
@@ -31,6 +37,8 @@ export const dummyProducts: Product[] = [
     itemName: "자라",
     price: 18000,
     itemImage: "/img/basic-img.png",
+    description: "신비한 자라",
+    status: "selling" as const,
     link: "/product/prod-004",
   },
   {
@@ -38,6 +46,8 @@ export const dummyProducts: Product[] = [
     itemName: "자연산 농어 1.5kg",
     price: 45000,
     itemImage: "/img/basic-img.png",
+    description: "신선한 자연산 농어",
+    status: "selling" as const,
     link: "/product/prod-005",
   },
   {
@@ -45,6 +55,8 @@ export const dummyProducts: Product[] = [
     itemName: "가재",
     price: 120000,
     itemImage: "/img/basic-img.png",
+    description: "싱싱한 가재",
+    status: "selling" as const,
     link: "/product/prod-006",
   },
   {
@@ -52,6 +64,8 @@ export const dummyProducts: Product[] = [
     itemName: "해마",
     price: 22000,
     itemImage: "/img/basic-img.png",
+    description: "앙증맞은 해마",
+    status: "selling" as const,
     link: "/product/prod-007",
   },
   {
@@ -59,6 +73,8 @@ export const dummyProducts: Product[] = [
     itemName: "빨판상어",
     price: 15000,
     itemImage: "/img/basic-img.png",
+    description: "독특한 빨판상어",
+    status: "selling" as const,
     link: "/product/prod-008",
   },
   {
@@ -66,6 +82,8 @@ export const dummyProducts: Product[] = [
     itemName: "소라게",
     price: 38000,
     itemImage: "/img/basic-img.png",
+    description: "집 찾는 소라게",
+    status: "selling" as const,
     link: "/product/prod-009",
   },
   {
@@ -73,6 +91,8 @@ export const dummyProducts: Product[] = [
     itemName: "조개",
     price: 32000,
     itemImage: "/img/basic-img.png",
+    description: "알찬 조개",
+    status: "selling" as const,
     link: "/product/prod-010",
   },
 ];
