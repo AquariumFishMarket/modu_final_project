@@ -2,6 +2,7 @@ import styled from "styled-components"
 import ProfileImg from "../../components/common/ProfileImg"
 import React from "react"
 import { useRef, useState } from "react"
+import { useNavigate } from "react-router-dom"
 
 const ContentsWrapper = styled.section<{$translateX:number}>`
     position: relative;
@@ -73,6 +74,7 @@ interface ChatData {
 
 
 export default function ChatItem({id,imgSrc,username,message,date}:ChatData){
+    const navigate = useNavigate();
     const startXRef = useRef(0);
     const startTransRef = useRef(0);
     const currentXRef = useRef(0);
@@ -134,8 +136,7 @@ export default function ChatItem({id,imgSrc,username,message,date}:ChatData){
             e.stopPropagation();
             return;
         }
-        console.log('채팅방 클릭');
-            // 채팅방 입장 로직
+        navigate(`/chat-room/${id}`)
     }
 
     return(

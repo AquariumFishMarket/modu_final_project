@@ -30,12 +30,12 @@ export default function ChatList() {
     return(
         <>
             {chats.map((room)=>(
-                    <ChatItems key={room.id} id={room.id}
-                    imgSrc={room.imgSrc}
-                    username={room.username}
-                    message={room.message}
-                    date={room.date}
-                    />
+                <ChatItems key={room.id} id={room.id}
+                imgSrc={room.imgSrc}
+                username={room.username}
+                message={room.message}
+                date={room.date}
+                />
             ))}
             {/* {chats.map((room)=>(
                 <Link key={room.id}
