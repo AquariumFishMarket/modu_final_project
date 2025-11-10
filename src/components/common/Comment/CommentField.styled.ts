@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 export const CommentContainer = styled.article`
-  padding: 1.2rem 1.6rem;
+  /* padding: 1.2rem 1.6rem; */
 `;
 
 export const CommentContent = styled.p`
@@ -10,4 +10,5 @@ export const CommentContent = styled.p`
   font-size: 1.4rem;
   line-height: 1.8rem;
   word-break: break-word;
+  margin-top: 4px;
 `;

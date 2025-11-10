@@ -4,15 +4,14 @@ export const PostCardContainer = styled.article`
   width: 100%;
   max-width: 100%;
   margin: 0 auto;
-  /* margin-bottom: 24px; */
   background: white;
   display: flex;
   flex-direction: column;
   gap: 1.6rem;
   overflow: hidden;
+  margin-bottom: 20px;
 
   @media (max-width: 389px) {
-    /* margin-bottom: 20px; */
     gap: 1.2rem;
   }
 `;
@@ -103,13 +102,13 @@ export const ActionButton = styled.button`
   font-size: var(--font-size-sm);
   transition: color 0.2s;
 
-  &:hover {
+  /* &:hover {
     color: var(--color-primary-600);
   }
 
   &:first-child:hover {
     color: var(--color-error);
-  }
+  } */
 
   img {
     width: 2rem;
