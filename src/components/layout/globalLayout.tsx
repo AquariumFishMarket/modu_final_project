@@ -26,7 +26,9 @@ const MainContent = styled.main<{
   $isPostDetail?: boolean;
 }>`
   height: 100%;
-  padding: ${(props) => (props.$isPostDetail ? "68px 25px 0" : "68px 15px 0")};
+  /* padding: ${(props) =>
+    props.$isPostDetail ? "68px 25px 0" : "68px 15px 0"}; */
+  padding: 68px 16px 0;
   overflow-x: hidden;
   overflow-y: auto;
   padding-bottom: ${(props) => {

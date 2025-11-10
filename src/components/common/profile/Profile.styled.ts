@@ -154,8 +154,8 @@ export const MyFeedTitle = styled.h2`
 export const PostListContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 2rem;
-  padding: 16px 21px;
+  /* gap: 2rem; */
+  padding: 16px;
 `;
 
 export const EmptyPostMessage = styled.p`
