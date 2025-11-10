@@ -1,8 +1,15 @@
-import { useState } from "react";
-import { Link } from "react-router-dom"
+import { useState,useRef } from "react";
 import ChatItems from "./ChatItem";
 
-const chatRoom = [
+interface ChatDataType {
+    id: number;
+    imgSrc: string;
+    username: string;
+    message: string;
+    date: string;
+}
+
+const chatRoom:ChatDataType[] = [
     {
         id: 1,
         imgSrc:'..',
@@ -17,42 +24,53 @@ const chatRoom = [
         message: '매운탕입니다',
         date: '2025.08.19'
     },
+    {
+        id: 3,
+        imgSrc:'..',
+        username: '콘치',
+        message: '관상어',
+        date: '2025.08.19'
+    },
 ]
 
 export default function ChatList() {
-  const [chats, setChats] = useState(chatRoom);
-    const [draggingId,setDraggingId] = useState<number | null>(null)
+    const [chats, setChats] = useState<ChatDataType[]>(chatRoom);
+    const [deleteIdx, setDeleteIdx] = useState<number[]>([]);
 
-  const handleDelete = (id: number) => {
-    setChats((s) => s.filter((c) => c.id !== id));
-  };
+    const handleDelete = (id:number) => {
+        setDeleteIdx((prev)=>[...prev,id])
+        setChats(prev=>prev.filter(c=> ![...deleteIdx,id].includes(c.id)))
+    }
 
     return(
         <>
-            {chats.map((room)=>(
+        {chats.length > 0 &&
+            chats.map((room)=>(
                 <ChatItems key={room.id} id={room.id}
                 imgSrc={room.imgSrc}
                 username={room.username}
                 message={room.message}
                 date={room.date}
+                onClick={handleDelete}
                 />
-            ))}
-            {/* {chats.map((room)=>(
-                <Link key={room.id}
-                to={`/chat-room/${room.id}`}
-                style={{ color: '#000' }}
-                onClick={(e) => {
-                    if (draggingId === room.id) e.preventDefault()
-                }}
-                >
-                    <ChatItems id={room.id}
-                    imgSrc={room.imgSrc}
-                    username={room.username}
-                    message={room.message}
-                    date={room.date}
-                    />
-                </Link>
-            ))} */}
+            ))
+        }
+        {chats.length == 0 &&
+            (
+                <>
+                <div style={{
+                    width: '100%',
+                    height: '300px',
+                    backgroundImage: 'url(/img/fish_logo.png)',
+                    backgroundSize: 'contain',
+                    backgroundRepeat: 'no-repeat',
+                    backgroundPosition: 'center'
+                    }}>
+                </div>
+                <p style={{ textAlign: 'center' }}>대화중인 목록이 없습니다.</p>
+                </>
+            )
+        }
         </>
     )
 }

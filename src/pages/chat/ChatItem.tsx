@@ -4,16 +4,27 @@ import React from "react"
 import { useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
 
-const ContentsWrapper = styled.section<{$translateX:number}>`
-    position: relative;
+const ContentsWrapper = styled.section`
     margin-bottom: 20px;
     display: flex;
-    gap: 12px;
     align-items: center;
     cursor: pointer;
-    translate: all 0.2s;
-    transform: translateX(${(props)=>props.$translateX}px)
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 `
+const Contents = styled.div<{$boxTrans:number}>`
+    position: relative;
+    width: 100%;
+    transform: tramslateX(${(props)=>props.$boxTrans});
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition-timing-function: ease-in;
+    transition-duration: 0.1s;
+`
+
 const ImageContainer = styled.div`
     position: relative;
 `
@@ -51,13 +62,19 @@ const ChatMessage = styled.p`
 const Date = styled.p`
     position: absolute;
     bottom: 4px;
-    right: 0;
+    right: 10px;
     font-size:var(--font-size-xs);
     color: var(--color-gray-medium)
 `
-const DeleteBtn = styled.div`
-    width: 100px;
-    height: 100px;
+const DeleteBtn = styled.button<{$boxTrans:number}>`
+    transition-timing-function: ease-in;
+    transition-duration: 0.1s;
+    width: calc(${(props)=>props.$boxTrans}px * -1);
+    height: 42px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--color-primary-600);
     > img {
         width: 24px;
         height: 24px;
@@ -70,20 +87,21 @@ interface ChatData {
     username: string;
     message: string;
     date: string;
+    onClick:(id:number)=>void;
 }
 
 
-export default function ChatItem({id,imgSrc,username,message,date}:ChatData){
+export default function ChatItem({id,imgSrc,username,message,date,onClick}:ChatData){
     const navigate = useNavigate();
     const startXRef = useRef(0);
     const startTransRef = useRef(0);
     const currentXRef = useRef(0);
-    const isDraggingRef = useRef(true);
+    const isDraggingRef = useRef(false);
     const hasDraggedRef = useRef(false);
     const [boxTrans,setBoxTrans] = useState<number>(0)
 
     const DRAG_THRESHOLD = 5;
-    const MAX_SWIPE = -100;
+    const MAX_SWIPE = -80;
 
     const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
         startXRef.current = e.clientX;
@@ -125,7 +143,6 @@ export default function ChatItem({id,imgSrc,username,message,date}:ChatData){
                 currentXRef.current = 0;
             }
         }
-
         isDraggingRef.current = false;
     }
 
@@ -139,24 +156,34 @@ export default function ChatItem({id,imgSrc,username,message,date}:ChatData){
         navigate(`/chat-room/${id}`)
     }
 
+
+
     return(
-        <ContentsWrapper
-        onMouseDown={handleMouseDown}
-        onClick={handleClick}
-        $translateX={boxTrans}
-        >
-            <ImageContainer>
-                <ProfileImg thumbimg={false}
-                    width={42}
-                    imgSrc={imgSrc}
-                />
-                <Alert />
-            </ImageContainer>
-            <TextContainer>
-                <UserName>{username}</UserName>
-                <ChatMessage>{message}</ChatMessage>
-            </TextContainer>
-            <Date>{date}</Date>
-        </ContentsWrapper>
+        <>
+            <ContentsWrapper>
+                <Contents $boxTrans={boxTrans}
+                    onMouseDown={handleMouseDown}
+                    onClick={handleClick}
+                >
+                    <ImageContainer>
+                        <ProfileImg thumbimg={false}
+                            width={42}
+                            imgSrc={imgSrc}
+                        />
+                        <Alert />
+                    </ImageContainer>
+                    <TextContainer>
+                        <UserName>{username}</UserName>
+                        <ChatMessage>{message}</ChatMessage>
+                    </TextContainer>
+                    <Date>{date}</Date>
+                </Contents>
+                {hasDraggedRef.current &&
+                    <DeleteBtn $boxTrans={boxTrans} onClick={()=>{onClick(id)}}>
+                        <img src="/img/icon-delete.svg"></img>
+                    </DeleteBtn>
+                }
+            </ContentsWrapper>
+        </>
     )
 }
