@@ -19,11 +19,14 @@ const LayoutContainer = styled.div<{ $isProfile?: boolean }>`
   border: 1px solid #eeeeee;
 `;
 
-
-const MainContent = styled.main<{ $hasFooter: boolean; $isProfile?: boolean, $isChatRoom?: boolean, $isPostDetail?: boolean }>`
-
+const MainContent = styled.main<{
+  $hasFooter: boolean;
+  $isProfile?: boolean;
+  $isChatRoom?: boolean;
+  $isPostDetail?: boolean;
+}>`
   height: 100%;
-  padding: ${(props) => props.$isPostDetail ? '68px 25px 0' : '68px 15px 0'};
+  padding: ${(props) => (props.$isPostDetail ? "68px 25px 0" : "68px 15px 0")};
   overflow-x: hidden;
   overflow-y: auto;
   padding-bottom: ${(props) => {
@@ -133,7 +136,7 @@ function LayoutContent() {
       setHeaderConfig({
         show: true,
         type: "productDetail",
-        onBackClick: () => navigate("/"),
+        onBackClick: () => navigate(-1),
         onMoreClick: () => console.log("더보기"),
       });
       return;
@@ -152,24 +155,24 @@ function LayoutContent() {
     }
 
     // 채팅 리스트
-    if(path === '/chat-list') {
+    if (path === "/chat-list") {
       setHeaderConfig({
-          show: true,
-          type: "chatList",
-          onBackClick: () => navigate(-1),
-        });
-        return;
+        show: true,
+        type: "chatList",
+        onBackClick: () => navigate(-1),
+      });
+      return;
     }
 
     // 채팅 방
-    if(path.includes('/chat-room')) {
+    if (path.includes("/chat-room")) {
       setHeaderConfig({
-          show: true,
-          type: "chat",
-          userName:'잉어킹',
-          onBackClick: () => navigate(-1),
-        });
-        return;
+        show: true,
+        type: "chat",
+        userName: "잉어킹",
+        onBackClick: () => navigate(-1),
+      });
+      return;
     }
 
     // 기본 (피드)
@@ -192,9 +195,8 @@ function LayoutContent() {
 
   const isProfilePage = location.pathname === "/profile";
 
-  const isChatRoomPage = location.pathname === "/chat-room"
+  const isChatRoomPage = location.pathname === "/chat-room";
   const isPostDetailPage = location.pathname.match(/^\/post\/[^/]+$/);
-
 
   return (
     <LayoutContainer $isProfile={isProfilePage}>
@@ -207,7 +209,11 @@ function LayoutContent() {
           key={location.pathname}
         >
           <Header />
-          <MainContent $hasFooter={shouldShowNav()} $isProfile={isProfilePage} $isPostDetail={!!isPostDetailPage}>
+          <MainContent
+            $hasFooter={shouldShowNav()}
+            $isProfile={isProfilePage}
+            $isPostDetail={!!isPostDetailPage}
+          >
             <Outlet />
           </MainContent>
         </motion.div>
