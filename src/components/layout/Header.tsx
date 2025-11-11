@@ -11,8 +11,9 @@ import {
   ChatUserContainer,
   AllyHiddenTitle,
 } from "./Header.styled";
-import DefaultButton from "../common/buttons/Button";
-import MoreMenu from "../common/modal/MoreMenu";
+import DefaultButton from "../common/Button";
+import MoreMenu from "../common/MoreMenu";
+
 import { useHeader } from "../../contexts/HeaderContext";
 import { useSearchContext } from "../../contexts/SearchContext";
 

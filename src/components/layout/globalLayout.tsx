@@ -54,7 +54,8 @@ function LayoutContent() {
       path === "/login" ||
       path === "/login/email" ||
       path === "/signup" ||
-      path === "/profile/setup"
+      path === "/profile/setup" ||
+      path === "/404"
     ) {
       setHeaderConfig({ show: false });
       return;
