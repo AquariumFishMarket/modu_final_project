@@ -41,10 +41,10 @@ const CreateForm = forwardRef<CommonFormRef, CreateFormProps>(
 
     const hasSelectedImage = imgFiles.length > 0;
 
-    // 🆕 프로필 이미지 클릭 시 삭제 핸들러
+    // 프로필 이미지 클릭 시 삭제 핸들러
     const handleProfileImageClick = () => {
       if (hasSelectedImage) {
-        setImgFiles([]); // 이미지 삭제하여 기본 이미지로 되돌리기
+        setImgFiles([]);
       }
     };
 
@@ -68,7 +68,7 @@ const CreateForm = forwardRef<CommonFormRef, CreateFormProps>(
       return allRequiredFilled && hasNoErrors;
     };
 
-    // 🆕 폼 유효성이 변경될 때마다 부모에게 알림
+    // 폼 유효성이 변경될 때마다 부모에게 알림
     useEffect(() => {
       const isValid = isFormValid();
       onValidationChange?.(isValid);
@@ -147,14 +147,14 @@ const CreateForm = forwardRef<CommonFormRef, CreateFormProps>(
           formData,
           imageFiles: imgFiles,
           formValues,
-          hasCustomImage: imgFiles.length > 0, // 🆕 커스텀 이미지 여부
-          useDefaultImage: imgFiles.length === 0, // 🆕 기본 이미지 사용 여부
+          hasCustomImage: imgFiles.length > 0, 
+          useDefaultImage: imgFiles.length === 0, 
         });
 
-        return true; // 성공
+        return true; 
       }
 
-      return false; // 실패
+      return false; 
     };
 
     // 외부에서 호출할 수 있는 제출 함수
