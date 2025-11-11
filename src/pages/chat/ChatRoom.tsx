@@ -105,6 +105,7 @@ export default function ChatRoom() {
   const [imgModalState, setImgModalState] = useState<boolean>(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const messageRef = useRef<ChatMessage[]>([])
+  const scenarioRef = useRef<number>(0)
 
   useEffect(() => {
     const channel = pusher.subscribe(`chat-${roomId}`);
@@ -130,17 +131,19 @@ export default function ChatRoom() {
   }
 
   // 답장 목 데이터 불러오는 함수
-const sendMockResponse = (roomId: string, index = 0) => {
-  const messagesForRoom = mockResponsesByRoom[roomId];
-  if (!messagesForRoom || index >= messagesForRoom.length) return;
+const sendMockResponse = (roomId: string, scenario:number, index = 0) => {
+  const messagesForRoom = mockResponsesByRoom[roomId][scenario];
+  if(mockResponsesByRoom[roomId].length == scenario) return;
 
-  setTimeout(() => {
-    setMessages(prev => [...prev, messagesForRoom[index]]);
-    const incoming = messagesForRoom[index]
-    handleIncommingMessage(incoming)
-    sendMockResponse(roomId, index + 1);
+  messagesForRoom.forEach((ele,i)=> {
+    setTimeout(()=>{
+      setMessages(prev => [...prev, ele])
+      const incoming = ele;
+      handleIncommingMessage(incoming)
+    }, i * 1200 + 1000)
+  })
 
-  }, 1000 + Math.random() * 2000);
+  scenarioRef.current += 1;
 
 };
 
@@ -215,7 +218,7 @@ const sendMockResponse = (roomId: string, index = 0) => {
     }).catch(err => console.error("텍스트 전송 실패", err));
 
     if(!roomId) return;
-    sendMockResponse(roomId)
+    sendMockResponse(roomId,scenarioRef.current)
   };
 
   const handleClose = () => {
