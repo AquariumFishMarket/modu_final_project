@@ -22,11 +22,11 @@ import {
   PostListContainer,
   EmptyPostMessage,
 } from "./Profile.styled";
-import DefaultButton from "../Button";
+import DefaultButton from "../../../components/common/Button";
 import SellingProducts from "./SellingProducts";
 import type { UserProfile } from "../../../types/user";
-import PostCard from "../postCard/PostCard";
-import PostStateBar from "../PostStateBar";
+import PostCard from "../../../components/post/postCard/PostCard";
+import PostStateBar from "../../../components/post/PostStateBar";
 import PostGallery from "./PostGallery";
 import { dummyPosts, type Post } from "../../../data/dummyPosts";
 

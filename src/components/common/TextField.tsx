@@ -1,6 +1,5 @@
 import { Dispatch, SetStateAction, useRef, useState } from "react";
 import styled from "styled-components"
-import ButtonTextField from "./Buttons/ButtonTextField";
 
 interface textfield {
   left?: React.ReactNode;
@@ -40,6 +39,18 @@ const Right = styled.div`
   position: absolute;
   top:0;
   right:0;
+`
+const Button = styled.button<{ $active: boolean }>`
+  background: none;
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+  color: ${props => props.$active ? 'var(--color-primary-600)' : 'var(--color-gray-medium)'};
+  font-weight: 500;
+  font-size: var(--font-size-md);
+  &:hover {
+    opacity: 0.8;
+  }
 `
 const TextArea = styled.textarea`
     width: calc(100% - 94px);
@@ -90,10 +101,10 @@ export default function TextField({left,placeholder,onClick}:textfield) {
             placeholder={placeholder}
             onChange={handleTextChange}
             ref={textAreaRef} />
-            <Right><ButtonTextField textcolor={btnColor} onClick={()=>{
+            <Right><Button $active={btnColor} onClick={()=>{
               if(!textAreaRef.current) return;
               onClick(textValue,textAreaRef)
-            }}/></Right>
+            }}>게시</Button></Right>
 
           </ContainerInner>
         </Container>
