@@ -179,7 +179,7 @@ function LayoutContent() {
       setHeaderConfig({
         show: true,
         type: "chat",
-        userName: messagesForRoom[0].username,
+        userName: messagesForRoom[0][0].username,
         onBackClick: () => navigate(-1),
       });
       return;
