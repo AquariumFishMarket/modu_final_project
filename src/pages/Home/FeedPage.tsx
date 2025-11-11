@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import DefaultButton from "../../components/common/Button";
+import DefaultButton from "../../components/common/buttons/Button";
 import {
   EmptyFeedSection,
   LogoImage,

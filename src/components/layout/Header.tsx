@@ -13,6 +13,7 @@ import {
 } from "./Header.styled";
 import DefaultButton from "../common/buttons/Button";
 import MoreMenu from "../common/modal/MoreMenu";
+
 import { useHeader } from "../../contexts/HeaderContext";
 import { useSearchContext } from "../../contexts/SearchContext";
 
