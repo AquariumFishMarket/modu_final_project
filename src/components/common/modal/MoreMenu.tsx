@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import BottomSheet, { SheetItem } from "./modal/BottomSheet";
-import AlertModal from "./modal/AlertModal";
+import BottomSheet, { SheetItem } from "./BottomSheet";
+import AlertModal from "./AlertModal";
 
 interface MoreMenuProps {
   type: "profile" | "post" | "comment" | "chat" | "chatList" | "product";

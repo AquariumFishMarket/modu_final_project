@@ -4,7 +4,7 @@ import React, {
   useImperativeHandle,
   forwardRef,
 } from "react";
-import DefaultButton from "../Button";
+import DefaultButton from "../buttons/Button";
 import ImageContainer from "../imageUpload/ImageContainer";
 import ProfileImg from "../ProfileImg";
 import ImageUpButton from "../imageUpload/UploadButton";
@@ -147,14 +147,14 @@ const CreateForm = forwardRef<CommonFormRef, CreateFormProps>(
           formData,
           imageFiles: imgFiles,
           formValues,
-          hasCustomImage: imgFiles.length > 0, 
-          useDefaultImage: imgFiles.length === 0, 
+          hasCustomImage: imgFiles.length > 0,
+          useDefaultImage: imgFiles.length === 0,
         });
 
-        return true; 
+        return true;
       }
 
-      return false; 
+      return false;
     };
 
     // 외부에서 호출할 수 있는 제출 함수
