@@ -60,7 +60,24 @@ function LayoutContent() {
       return;
     }
 
-    // 프로필 수정 -> 경로 체크 id
+    // 팔로우 페이지 - 자체적으로 헤더 관리
+    if (path.match(/^\/profile\/[^/]+\/(followers|following)$/)) {
+      return;
+    }
+
+    // 프로필 셋업 (정확한 경로 체크)
+    // if (path === "/profile/setup") {
+    //   setHeaderConfig({
+    //     show: true,
+    //     type: "edit",
+    //     inputState: true,
+    //     onBackClick: () => navigate("/login"),
+    //     onButtonClick: () => console.log("프로필 설정 완료"),
+    //   });
+    //   return;
+    // }
+
+    // 프로필 수정 -> 경로 체크
     if (path === "/profile/edit") {
       setHeaderConfig({
         show: true,
@@ -70,14 +87,8 @@ function LayoutContent() {
       return;
     }
 
-    // 프로필 페이지
-    if (path === "/profile") {
-      setHeaderConfig({
-        show: true,
-        type: "profile",
-        onBackClick: () => navigate(-1),
-        onMoreClick: () => console.log("더보기"),
-      });
+    // 프로필 페이지 - 자체적으로 헤더 관리
+    if (path === "/profile" || path.match(/^\/profile\/[^/]+$/)) {
       return;
     }
 
@@ -179,35 +190,38 @@ function LayoutContent() {
   const shouldShowNav = (): boolean => {
     const path = location.pathname;
 
-    const showNavPaths = ["/", "/feed", "/search", "/profile", "/chat-list"];
+    const showNavPaths = ["/", "/feed", "/search", "/chat-list"];
 
-    return showNavPaths.includes(path);
+    // 프로필 페이지인지 체크 (동적 라우트 포함)
+    const isProfilePath =
+      path === "/profile" || path.match(/^\/profile\/[^/]+$/);
+
+    return showNavPaths.includes(path) || !!isProfilePath;
   };
 
-  const isProfilePage = location.pathname === "/profile";
+  const isProfilePage =
+    location.pathname === "/profile" ||
+    !!location.pathname.match(/^\/profile\/[^/]+$/);
 
   const isChatRoomPage = location.pathname === "/chat-room";
   const isPostDetailPage = location.pathname.match(/^\/post\/[^/]+$/);
 
   return (
     <LayoutContainer $isProfile={isProfilePage}>
+      <Header />
       <AnimatePresence mode="wait">
-        <motion.div
+        <MainContent
+          key={location.pathname}
+          $hasFooter={shouldShowNav()}
+          $isProfile={isProfilePage}
+          $isPostDetail={!!isPostDetailPage}
+          as={motion.main}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          style={{ height: "100%" }}
           transition={{ duration: 0.26, ease: "easeOut" }}
-          key={location.pathname}
         >
-          <Header />
-          <MainContent
-            $hasFooter={shouldShowNav()}
-            $isProfile={isProfilePage}
-            $isPostDetail={!!isPostDetailPage}
-          >
-            <Outlet />
-          </MainContent>
-        </motion.div>
+          <Outlet />
+        </MainContent>
       </AnimatePresence>
       {shouldShowNav() && <FooterNav />}
     </LayoutContainer>

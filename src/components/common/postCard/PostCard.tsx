@@ -7,6 +7,7 @@ import {
   PostActions,
   ActionButton,
   PostTime,
+  HeartLabel
 } from "./PostCard.styled";
 import PostHeader from "../PostHeader";
 
@@ -30,6 +31,7 @@ interface PostCardProps {
   isLiked: boolean;
   onLikeClick?: () => void;
   onCommentClick?: () => void;
+  onMoreClick?: () => void;
 
   // API 연동 준비 (추후 사용)
   // post: Post;
@@ -149,17 +151,18 @@ function PostCard({
               onClick={handleLikeClick}
               className={liked ? "liked" : ""}
             >
-              <img
-                src={
-                  liked ? "/img/icon-like-full.svg" : "/img/icon-like-empty.svg"
-                }
-                alt=""
-              />
-              <span>{likes}</span>
+            <HeartLabel
+            $liked={liked}
+            aria-label="좋아요">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+              </svg>
+            </HeartLabel>
+              <span style={{ position: 'relative', top: '-1px' }}>{likes}</span>
             </ActionButton>
             <ActionButton aria-label="댓글" onClick={handleCommentClick}>
               <img src="/img/message-circle.svg" alt="" />
-              <span>{commentCount}</span>
+              <span style={{ position: 'relative', top: '-1px' }}>{commentCount}</span>
             </ActionButton>
           </PostActions>
           <PostTime dateTime={dateTime}>{dateText}</PostTime>

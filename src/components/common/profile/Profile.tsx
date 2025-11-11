@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useHeader } from "../../../contexts/HeaderContext";
 import {
   ProfileSection,
   ProfileContainer,
@@ -19,7 +20,7 @@ import {
   LoadingText,
   MyFeedSection,
   PostListContainer,
-  // EmptyPostMessage,
+  EmptyPostMessage,
 } from "./Profile.styled";
 import DefaultButton from "../Button";
 import SellingProducts from "./SellingProducts";
@@ -41,6 +42,7 @@ import { dummyPosts, type Post } from "../../../data/dummyPosts";
 
 function Profile() {
   const navigate = useNavigate();
+  const { setHeaderConfig } = useHeader();
 
   // URL 파라미터에서 userId 가져오기 (동적 라우팅 대비)
   const { userId: paramUserId } = useParams<{ userId?: string }>();
@@ -155,7 +157,6 @@ function Profile() {
   // 채팅 페이지 라우팅 구현
 
   const handleChatClick = (): void => {
-    console.log("채팅 페이지로 이동");
     // navigate(`/chat/${profileData.id}`);
   };
 
@@ -173,7 +174,10 @@ function Profile() {
   const handleImageError = (
     e: React.SyntheticEvent<HTMLImageElement, Event>
   ): void => {
-    e.currentTarget.src = "/img/fish_profile.png";
+    const target = e.currentTarget;
+    // 무한 onError 방지: 이미 대체 이미지로 변경된 경우 중단
+    if (target.src.includes("/img/fish_profile.png")) return;
+    target.src = "/img/fish_profile.png";
   };
 
   // 프로필 수정 버튼 클릭 핸들러
@@ -242,6 +246,13 @@ function Profile() {
   //  API 연동 시 주석 해제
 
   useEffect(() => {
+    // 헤더 설정
+    setHeaderConfig({
+      show: true,
+      type: "profile",
+      onBackClick: () => navigate(-1),
+    });
+
     // const loadProfileAndPosts = async (): Promise<void> => {
     //   setIsLoading(true);
     //   try {
@@ -268,7 +279,7 @@ function Profile() {
     // 임시: API 연동 전까지 더미 데이터 사용
     setUserPosts(dummyPosts);
     setIsLoading(false);
-  }, [targetUserId]);
+  }, [targetUserId, setHeaderConfig, navigate]);
 
   // 로딩 중일 때
   if (isLoading) {
@@ -349,9 +360,9 @@ function Profile() {
                 aria-label="채팅하기"
               />
 
-              {/* 팔로우/언팔로우 버튼 */}
+              {/* 팔로우/팔로잉 버튼 */}
               <DefaultButton
-                text={profileData.isFollowing ? "언팔로우" : "팔로우"}
+                text={profileData.isFollowing ? "팔로잉" : "팔로우"}
                 height="medium"
                 variant={profileData.isFollowing ? "secondary" : "primary"}
                 width={120}
@@ -408,13 +419,19 @@ function Profile() {
               <PostGallery
                 posts={userPosts}
                 onPostClick={(postId) => {
-                  // TODO: 게시글 상세 페이지로 이동
-                  console.log("Gallery post clicked:", postId);
+                  navigate(`/post/${postId}`);
                 }}
               />
             )}
           </MyFeedSection>
         </>
+      )}
+
+      {/* 게시글이 없을 때 빈 상태 메시지 표시 */}
+      {!isLoading && userPosts.length === 0 && (
+        <MyFeedSection>
+          <EmptyPostMessage>게시글이 없습니다.</EmptyPostMessage>
+        </MyFeedSection>
       )}
     </>
   );
