@@ -1,5 +1,5 @@
-import Header from "../common/Header";
-import FooterNav from "../common/FooterNav";
+import Header from "./Header";
+import FooterNav from "./FooterNav";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { HeaderProvider, useHeader } from "../../contexts/HeaderContext";
@@ -54,7 +54,8 @@ function LayoutContent() {
       path === "/login" ||
       path === "/login/email" ||
       path === "/signup" ||
-      path === "/profile/setup"
+      path === "/profile/setup" ||
+      path === "/404"
     ) {
       setHeaderConfig({ show: false });
       return;

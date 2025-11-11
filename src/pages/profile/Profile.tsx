@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useHeader } from "../../../contexts/HeaderContext";
+import { useHeader } from "../../contexts/HeaderContext";
 import {
   ProfileSection,
   ProfileContainer,
@@ -22,13 +22,13 @@ import {
   PostListContainer,
   EmptyPostMessage,
 } from "./Profile.styled";
-import DefaultButton from "../../../components/common/Button";
-import SellingProducts from "./SellingProducts";
-import type { UserProfile } from "../../../types/user";
-import PostCard from "../../../components/post/postCard/PostCard";
-import PostStateBar from "../../../components/post/PostStateBar";
-import PostGallery from "./PostGallery";
-import { dummyPosts, type Post } from "../../../data/dummyPosts";
+import DefaultButton from "../../components/common/Button";
+import SellingProducts from "./components/SellingProducts";
+import type { UserProfile } from "../../types/user";
+import PostCard from "../../components/post/postCard/PostCard";
+import PostStateBar from "../../components/post/PostStateBar";
+import PostGallery from "./components/PostGallery";
+import { dummyPosts, type Post } from "../../data/dummyPosts";
 
 //  Profile 컴포넌트
 //  - 내 프로필과 다른 유저의 프로필을 조건부 렌더링
