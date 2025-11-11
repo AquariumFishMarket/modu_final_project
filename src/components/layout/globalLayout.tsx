@@ -1,5 +1,5 @@
-import Header from "../common/Header";
-import FooterNav from "../common/FooterNav";
+import Header from "./Header";
+import FooterNav from "./FooterNav";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { HeaderProvider, useHeader } from "../../contexts/HeaderContext";

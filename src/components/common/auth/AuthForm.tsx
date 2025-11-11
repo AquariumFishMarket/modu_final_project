@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import DefaultButton from "../Button";
+import DefaultButton from "../buttons/Button";
 import {
   Form,
   Fieldset,

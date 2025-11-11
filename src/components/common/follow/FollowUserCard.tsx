@@ -9,7 +9,7 @@ import {
   UserName,
   UserIntro,
 } from "./FollowUserCard.styled";
-import DefaultButton from "../../../components/common/Button";
+import DefaultButton from "../buttons/Button";
 
 interface FollowUserCardProps {
   userName: string;

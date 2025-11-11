@@ -6,7 +6,7 @@ import Login from "./pages/login/Login";
 import LoginEmail from "./pages/login/LoginEmail";
 import Signup from "./pages/signup/Signup";
 import ProfileSetup from "./pages/profile/ProfileSetup";
-import Profile from "./pages/profile/components/Profile";
+import Profile from "./pages/profile/Profile";
 import ProfileEdit from "./pages/profile/ProfileEdit";
 import SearchPage from "./pages/search/SearchPage";
 import PostWrite from "./pages/post/PostWrite";
@@ -50,7 +50,10 @@ export default function RootRoute() {
             path="/profile/:userId"
             element={<Profile key={location.pathname} />}
           />
-          <Route path="/profile" element={<Profile key={location.pathname} />} />
+          <Route
+            path="/profile"
+            element={<Profile key={location.pathname} />}
+          />
           {/* 메인 피드, 검색 */}
           <Route path="/search" element={<SearchPage />} />
           {/* 상품 */}
@@ -62,7 +65,7 @@ export default function RootRoute() {
           {/* 상세게시글 */}
           <Route path="/post/:postId" element={<PostDetail />} />
           {/* 채팅 */}
-          <Route path="/chat-list" element={<ChatList />}/>
+          <Route path="/chat-list" element={<ChatList />} />
           <Route path="/chat-room/:roomId" element={<ChatRoom />} />
           {/* 에러 페이지 */}
           <Route path="/404" element={<ErrPage />} />
