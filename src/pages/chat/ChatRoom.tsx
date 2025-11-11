@@ -84,6 +84,14 @@ const Background = styled.div`
   background-color: rgba(0, 0, 0, 0.2);
   z-index: 100;
 `;
+const ChatNotice = styled.div`
+  width: fit-content;
+  margin: 0 auto;
+  font-size: var(--font-size-md);
+  background-color: #eeeeee;
+  padding: 10px 40px;
+  border-radius: 500px;
+`
 
 export interface ChatMessage {
   id: string;
@@ -131,21 +139,21 @@ export default function ChatRoom() {
   }
 
   // 답장 목 데이터 불러오는 함수
-const sendMockResponse = (roomId: string, scenario:number, index = 0) => {
-  const messagesForRoom = mockResponsesByRoom[roomId][scenario];
-  if(mockResponsesByRoom[roomId].length == scenario) return;
+  const sendMockResponse = (roomId: string, scenario:number, index = 0) => {
+    const messagesForRoom = mockResponsesByRoom[roomId][scenario];
+    if(mockResponsesByRoom[roomId].length == scenario) return;
 
-  messagesForRoom.forEach((ele,i)=> {
-    setTimeout(()=>{
-      setMessages(prev => [...prev, ele])
-      const incoming = ele;
-      handleIncommingMessage(incoming)
-    }, i * 1200 + 1000)
-  })
+    messagesForRoom.forEach((ele,i)=> {
+      setTimeout(()=>{
+        setMessages(prev => [...prev, ele])
+        const incoming = ele;
+        handleIncommingMessage(incoming)
+      }, i * 1200 + 1000)
+    })
 
-  scenarioRef.current += 1;
+    scenarioRef.current += 1;
 
-};
+  };
 
   // 이미지 삭제 처리
   useEffect(() => {
@@ -226,10 +234,16 @@ const sendMockResponse = (roomId: string, scenario:number, index = 0) => {
     setImgArr([]);
   };
 
+  if(!roomId) return;
+  const chatUsername = mockResponsesByRoom[roomId][0][0].username
+
   return (
     <>
       <ChatContainer>
         <h2 className="sr-only">ooo님의 채팅룸</h2>
+        {messages.length == 0 && (
+          <ChatNotice>{chatUsername}님과 대화를 시작해볼까요? 😎</ChatNotice>
+        )}
         {messages.map(msg => (
           msg.userId === "me" ? (
             <MyChat key={msg.id}>
