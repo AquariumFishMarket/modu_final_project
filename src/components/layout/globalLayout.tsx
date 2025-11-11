@@ -5,6 +5,8 @@ import styled from "styled-components";
 import { HeaderProvider, useHeader } from "../../contexts/HeaderContext";
 import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { mockResponsesByRoom } from "../../pages/chat/mockChatData";
+import { useParams } from "react-router-dom";
 
 // import { relative } from "path";
 
@@ -44,6 +46,7 @@ function LayoutContent() {
   const location = useLocation();
   const { setHeaderConfig } = useHeader();
   const navigate = useNavigate();
+  const { roomId } = useParams<{ roomId: string }>();
 
   // 경로별 헤더 자동 설정
   useEffect(() => {
@@ -168,11 +171,15 @@ function LayoutContent() {
     }
 
     // 채팅 방
+
     if (path.includes("/chat-room")) {
+      if(!roomId) return;
+      const messagesForRoom = mockResponsesByRoom[roomId];
+
       setHeaderConfig({
         show: true,
         type: "chat",
-        userName: "잉어킹",
+        userName: messagesForRoom[0].username,
         onBackClick: () => navigate(-1),
       });
       return;

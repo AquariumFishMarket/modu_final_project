@@ -56,6 +56,7 @@ export const IconButton = styled.button`
   margin-inline: 0.1rem;
   border: none;
   background: #fff;
+  height: 22px;
 `;
 
 export const SearchForm = styled.form`
