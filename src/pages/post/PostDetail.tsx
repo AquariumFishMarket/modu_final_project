@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import PostCard from "../../components/common/postCard/PostCard";
-import CommentField from "../../components/common/Comment/CommentField";
+import PostCard from "../../components/post/postCard/PostCard";
+import CommentField from "../../components/post/comment/CommentField";
 import TextField from "../../components/common/TextField";
 import { dummyPosts } from "../../data/dummyPosts";
 import { PostDetailContainer, CommentsSection } from "./PostDetail.styled";

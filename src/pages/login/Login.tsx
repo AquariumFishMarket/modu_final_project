@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import SocialButton from "../../components/common/SocialButton";
+import SocialButton from "./components/SocialButton";
 
 const LoginContainer = styled.section`
   position: absolute; /* 전체화면을 위해 */

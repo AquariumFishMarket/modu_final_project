@@ -8,7 +8,7 @@ import {
   UserName,
   UserId,
 } from "./PostHeader.styled";
-import MoreMenu from "./MoreMenu";
+import MoreMenu from "../common/MoreMenu";
 
 // API 연동 준비 (추후 사용)
 // import { Author } from "../../types/post";
