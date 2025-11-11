@@ -31,6 +31,7 @@ const MainContent = styled.main<{
   padding: 68px 16px 0;
   overflow-x: hidden;
   overflow-y: auto;
+  position: relative; //스크롤 버튼을 위해
   padding-bottom: ${(props) => {
     if (props.$isProfile) return "0";
     return props.$hasFooter ? "110px" : "50px";
@@ -192,12 +193,15 @@ function LayoutContent() {
     const showNavPaths = ["/", "/feed", "/search", "/chat-list"];
 
     // 프로필 페이지인지 체크 (동적 라우트 포함)
-    const isProfilePath = path === "/profile" || path.match(/^\/profile\/[^/]+$/);
+    const isProfilePath =
+      path === "/profile" || path.match(/^\/profile\/[^/]+$/);
 
     return showNavPaths.includes(path) || !!isProfilePath;
   };
 
-  const isProfilePage = location.pathname === "/profile" || !!location.pathname.match(/^\/profile\/[^/]+$/);
+  const isProfilePage =
+    location.pathname === "/profile" ||
+    !!location.pathname.match(/^\/profile\/[^/]+$/);
 
   const isChatRoomPage = location.pathname === "/chat-room";
   const isPostDetailPage = location.pathname.match(/^\/post\/[^/]+$/);
@@ -216,10 +220,8 @@ function LayoutContent() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.26, ease: "easeOut" }}
         >
-
           <Outlet />
         </MainContent>
-
       </AnimatePresence>
       {shouldShowNav() && <FooterNav />}
     </LayoutContainer>

@@ -4,7 +4,7 @@ import React, {
   useImperativeHandle,
   forwardRef,
 } from "react";
-import ImageContainer from "../imageUpload/ImageContainer";
+// import ImageContainer from "../imageUpload/ImageContainer";
 import ProfileImg from "../ProfileImg";
 import ImageUpButton from "../imageUpload/UploadButton";
 import DeleteButton from "../imageUpload/DeleteButton";
@@ -20,6 +20,8 @@ import {
   EmptyImageMessage,
   ImageCountBadge,
   ImageSlide,
+  ProfileImageWrapper,
+  ProfileImageOverlay,
 } from "./Form.styled";
 
 const EditForm = forwardRef<CommonFormRef, EditFormProps>(
@@ -51,18 +53,18 @@ const EditForm = forwardRef<CommonFormRef, EditFormProps>(
     // 🆕 수정 모드 특화 로직들 - 누락된 상태 추가
     const [deletedExistingImages, setDeletedExistingImages] = useState<
       number[]
-    >([]); // 🆕 추가
+    >([]);
     const [deleteExistingIdx, setDeleteExistingIdx] = useState<
       number | undefined
     >();
     const [hasUserInteraction, setHasUserInteraction] = useState(false);
 
-    // 🆕 총 이미지 개수 계산
+    // 총 이미지 개수 계산
     const totalImageCount =
       existingImageUrls.length - deletedExistingImages.length + imgFiles.length;
     const hasSelectedImage = totalImageCount > 0;
 
-    // 🆕 이미지 삭제 처리
+    // 이미지 삭제 처리
     useEffect(() => {
       if (deleteIdx !== undefined) {
         const newImgFiles = imgFiles.filter((_, index) => index !== deleteIdx);
@@ -71,7 +73,14 @@ const EditForm = forwardRef<CommonFormRef, EditFormProps>(
       }
     }, [deleteIdx, imgFiles]);
 
-    // 🆕 기존 이미지 삭제 처리 추가
+    // 프로필 이미지 클릭 시 삭제 핸들러
+    const handleProfileImageClick = () => {
+      if (hasSelectedImage) {
+        setImgFiles([]);
+      }
+    };
+
+    // 상품 기존 이미지 삭제 처리
     useEffect(() => {
       if (deleteExistingIdx !== undefined) {
         setDeletedExistingImages((prev) => [...prev, deleteExistingIdx]);
@@ -114,7 +123,7 @@ const EditForm = forwardRef<CommonFormRef, EditFormProps>(
       }
     };
 
-    // 🆕 포커스 아웃 시 유효성 검사
+    // 포커스 아웃 시 유효성 검사
     const handleBlur = async (fieldName: string, value: string) => {
       if (!hasUserInteraction) return; // 사용자가 실제로 수정한 경우에만 유효성 검사
 
@@ -137,7 +146,7 @@ const EditForm = forwardRef<CommonFormRef, EditFormProps>(
       }
     };
 
-    // 🆕 폼 제출 로직
+    // 폼 제출 로직
     const performSubmit = async () => {
       const newErrors: ValidationErrors = {};
 
@@ -160,7 +169,7 @@ const EditForm = forwardRef<CommonFormRef, EditFormProps>(
           formData.append(field.name, formValues[field.name]);
         });
 
-        // 🆕 삭제된 기존 이미지 정보 추가
+        // 삭제된 기존 이미지 정보 추가
         if (deletedExistingImages.length > 0) {
           formData.append(
             "deletedExistingImages",
@@ -168,7 +177,7 @@ const EditForm = forwardRef<CommonFormRef, EditFormProps>(
           );
         }
 
-        // 🆕 새 이미지 파일 추가
+        // 새 이미지 파일 추가
         if (imgFiles.length > 0) {
           if (formType === "profile") {
             formData.append("profileImage", imgFiles[0]);
@@ -191,7 +200,7 @@ const EditForm = forwardRef<CommonFormRef, EditFormProps>(
       return false;
     };
 
-    // 🆕 외부에서 호출할 수 있는 제출 함수
+    // 외부에서 호출할 수 있는 제출 함수
     const submitForm = async () => {
       await performSubmit();
     };
@@ -212,7 +221,6 @@ const EditForm = forwardRef<CommonFormRef, EditFormProps>(
         setFormValues((prev) => {
           const updated = { ...prev };
           fields.forEach((field) => {
-            // 🆕 현재 값이 비어있거나 사용자가 아직 수정하지 않은 경우에만 초기값 설정
             if (
               initialValues[field.name] !== undefined &&
               (prev[field.name] === "" || !hasUserInteraction)
@@ -243,16 +251,24 @@ const EditForm = forwardRef<CommonFormRef, EditFormProps>(
           >
             {/* 프로필용 이미지 렌더링 */}
             {formType === "profile" && (
-              <>
+              <ProfileImageWrapper
+                $hasImage={hasSelectedImage}
+                onClick={handleProfileImageClick}
+                title={hasSelectedImage ? "클릭하여 기본 이미지로 변경" : ""}
+              >
                 {!hasSelectedImage ? (
                   <ProfileImg width={150} thumbimg={false} imgSrc={undefined} />
                 ) : (
-                  <ImageContainer
-                    imgArr={imgFiles}
-                    setDeleteIdx={setDeleteIdx}
-                  />
+                  <>
+                    <ProfileImg
+                      width={150}
+                      thumbimg={true}
+                      imgSrc={URL.createObjectURL(imgFiles[0])}
+                    />
+                    <ProfileImageOverlay>클릭하여 삭제</ProfileImageOverlay>
+                  </>
                 )}
-              </>
+              </ProfileImageWrapper>
             )}
 
             {/* 상품용 이미지 렌더링 */}
@@ -304,13 +320,13 @@ const EditForm = forwardRef<CommonFormRef, EditFormProps>(
               />
             </FormBtnContainer>
 
-            {/* 🆕 총 이미지 개수 표시 */}
+            {/* 총 이미지 개수 표시 */}
             {formType === "product" && totalImageCount > 0 && (
               <ImageCountBadge>{totalImageCount}/10</ImageCountBadge>
             )}
           </FormImgContainer>
 
-          {/* 🆕 입력 필드들 */}
+          {/* 입력 필드들 */}
           {fields.map((field) => (
             <InputGroup key={field.name}>
               <label htmlFor={field.name}>
