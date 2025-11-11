@@ -13,22 +13,22 @@ const chatRoom:ChatDataType[] = [
     {
         id: 1,
         imgSrc:'..',
-        username: '잉어킹',
-        message: '살려주세요 잡아먹지마세요',
+        username: '철갑상어',
+        message: '붉은색 베타 분양받고싶어요. 가능한가요?',
         date: '2025.12.02'
     },
     {
         id: 2,
         imgSrc:'..',
-        username: '갸라도스',
-        message: '매운탕입니다',
+        username: 'ggamjang12',
+        message: '그럼 저녁 7시에 버드내도서관 앞에서 기다릴게요(_ _)',
         date: '2025.08.19'
     },
     {
         id: 3,
         imgSrc:'..',
-        username: '콘치',
-        message: '관상어',
+        username: '붕어빵',
+        message: '물고기 잘보는 동물병원 어딘가요?',
         date: '2025.08.19'
     },
 ]
