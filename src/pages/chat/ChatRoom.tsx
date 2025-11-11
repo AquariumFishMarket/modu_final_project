@@ -5,6 +5,7 @@ import TextField from "../../components/common/TextField";
 import ImageUpButton from "../../components/common/imageUpload/UploadButton";
 import ImageContainer from "../../components/common/imageUpload/ImageContainer";
 import DefaultButton from "../../components/common/buttons/Button";
+import { mockResponsesByRoom } from "./mockChatData";
 
 import styled from "styled-components";
 import { pusher } from "../../App";
@@ -84,24 +85,26 @@ const Background = styled.div`
   z-index: 100;
 `;
 
-interface ChatMessage {
+export interface ChatMessage {
   id: string;
   userId: string;
   username: string;
   content: string;
   type: "text" | "image" | "system";
   timestamp: number;
+  isRead?: boolean;
 }
 
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzzPfbfdpUEbR5QPIfDS0Z8Yl5a_keypTw-HvCnK1CnUYOUbd2f4wdhkglQxMXsZvTDAA/exec";
 
 
 export default function ChatRoom() {
-  const { roomId } = useParams();
+  const { roomId } = useParams<{ roomId: string }>();
   const [imgArr, setImgArr] = useState<File[]>([]);
   const [deleteIndex, setDeleteIdx] = useState<number | undefined>();
   const [imgModalState, setImgModalState] = useState<boolean>(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const messageRef = useRef<ChatMessage[]>([])
 
   useEffect(() => {
     const channel = pusher.subscribe(`chat-${roomId}`);
@@ -115,6 +118,31 @@ export default function ChatRoom() {
     };
   }, [roomId]);
 
+  useEffect(()=>{
+    messageRef.current = messages;
+  }, [messages])
+
+  const handleIncommingMessage = (incoming:ChatMessage) => {
+    const updated = messageRef.current.map(msg =>
+      msg.userId === "me" ? { ...msg, isRead: true } : msg
+    );
+    setMessages([...updated, incoming])
+  }
+
+  // 답장 목 데이터 불러오는 함수
+const sendMockResponse = (roomId: string, index = 0) => {
+  const messagesForRoom = mockResponsesByRoom[roomId];
+  if (!messagesForRoom || index >= messagesForRoom.length) return;
+
+  setTimeout(() => {
+    setMessages(prev => [...prev, messagesForRoom[index]]);
+    const incoming = messagesForRoom[index]
+    handleIncommingMessage(incoming)
+    sendMockResponse(roomId, index + 1);
+
+  }, 1000 + Math.random() * 2000);
+
+};
 
   // 이미지 삭제 처리
   useEffect(() => {
@@ -142,6 +170,7 @@ export default function ChatRoom() {
       type: "image",
       content: URL.createObjectURL(img),
       timestamp: Date.now(),
+      isRead: false,
     }));
 
     // 로컬 state에 추가
@@ -172,6 +201,7 @@ export default function ChatRoom() {
       content: text,
       type: "text",
       timestamp: Date.now(),
+      isRead: false,
     };
 
     setMessages(prev => [...prev, newMessage]);
@@ -183,6 +213,9 @@ export default function ChatRoom() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ roomId, message: newMessage }),
     }).catch(err => console.error("텍스트 전송 실패", err));
+
+    if(!roomId) return;
+    sendMockResponse(roomId)
   };
 
   const handleClose = () => {
@@ -198,7 +231,9 @@ export default function ChatRoom() {
           msg.userId === "me" ? (
             <MyChat key={msg.id}>
               <MyTime>
+                {!msg.isRead &&
                 <p style={{ marginBottom: "4px" }}>안읽음</p>
+                }
                 <p>{new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
               </MyTime>
               <MyChatMessage>
