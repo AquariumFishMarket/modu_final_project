@@ -102,25 +102,40 @@ export default function BottomSheet({
   onClose,
   children,
 }: BottomSheetProps) {
+  const handleClose = () => {
+    document.body.style.overflow = "";
+    onClose();
+  };
+
   // 배경 클릭으로 닫기
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
-      onClose();
+      handleClose();
     }
   };
 
-  // 드래그로 닫기
-  const handleDragEnd = (
+  function handleDrag(
     event: MouseEvent | TouchEvent | PointerEvent,
     info: PanInfo
-  ) => {
-    const threshold = 100; // 100px 이상 드래그하면 닫기
+  ) {
+    const threshold = 10; // 30px 이상 내려가면 바로 닫기
+    if (info.offset.y > threshold) {
+      handleClose();
+    }
+  }
+
+  // 드래그로 닫기
+  function handleDragEnd(
+    event: MouseEvent | TouchEvent | PointerEvent,
+    info: PanInfo
+  ) {
+    const threshold = 30; // 30px 이상 드래그하면 닫기
     const velocity = info.velocity.y; // 드래그 속도
 
     if (info.offset.y > threshold || velocity > 500) {
-      onClose();
+      handleClose();
     }
-  };
+  }
 
   // ESC 키로 닫기
   useEffect(() => {
@@ -161,6 +176,7 @@ export default function BottomSheet({
             drag="y"
             dragConstraints={{ top: 0 }} // 위로는 드래그 불가
             dragElastic={0.2}
+            onDrag={handleDrag}
             onDragEnd={handleDragEnd}
             onClick={(e) => e.stopPropagation()} // 이벤트 버블링 방지
           >
