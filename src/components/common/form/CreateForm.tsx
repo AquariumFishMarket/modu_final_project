@@ -35,6 +35,9 @@ const CreateForm = forwardRef<CommonFormRef, CreateFormProps>(
     });
 
     const [errors, setErrors] = useState<ValidationErrors>({});
+    const [validationStatus, setValidationStatus] = useState<{
+      [key: string]: "idle" | "checking" | "success" | "error";
+    }>({}); // 🆕
     const [imgFiles, setImgFiles] = useState<File[]>([]);
     const [deleteIdx, setDeleteIdx] = useState<number | undefined>();
     const [hasUserInteraction, setHasUserInteraction] = useState(false);
@@ -65,7 +68,12 @@ const CreateForm = forwardRef<CommonFormRef, CreateFormProps>(
       );
       const hasNoErrors = Object.values(errors).every((error) => !error);
 
-      return allRequiredFilled && hasNoErrors;
+      // 🆕 검사 중인 필드가 있으면 비활성화
+      const isChecking = Object.values(validationStatus).some(
+        (status) => status === "checking"
+      );
+
+      return allRequiredFilled && hasNoErrors && !isChecking;
     };
 
     // 폼 유효성이 변경될 때마다 부모에게 알림
@@ -90,18 +98,42 @@ const CreateForm = forwardRef<CommonFormRef, CreateFormProps>(
       if (errors[fieldName]) {
         setErrors((prev) => ({ ...prev, [fieldName]: "" }));
       }
+      setValidationStatus((prev) => ({ ...prev, [fieldName]: "idle" }));
     };
 
     // 포커스 아웃 시 유효성 검사
     const handleBlur = async (fieldName: string, value: string) => {
-      if (!hasUserInteraction) return;
-
       const field = fields.find((f) => f.name === fieldName);
-      if (field?.validator && value.trim()) {
+
+      // validator가 없으면 검사 안함
+      if (!field?.validator) return;
+
+      // 필수 필드가 아니고 비어있으면 검사 안함
+      if (!field.required && !value.trim()) {
+        return;
+      }
+
+      console.log(`${fieldName} 유효성 검사 시작:`, value);
+      setValidationStatus((prev) => ({ ...prev, [fieldName]: "checking" }));
+      setErrors((prev) => ({ ...prev, [fieldName]: "" }));
+
+      try {
         const errorMessage = await field.validator(value);
+        console.log(`${fieldName} 검사 결과:`, errorMessage);
+
         if (errorMessage) {
           setErrors((prev) => ({ ...prev, [fieldName]: errorMessage }));
+          setValidationStatus((prev) => ({ ...prev, [fieldName]: "error" }));
+        } else {
+          setValidationStatus((prev) => ({ ...prev, [fieldName]: "success" }));
         }
+      } catch (err) {
+        console.error(`${fieldName} 검사 오류:`, err);
+        setErrors((prev) => ({
+          ...prev,
+          [fieldName]: "검사 중 오류가 발생했습니다.",
+        }));
+        setValidationStatus((prev) => ({ ...prev, [fieldName]: "error" }));
       }
     };
 
@@ -121,40 +153,43 @@ const CreateForm = forwardRef<CommonFormRef, CreateFormProps>(
 
       setErrors(newErrors);
 
-      // 에러가 없으면 폼 제출
-      if (Object.keys(newErrors).length === 0) {
-        const formData = new FormData();
+      // 이미지 파일 추가
+      // if (formType === "profile") {
+      //   if (imgFiles.length > 0) {
+      //     formData.append("profileImage", imgFiles[0]);
+      //   } else {
+      //     formData.append("DefaultImage", "true");
+      //   }
+      // } else if (formType === "product") {
+      //   imgFiles.forEach((file, index) => {
+      //     formData.append(`productImage_${index}`, file);
+      //   });
+      // }
 
-        // 폼 데이터 추가
-        fields.forEach((field) => {
-          formData.append(field.name, formValues[field.name]);
-        });
-
-        // 이미지 파일 추가
-        if (formType === "profile") {
-          if (imgFiles.length > 0) {
-            formData.append("profileImage", imgFiles[0]);
-          } else {
-            formData.append("DefaultImage", "true");
-          }
-        } else if (formType === "product") {
-          imgFiles.forEach((file, index) => {
-            formData.append(`productImage_${index}`, file);
-          });
-        }
-
-        onSubmit?.({
-          formData,
-          imageFiles: imgFiles,
-          formValues,
-          hasCustomImage: imgFiles.length > 0,
-          useDefaultImage: imgFiles.length === 0,
-        });
-
-        return true;
+      // 에러가 있으면 제출 중단
+      if (Object.keys(newErrors).length > 0) {
+        console.log("유효성 검사 실패:", newErrors);
+        return false;
       }
 
-      return false;
+      // onSubmit 호출 - FormSubmissionData 형식으로 전달
+      if (onSubmit) {
+        console.log("onSubmit 호출:", formValues);
+
+        // FormSubmissionData 형식으로 변환
+        const submissionData: Record<string, string | File | null> = {
+          ...formValues,
+        };
+
+        // 이미지 파일이 있으면 추가
+        if (formType === "profile" && imgFiles.length > 0) {
+          submissionData.profileImage = imgFiles[0];
+        }
+
+        onSubmit(submissionData);
+      }
+
+      return true;
     };
 
     // 외부에서 호출할 수 있는 제출 함수
