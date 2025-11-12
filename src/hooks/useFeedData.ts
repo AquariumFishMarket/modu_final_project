@@ -50,7 +50,6 @@ export const useFeedData = () => {
         const filtered = datalist.filter((ele:any)=> ele.author.email.includes('pirate'))
 
         setFeedList(filtered);
-        console.log(filtered)
       } catch (err) {
 
       } finally {

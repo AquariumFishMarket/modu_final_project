@@ -56,9 +56,15 @@ function PostCard({
   onLikeClick,
   onCommentClick,
 }: PostCardProps) {
+  if(imageSrc) {
+  }
+
+  const cutImageSrc = imageSrc?.split('/') as string[]
+
+
   const [liked, setLiked] = useState(isLiked);
   const [likes, setLikes] = useState(likeCount);
-  const [postImageSrc, setPostImageSrc] = useState(imageSrc);
+  const [postImageSrc, setPostImageSrc] = useState<string | undefined>(cutImageSrc[1]);
 
   // 낙관적 업데이트
   const handleLikeClick = () => {
@@ -100,9 +106,9 @@ function PostCard({
     // }
   };
 
-  const handlePostImageError = () => {
-    setPostImageSrc("/img/cook.png");
-  };
+  // const handlePostImageError = () => {
+  //   setPostImageSrc("/img/cook.png");
+  // };
 
   return (
     <PostCardContainer>
@@ -124,9 +130,8 @@ function PostCard({
           {content && <figcaption>{content}</figcaption>}
           {postImageSrc && (
             <img
-              src={postImageSrc}
+              src={`https://dev.wenivops.co.kr/services/mandarin/${postImageSrc}`}
               alt={imageAlt || "게시글 이미지"}
-              onError={handlePostImageError}
             />
           )}
         </PostMain>
