@@ -48,7 +48,6 @@ export const useFeedData = () => {
         const data = await fetchPosts(token, 10, 0); // limit=10, skip=0
         const datalist = data.posts;
         const filtered = datalist.filter((ele:any)=> ele.author.email.includes('pirate'))
-
         setFeedList(filtered);
       } catch (err) {
 

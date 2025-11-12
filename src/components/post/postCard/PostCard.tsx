@@ -111,7 +111,7 @@ function PostCard({
   // };
 
   return (
-    <PostCardContainer>
+    <PostCardContainer key={postId}>
       {/* 게시자 정보 */}
       <PostHeader
         userName={userName}

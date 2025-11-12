@@ -22,20 +22,13 @@ import ChatList from "./pages/chat/ChatList";
 import ProductDetail from "./pages/product/ProductDetail";
 import ProductEdit from "./pages/product/ProductEdit";
 import Follow from "./pages/follow/follow";
-import { useFeedData } from "./hooks/useFeedData";
-import ScrollButton from "./pages/home/components/ScrollButton";
-
 export default function RootRoute() {
   const location = useLocation();
-  const {
-    scrollContainerRef
-  } = useFeedData();
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
         {/* 스플래시 - 앱 진입점 */}
         <Route path="/" element={<Splash />} />
-
         <Route element={<GlobalLayout />}>
           {/* 피드 */}
           <Route path="/feed" element={<FeedPage />} />
@@ -75,7 +68,6 @@ export default function RootRoute() {
           <Route path="/404" element={<ErrPage />} />
         </Route>
       </Routes>
-      <ScrollButton scrollContainerRef={scrollContainerRef} />
     </AnimatePresence>
   );
 }

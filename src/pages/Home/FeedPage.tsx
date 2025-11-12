@@ -171,7 +171,6 @@ const FeedPage = () => {
       <Toast></Toast>
 
       {feedList.map((feed) => (
-        <>
         <PostCard
           key={feed.id}
           postId={feed.id}
@@ -190,7 +189,6 @@ const FeedPage = () => {
           onLikeClick={() => handleLikeToggle(feed.id)}
           onCommentClick={() => navigate(`/post/${feed.id}`)}
         />
-        </>
       ))}
     </motion.div>
   );
