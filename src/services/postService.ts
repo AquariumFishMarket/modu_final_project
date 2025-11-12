@@ -323,3 +323,52 @@ export async function fetchPostComments(postId: string): Promise<Comment[]> {
     return [];
   }
 }
+
+/**
+ * 댓글 수정
+ */
+
+/**
+ * 댓글 삭제
+ */
+export async function deleteComment(
+  postId: string,
+  commentId: string
+): Promise<boolean> {
+  try {
+    const token = getToken();
+
+    console.log("deleteComment API 요청:", postId);
+
+    const response = await fetch(
+      `${BASE_URL}/post/${postId}/comments/${commentId}`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-type": "application/json",
+        },
+      }
+    );
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error("유효하지 않은 게시글 ID입니다.");
+      }
+      if (response.status === 403) {
+        throw new Error("삭제 권한이 없습니다. 로그인 정보를 확인하세요.");
+      }
+      if (response.status === 401) {
+        throw new Error("유효하지 않은 토큰입니다.");
+      }
+      throw new Error("게시글 삭제 실패");
+    }
+
+    console.log("deleteComment API 응답:", response.status);
+
+    return true;
+  } catch (error) {
+    console.error("댓글 삭제 실패:", error);
+    throw error;
+  }
+}
