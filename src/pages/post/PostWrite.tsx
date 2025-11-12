@@ -7,6 +7,7 @@ import { motion } from "motion/react";
 import { useNavigate } from "react-router-dom";
 import { useHeader } from "../../contexts/HeaderContext";
 import { ToastContainer, toast } from "react-toastify";
+import { useToastStore } from "../../contexts/useToastStore";
 
 const PostContainer = styled.section`
   height: 100%;
@@ -72,22 +73,23 @@ export default function PostWrite() {
   const isFormValid = content.trim().length > 0 || imgArr.length > 0;
 
   //toast 알림
-  const notify = (msg:string) => toast(msg,{
-    position: "top-center",
-    autoClose: 3000,
-    hideProgressBar: false,
-    closeOnClick: true,
-    pauseOnHover: true,
-    draggable: true,
-    progress: undefined,
-    theme: "light",
-    style: {
-      justifyContent: "center",
-    },
-    onClose: () => {
-      //navigate('/')
-    }
-    });
+  const { setToast } = useToastStore();
+  // const notify = (msg:string) => toast(msg,{
+  //   position: "top-center",
+  //   autoClose: 3000,
+  //   hideProgressBar: false,
+  //   closeOnClick: true,
+  //   pauseOnHover: true,
+  //   draggable: true,
+  //   progress: undefined,
+  //   theme: "light",
+  //   style: {
+  //     justifyContent: "center",
+  //   },
+  //   onClose: () => {
+  //     //navigate('/')
+  //   }
+  //   });
 
 
   // 헤더 설정
@@ -168,19 +170,21 @@ export default function PostWrite() {
 
       if (postRes.ok) {
         console.log("게시글 작성 성공:", postData);
-        notify('게시글 작성이 완료됐어요! 😊');
+        //notify('게시글 작성이 완료됐어요! 😊');
+        setToast('게시글 작성이 완료됐어요! 😊')
         setContent("");  // textarea 초기화
         setImgArr([]);   // 이미지 초기화
         if (textAreaRef.current) {
           textAreaRef.current.value = '';
         }
+        navigate('/feed')
       } else {
-        notify('게시글 작성이 실패했어요 🥲');
+        //notify('게시글 작성이 실패했어요 🥲');
         console.log(postData.message || "게시글 작성 실패");
       }
     } catch (err) {
       console.error(err);
-      notify("오류가 발생했습니다 🥲");
+      //notify("오류가 발생했습니다 🥲");
     }
   };
 
@@ -198,7 +202,6 @@ export default function PostWrite() {
 
   return (
     <div style={{ height: "100%", overflow: "hidden" }}>
-      <ToastContainer />
       <motion.div
         initial={{ y: "100%", opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}

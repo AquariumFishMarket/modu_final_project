@@ -2,6 +2,9 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import DefaultButton from "../../components/common/buttons/Button";
+import Toast from "../../components/common/modal/Toast";
+
+
 import {
   EmptyFeedSection,
   LogoImage,
@@ -14,6 +17,7 @@ import {
 import { dummyPosts } from "../../data/dummyPosts";
 import PostCard from "../../components/post/postCard/PostCard";
 import ScrollButton from "./components/ScrollButton";
+import { ToastContainer } from "react-toastify";
 
 const FeedPage = () => {
   const navigate = useNavigate();
@@ -199,6 +203,8 @@ const FeedPage = () => {
       exit="exit"
       variants={pageVariants}
     >
+      <ToastContainer></ToastContainer>
+      <Toast></Toast>
       <FeedSection ref={scrollContainerRef}>
         {/* 피드 목록 렌더링 */}
         {feedList.map((feed) => (
