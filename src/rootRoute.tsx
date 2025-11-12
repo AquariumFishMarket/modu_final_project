@@ -6,7 +6,7 @@ import Login from "./pages/login/Login";
 import LoginEmail from "./pages/login/LoginEmail";
 import Signup from "./pages/signup/Signup";
 import ProfileSetup from "./pages/profile/ProfileSetup";
-import Profile from "./pages/profile/Profile";
+import Profile from "./pages/profile/components/Profile";
 import ProfileEdit from "./pages/profile/ProfileEdit";
 import SearchPage from "./pages/search/SearchPage";
 import PostWrite from "./pages/post/PostWrite";

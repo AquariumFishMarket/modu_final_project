@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useHeader } from "../../contexts/HeaderContext";
+import { useHeader } from "../../../contexts/HeaderContext";
 import {
   ProfileSection,
   ProfileContainer,
@@ -23,27 +23,29 @@ import {
   EmptyPostMessage,
 } from "./Profile.styled";
 
-import DefaultButton from "../../components/common/buttons/Button";
-import SellingProducts from "./components/SellingProducts";
-import type { UserProfile } from "../../types/user";
-import PostCard from "../../components/post/postCard/PostCard";
-import PostStateBar from "../../components/post/PostStateBar";
-import PostGallery from "./components/PostGallery";
-import { dummyPosts, type Post } from "../../data/dummyPosts";
-import { getToken } from "../../utils/tokenManager";
-import { useAuth } from "../../contexts/AuthContext";
+import DefaultButton from "../../../components/common/buttons/Button";
+import SellingProducts from "./SellingProducts";
+import type { UserProfile } from "../../../types/user";
+import PostCard from "../../../components/post/postCard/PostCard";
+import PostStateBar from "../../../components/post/PostStateBar";
+import PostGallery from "./PostGallery";
+import { type Post } from "../../data/dummyPosts";
+import { getToken } from "../../../utils/tokenManager";
+import { useAuth } from "../../../contexts/AuthContext";
 // import { useUserPostsData } from "../../hooks/useUserPostsData";
 // import type { Feed } from "../../types/feed";
 
+const BASE_URL = `https://dev.wenivops.co.kr/services/mandarin`;
+
 //  Profile 컴포넌트
 //  - 내 프로필과 다른 유저의 프로필을 조건부 렌더링
-//  - isMyProfile = (profileData.id === currentUserId)로 구분
+//  - isMyProfile = targetAccountname === currentUserAccountname로 구분
 
 //  API 연동 예정:
-//  - fetchProfileData: 프로필 정보 가져오기
-//  - fetchUserPosts: 사용자 게시글 목록 가져오기
-//  - handleFollowToggle: 팔로우/언팔로우 처리
-//  - handleLikeToggle: 게시글 좋아요 처리
+//  - fetchProfileData: 프로필 정보 가져오기 👤
+//  - fetchUserPosts: 사용자 게시글 목록 가져오기 📜
+//  - handleFollowToggle: 팔로우/언팔로우 처리 🔄
+//  - handleLikeToggle: 게시글 좋아요 처리 ❤️
 
 function Profile() {
   const navigate = useNavigate();
@@ -76,14 +78,15 @@ function Profile() {
   //   isFollowing: false,
   // });
 
-  // 프로필 데이터 상태 관리
-  const [profileData, setProfileData] = useState<UserProfile | null>(null);
-
-  const [postsList, setUserPosts] = useState<Post[]>([]);
   // const [isPostsInitialLoading, setIsPostsInitialLoading] =
   //   useState<boolean>(true);
   // const [isPostsLoading, setIsPostsLoading] = useState<boolean>(false);
   // const [hasMore, setHasMore] = useState<boolean>(false);
+
+  // 프로필 데이터 상태 관리
+  const [profileData, setProfileData] = useState<UserProfile | null>(null);
+
+  const [postsList, setUserPosts] = useState<Post[]>([]);
 
   // 로딩 상태
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -108,19 +111,19 @@ function Profile() {
   // 팔로우 처리 중 상태 (중복 클릭 방지)
   const [isFollowLoading, setIsFollowLoading] = useState(false);
 
-  //  ✅ 프로필 데이터 가져오기
+  // 👤 프로필 데이터 가져오기
   const fetchProfileData = async (
     accountname?: string
   ): Promise<UserProfile | null> => {
     try {
       const token = getToken(); // 토큰 가져오기
-      let url = "https://dev.wenivops.co.kr/services/mandarin/user/myinfo";
+      let url = `${BASE_URL}/user/myinfo`;
       const headers: Record<string, string> = {
         Authorization: `Bearer ${token}`,
       };
 
       if (accountname && accountname !== currentUserAccountname) {
-        url = `https://dev.wenivops.co.kr/services/mandarin/profile/${accountname}`;
+        url = `${BASE_URL}/profile/${accountname}`;
         headers["Content-type"] = "application/json";
       }
 
@@ -144,16 +147,16 @@ function Profile() {
     }
   };
 
-  // ✅ 사용자 게시글 피드 가져오기
+  // 📜 사용자 게시글 피드 가져오기
   const fetchUserPosts = async (
     accountname: string
   ): Promise<Post[] | null> => {
     try {
       const token = getToken();
-      const limit = 1000;
+      const limit = 1000; // ☑️ 무한 스크롤 되면 개수 20개로 줄이기
 
       const response = await fetch(
-        `https://dev.wenivops.co.kr/services/mandarin/post/${accountname}/userpost?limit=${limit}`,
+        `${BASE_URL}/post/${accountname}/userpost?limit=${limit}`,
         {
           method: "GET",
           headers: {
@@ -168,7 +171,12 @@ function Profile() {
       console.log("게시글 응답 전체:", data);
       console.log(`${accountname}의 게시글 목록:`, data.post);
 
-      return Array.isArray(data.post) ? data.post : [];
+      // 최신순
+      const posts = Array.isArray(data.post) ? data.post : [];
+      return posts.sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
     } catch (error) {
       console.error("게시글 데이터 가져오기 실패:", error);
       return null;
@@ -213,9 +221,8 @@ function Profile() {
     }
   };
 
-  // 채팅 버튼 클릭 핸들러
+  // 채팅 버튼 클릭 핸들러 🗯️
   // 채팅 페이지 라우팅 구현
-
   const handleChatClick = (): void => {
     // navigate(`/chat/${profileData.id}`);
   };
@@ -223,17 +230,13 @@ function Profile() {
   // 팔로워 목록 클릭 핸들러
   const handleFollowerClick = (): void => {
     if (!profileData) return;
-    navigate(
-      `/profile/${encodeURIComponent(profileData.accountname)}/followers`
-    );
+    navigate(`${BASE_URL}/profile/${profileData.accountname}/follower`);
   };
 
   // 팔로잉 목록 클릭 핸들러
   const handleFollowingClick = (): void => {
     if (!profileData) return;
-    navigate(
-      `/profile/${encodeURIComponent(profileData.accountname)}/following`
-    );
+    navigate(`${BASE_URL}/profile/${profileData.accountname}/following`);
   };
 
   // 이미지 로드 에러 핸들러
@@ -255,6 +258,25 @@ function Profile() {
   const handleUploadProduct = (): void => {
     navigate("/product/upload");
   };
+
+  // ❤️ 좋아요 토글 핸들러 추가
+  // const handlePostLikeToggle = (postId: string): void => {
+  //   // TODO: 좋아요 API 연동
+  //   console.log("좋아요 토글:", postId);
+
+  //   // 임시 낙관적 업데이트
+  //   setUserPosts((prev) =>
+  //     prev.map((post) =>
+  //       post.id === postId
+  //         ? {
+  //             ...post,
+  //             hearted: !post.hearted,
+  //             likeCount: post.hearted ? post.likeCount - 1 : post.likeCount + 1,
+  //           }
+  //         : post
+  //     )
+  //   );
+  // };
 
   //  프로필 공유 버튼 클릭 핸들러
   // Web Share API 또는 클립보드 복사 기능 구현
@@ -309,11 +331,12 @@ function Profile() {
             _id: currentUser._id,
             username: currentUser.username,
             accountname: currentUser.accountname,
-            email: currentUser.email,
             image: currentUser.image,
             intro: currentUser.intro,
-            followerCount: currentUser.followerCount,
-            followingCount: currentUser.followingCount,
+            followerCount: 0,
+            followingCount: 0,
+            follower: [],
+            following: [],
             isfollow: false, // 내 프로필은 팔로우 상태 없음
           };
         } else {
@@ -341,10 +364,6 @@ function Profile() {
     };
 
     loadProfileAndPosts();
-
-    // 임시: API 연동 전까지 더미 데이터 사용
-    // setUserPosts(dummyPosts);
-    // setIsLoading(false);
   }, [
     targetAccountname,
     currentUserAccountname,
@@ -363,9 +382,6 @@ function Profile() {
       </ProfileSection>
     );
   }
-  // 임시: API 연동 전까지 프로필만 로드
-  //     setIsLoading(false);
-  //   }, [targetUserId, setHeaderConfig, navigate]);
 
   // 로딩 중일 때
   if (isLoading || !profileData) {
@@ -480,67 +496,68 @@ function Profile() {
 
       {/* 게시글이 있을 때만 포스트 상태바와 피드 섹션 표시 */}
       {/* {!isPostsInitialLoading && postsList.length > 0 && ( */}
-      <>
-        <PostStateBar postState={postState} setPostState={setPostState} />
+      {postsList.length > 0 && (
+        <>
+          <PostStateBar postState={postState} setPostState={setPostState} />
 
-        {/* 피드 섹션 - 모든 프로필에서 표시 */}
-        <MyFeedSection>
-          {postState === "list" ? (
-            <PostListContainer>
-              {postsList.map((post) => (
-                <PostCard
-                  key={post.postId}
-                  postId={post.postId}
-                  userName={profileData.username}
-                  userId={profileData.accountname}
-                  avatarSrc={profileData.image}
-                  avatarAlt={`${profileData.username}의 프로필 이미지`}
-                  content={post.content}
-                  imageSrc={post.image}
-                  imageAlt="게시글 이미지"
-                  dateTime={post.createdAt}
-                  dateText={post.createdAt}
-                  likeCount={post.likeCount}
-                  commentCount={post.commentCount}
-                  isLiked={post.isLiked}
-                  onLikeClick={() => handlePostLikeToggle(post.id)}
-                  onCommentClick={() => navigate(`/post/${post.id}`)}
-                />
-              ))}
+          {/* 피드 섹션 - 모든 프로필에서 표시 */}
+          <MyFeedSection>
+            {postState === "list" ? (
+              <PostListContainer>
+                {postsList.map((post) => (
+                  <PostCard
+                    key={post.id}
+                    postId={post.id}
+                    userName={profileData.username}
+                    userId={profileData.accountname}
+                    avatarSrc={profileData.image}
+                    avatarAlt={`${profileData.username}의 프로필 이미지`}
+                    content={post.content}
+                    imageSrc={post.image}
+                    imageAlt="게시글 이미지"
+                    dateTime={post.createdAt}
+                    dateText={post.createdAt}
+                    likeCount={post.likeCount}
+                    commentCount={post.commentCount}
+                    isLiked={post.hearted}
+                    onLikeClick={() => handlePostLikeToggle(post.id)}
+                    onCommentClick={() => navigate(`/post/${post.id}`)}
+                  />
+                ))}
 
-              {/* IntersectionObserver 트리거 */}
-              {/* <div ref={loadMoreTriggerRef} style={{ height: "1px" }} />
+                {/* IntersectionObserver 트리거 */}
+                {/* <div ref={loadMoreTriggerRef} style={{ height: "1px" }} />
 
                 {isPostsLoading && <LoadingText>불러오는 중...</LoadingText>}
                 {!hasMore && postsList.length > 0 && (
                   <LoadingText>더 이상 게시글이 없습니다.</LoadingText>
                 )} */}
-            </PostListContainer>
-          ) : (
-            <PostGallery
-              posts={postsList.map((post) => ({
-                postId: post.id,
-                userName: post.userName,
-                userId: post.userId,
-                avatarSrc: post.profileImg,
-                avatarAlt: `${post.userName}의 프로필 이미지`,
-                content: post.content,
-                imageSrc: post.image,
-                imageAlt: "게시글 이미지",
-                dateTime: post.createdAt,
-                dateText: post.createdAt,
-                likeCount: post.likeCount,
-                commentCount: post.commentCount,
-                isLiked: post.isLiked,
-              }))}
-              onPostClick={(postId) => {
-                navigate(`/post/${postId}`);
-              }}
-            />
-          )}
-        </MyFeedSection>
-      </>
-      {/* )} */}
+              </PostListContainer>
+            ) : (
+              <PostGallery
+                posts={postsList.map((post) => ({
+                  postId: post.id,
+                  userName: post.userName,
+                  userId: post.userId,
+                  avatarSrc: post.profileImg,
+                  avatarAlt: `${post.userName}의 프로필 이미지`,
+                  content: post.content,
+                  imageSrc: post.image,
+                  imageAlt: "게시글 이미지",
+                  dateTime: post.createdAt,
+                  dateText: post.createdAt,
+                  likeCount: post.likeCount,
+                  commentCount: post.commentCount,
+                  isLiked: post.isLiked,
+                }))}
+                onPostClick={(postId) => {
+                  navigate(`/post/${postId}`);
+                }}
+              />
+            )}
+          </MyFeedSection>
+        </>
+      )}
 
       {/* 게시글이 없을 때 빈 상태 메시지 표시 */}
       {/* {!isPostsInitialLoading && postsList.length === 0 && ( */}
