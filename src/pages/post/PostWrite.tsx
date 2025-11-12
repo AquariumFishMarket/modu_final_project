@@ -108,12 +108,14 @@ export default function PostWrite() {
 
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const target = e.target;
+    const newValue = e.target.value;
     target.style.height = "auto";
     target.style.height = target.scrollHeight + "px";
     setContent(e.target.value);
   };
 
   const handleSubmit = async () => {
+    const actualContent = textAreaRef.current?.value || '';
     try {
       // 토큰 불러오기
       const token = localStorage.getItem("authToken");
@@ -154,7 +156,7 @@ export default function PostWrite() {
         },
         body: JSON.stringify({
           post: {
-            content: content,           // textarea state
+            content: actualContent,      // textarea useRef
             image: uploadedImagePath,   // 업로드된 이미지 경로
           },
         }),
@@ -180,6 +182,7 @@ export default function PostWrite() {
       notify("오류가 발생했습니다 🥲");
     }
   };
+
 
   useEffect(() => {
     if (imgArr.length > 0 && textAreaRef.current?.value !== "") {

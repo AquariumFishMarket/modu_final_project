@@ -187,7 +187,7 @@ const FeedPage = () => {
           </RefreshSpinner>
         </motion.div>
 
-
+        {/* 피드 목록 */}
         {feedList.map((feed) => (
           <FeedItemWrapper key={feed.id}>
             <PostCard
