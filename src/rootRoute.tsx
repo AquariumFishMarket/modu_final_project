@@ -22,16 +22,13 @@ import ChatList from "./pages/chat/ChatList";
 import ProductDetail from "./pages/product/ProductDetail";
 import ProductEdit from "./pages/product/ProductEdit";
 import Follow from "./pages/follow/follow";
-
 export default function RootRoute() {
   const location = useLocation();
-
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
         {/* 스플래시 - 앱 진입점 */}
         <Route path="/" element={<Splash />} />
-
         <Route element={<GlobalLayout />}>
           {/* 피드 */}
           <Route path="/feed" element={<FeedPage />} />
