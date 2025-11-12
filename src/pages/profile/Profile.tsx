@@ -79,25 +79,31 @@ function Profile() {
   // 프로필 데이터 상태 관리
   const [profileData, setProfileData] = useState<UserProfile | null>(null);
 
+  const [postsList, setUserPosts] = useState<Post[]>([]);
+  // const [isPostsInitialLoading, setIsPostsInitialLoading] =
+  //   useState<boolean>(true);
+  // const [isPostsLoading, setIsPostsLoading] = useState<boolean>(false);
+  // const [hasMore, setHasMore] = useState<boolean>(false);
+
   // 로딩 상태
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // 포스트 상태 관리 (리스트 / 갤러리)
   const [postState, setPostState] = useState<"list" | "gallery">("list");
 
-  // 무한 스크롤 훅 사용
-  const {
-    postsList,
-    isLoading: isPostsLoading,
-    isInitialLoading: isPostsInitialLoading,
-    hasMore,
-    scrollContainerRef,
-    loadMoreTriggerRef,
-    handleLikeToggle: handlePostLikeToggle,
-  } = useUserPostsData(profileData.userId);
+  // // 무한 스크롤 훅 사용
+  // const {
+  //   postsList,
+  //   isLoading: isPostsLoading,
+  //   isInitialLoading: isPostsInitialLoading,
+  //   hasMore,
+  //   scrollContainerRef,
+  //   loadMoreTriggerRef,
+  //   handleLikeToggle: handlePostLikeToggle,
+  // } = useUserPostsData(profileData.userId);
 
-  // 내 프로필인지 다른 사람 프로필인지 구분
-  const isMyProfile = profileData.id && profileData.id === currentUserId;
+  // 프로필 데이터 상태 관리
+  // const [profileData, setProfileData] = useState<UserProfile | null>(null);
 
   // 팔로우 처리 중 상태 (중복 클릭 방지)
   const [isFollowLoading, setIsFollowLoading] = useState(false);
@@ -250,7 +256,6 @@ function Profile() {
     navigate("/product/upload");
   };
 
-
   //  프로필 공유 버튼 클릭 핸들러
   // Web Share API 또는 클립보드 복사 기능 구현
 
@@ -358,9 +363,9 @@ function Profile() {
       </ProfileSection>
     );
   }
-    // 임시: API 연동 전까지 프로필만 로드
-//     setIsLoading(false);
-//   }, [targetUserId, setHeaderConfig, navigate]);
+  // 임시: API 연동 전까지 프로필만 로드
+  //     setIsLoading(false);
+  //   }, [targetUserId, setHeaderConfig, navigate]);
 
   // 로딩 중일 때
   if (isLoading || !profileData) {
