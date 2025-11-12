@@ -16,11 +16,12 @@ export interface FormFieldConfig {
 }
 
 export interface FormSubmissionData {
-  formData: FormData;
-  imageFiles: File[];
-  formValues: Record<string, string>;
-  hasCustomImage?: boolean;
-  useDefaultImage?: boolean;
+  // formData: FormData;
+  // imageFiles: File[];
+  // formValues: Record<string, string>;
+  // hasCustomImage?: boolean;
+  // useDefaultImage?: boolean;
+  [key: string]: string | File | null;
 }
 
 export interface ValidationErrors {

@@ -1,3 +1,7 @@
+import { checkAccountIdDuplicate } from "../../services/authService";
+import type { FormFieldConfig } from "../../components/common/form/types";
+// import type { CheckDuplicateResponse } from "../../services/authService";
+
 // 사용자명 유효성 검사
 export const validateUsername = (username: string): string | null => {
   if (username.length < 2 || username.length > 10) {
@@ -22,12 +26,19 @@ export const validateAccountId = async (
 
   // 중복 검사 (API 호출 시뮬레이션)
   try {
-    const isDuplicate = await checkAccountIdDuplicate(accountId);
-    if (isDuplicate) {
+    const result = await checkAccountIdDuplicate(accountId);
+    if (result.message === "이미 가입된 계정ID 입니다.") {
       return "이미 사용 중인 계정 ID입니다.";
     }
-  } catch {
-    // error 매개변수 잠시 제거
+
+    if (result.message === "사용 가능한 계정ID 입니다.") {
+      return null; // 사용 가능
+    }
+
+    // 기타 에러 메시지
+    return result.message;
+  } catch (err) {
+    console.error("계정 ID 중복 확인 오류:", err);
     return "계정 ID 중복 확인 중 오류가 발생했습니다.";
   }
 
@@ -35,16 +46,16 @@ export const validateAccountId = async (
 };
 
 // 중복 검사 API 시뮬레이션
-const checkAccountIdDuplicate = async (accountId: string): Promise<boolean> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const duplicateIds = ["admin", "test", "user123"]; // ID 중복 테스트 데이터
-      resolve(duplicateIds.includes(accountId.toLowerCase()));
-    }, 500);
-  });
-};
+// const checkAccountIdDuplicate = async (accountId: string): Promise<boolean> => {
+//   return new Promise((resolve) => {
+//     setTimeout(() => {
+//       const duplicateIds = ["admin", "test", "user123"]; // ID 중복 테스트 데이터
+//       resolve(duplicateIds.includes(accountId.toLowerCase()));
+//     }, 500);
+//   });
+// };
 
-export const getProfileFields = () => [
+export const getProfileFields = (): FormFieldConfig[] => [
   {
     name: "username",
     label: "사용자 이름",
