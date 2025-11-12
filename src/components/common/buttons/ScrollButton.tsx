@@ -21,7 +21,6 @@ const TopButton = styled.button`
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 `;
 
-
 interface ScrollToTopButtonProps {
   scrollContainerRef: React.RefObject<HTMLElement | null>;
 }
@@ -35,12 +34,12 @@ export default function ScrollButton({
     const scrollContainer = scrollContainerRef.current;
     if (!scrollContainer) return;
     const handleScroll = () => {
-      console.log(scrollContainer)
+      // console.log(scrollContainer) // 잠깐 주석 처리 했숨다 -명슬
       setShowButton(scrollContainer.scrollTop > 100); // 100px 이상일 때 버튼 표시
     };
 
-    scrollContainer.addEventListener('scroll', handleScroll);
-    return () => scrollContainer.removeEventListener('scroll', handleScroll); // 클린업
+    scrollContainer.addEventListener("scroll", handleScroll);
+    return () => scrollContainer.removeEventListener("scroll", handleScroll); // 클린업
   }, []);
 
   const handleUpClick = () => {
@@ -50,22 +49,22 @@ export default function ScrollButton({
 
   return (
     <>
-    {showButton && (
-    <ScrollBtnContainer>
-      <TopButton onClick={handleUpClick} aria-label="맨 위로">
-        {/* 위쪽 화살표 SVG */}
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-          <path
-            d="M7 14l5-5 5 5"
-            stroke="var(--color-gray-dark)"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      </TopButton>
-    </ScrollBtnContainer>
-    )}
+      {showButton && (
+        <ScrollBtnContainer>
+          <TopButton onClick={handleUpClick} aria-label="맨 위로">
+            {/* 위쪽 화살표 SVG */}
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M7 14l5-5 5 5"
+                stroke="var(--color-gray-dark)"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </TopButton>
+        </ScrollBtnContainer>
+      )}
     </>
   );
 }

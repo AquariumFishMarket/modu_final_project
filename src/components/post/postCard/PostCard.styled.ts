@@ -37,6 +37,7 @@ export const PostMain = styled.figure`
   margin: 0;
   border: none;
   /* padding: 0 1.6rem 0 0; */
+  cursor: pointer; // 상세 보기
 
   figcaption {
     line-height: 1.8rem;
@@ -122,7 +123,7 @@ export const PostTime = styled.time`
   color: var(--color-gray-dark);
 `;
 
-export const HeartLabel = styled.div<{$liked: boolean}>`
+export const HeartLabel = styled.div<{ $liked: boolean }>`
   position: relative;
   font-size: 1rem;
   user-select: none;
@@ -130,24 +131,26 @@ export const HeartLabel = styled.div<{$liked: boolean}>`
   display: flex;
   align-items: center;
   justify-content: center;
-  color: ${props => props.$liked ? '#e2264d' : 'transparent'};
-  stroke: ${props => props.$liked ? '#e2264d' : 'var(--color-gray-dark)'};
+  color: ${(props) => (props.$liked ? "#e2264d" : "transparent")};
+  stroke: ${(props) => (props.$liked ? "#e2264d" : "var(--color-gray-dark)")};
   stroke-width: 2px;
-  filter: ${props => props.$liked ? 'none' : 'grayscale(1)'};
+  filter: ${(props) => (props.$liked ? "none" : "grayscale(1)")};
   transition: filter 0.5s;
 
   svg {
     transition: transform 0.3s;
-    animation: ${props => props.$liked ? 'heart 1s cubic-bezier(0.17, 0.89, 0.32, 1.49)' : 'none'};
+    animation: ${(props) =>
+      props.$liked ? "heart 1s cubic-bezier(0.17, 0.89, 0.32, 1.49)" : "none"};
   }
 
-  &::before, &::after {
+  &::before,
+  &::after {
     position: absolute;
     z-index: -1;
     top: 50%;
     left: 50%;
     border-radius: 50%;
-    content: '';
+    content: "";
   }
 
   /* 버블 효과 제거 */
@@ -160,10 +163,9 @@ export const HeartLabel = styled.div<{$liked: boolean}>`
     margin: -0.1875rem;
     width: 0.375rem;
     height: 0.375rem;
-    opacity: ${props => props.$liked ? 1 : 0};
-    animation: ${props => props.$liked ? 'sparkles 1s ease-out' : 'none'};
-    box-shadow:
-      0 -2.8125rem 0 -0.1875rem hsl(0, 100%, 75%),
+    opacity: ${(props) => (props.$liked ? 1 : 0)};
+    animation: ${(props) => (props.$liked ? "sparkles 1s ease-out" : "none")};
+    box-shadow: 0 -2.8125rem 0 -0.1875rem hsl(0, 100%, 75%),
       1.6875rem -2.8125rem 0 -0.1875rem hsl(0, 100%, 75%),
       2.4375rem -1.125rem 0 -0.1875rem hsl(51.43, 100%, 75%),
       2.4375rem 1.125rem 0 -0.1875rem hsl(102.86, 100%, 75%),
@@ -178,7 +180,8 @@ export const HeartLabel = styled.div<{$liked: boolean}>`
   }
 
   @keyframes heart {
-    0%, 17.5% {
+    0%,
+    17.5% {
       transform: scale(0);
     }
     100% {
@@ -187,13 +190,13 @@ export const HeartLabel = styled.div<{$liked: boolean}>`
   }
 
   @keyframes sparkles {
-    0%, 20% {
+    0%,
+    20% {
       opacity: 0;
     }
     25% {
       opacity: 1;
-      box-shadow:
-        0 -2.25rem 0 0 hsl(0, 100%, 75%),
+      box-shadow: 0 -2.25rem 0 0 hsl(0, 100%, 75%),
         1.125rem -2.25rem 0 0 hsl(0, 100%, 75%),
         1.6875rem -0.75rem 0 0 hsl(51.43, 100%, 75%),
         1.6875rem 0.75rem 0 0 hsl(102.86, 100%, 75%),
@@ -212,6 +215,6 @@ export const HeartLabel = styled.div<{$liked: boolean}>`
   }
 
   &:hover {
-    filter: ${props => props.$liked ? 'none' : 'grayscale(0.5)'};
+    filter: ${(props) => (props.$liked ? "none" : "grayscale(0.5)")};
   }
 `;

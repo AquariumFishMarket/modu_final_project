@@ -168,7 +168,6 @@ function Profile() {
 
       if (!response.ok) throw new Error("내 게시글 데이터 가져오기 실패");
       const data = await response.json();
-      console.log("게시글 응답 전체:", data);
       console.log(`${accountname}의 게시글 목록:`, data.post);
 
       // 최신순

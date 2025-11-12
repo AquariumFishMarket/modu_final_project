@@ -87,12 +87,12 @@ function Login() {
     animate: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.5 }
+      transition: { duration: 0.5 },
     },
     exit: {
       opacity: 0,
-      transition: { duration: 0.3 }
-    }
+      transition: { duration: 0.3 },
+    },
   };
 
   return (
@@ -103,45 +103,45 @@ function Login() {
       variants={pageVariants}
     >
       <LoginContainer>
-      <LogoArea>
-        {" "}
-        <LogoImage src="/src/assets/icons/fish-logo.svg" alt="생선마켓 로고" />
-      </LogoArea>
+        <LogoArea>
+          {" "}
+          <LogoImage src="/icons/fish-logo.svg" alt="생선마켓 로고" />
+        </LogoArea>
 
-      <LoginSection>
-        {/* 카카오 로그인 버튼 */}
-        <SocialButton
-          width={322}
-          text="카카오 계정으로 로그인"
-          onClick={handleKakaoLogin}
-          borderColor="#F2C94C"
-          icon="/src/assets/icons/kakao-logo.svg"
-        />
+        <LoginSection>
+          {/* 카카오 로그인 버튼 */}
+          <SocialButton
+            width={322}
+            text="카카오 계정으로 로그인"
+            onClick={handleKakaoLogin}
+            borderColor="#F2C94C"
+            icon="/icons/kakao-logo.svg"
+          />
 
-        {/* 구글 로그인 버튼 */}
-        <SocialButton
-          width={322}
-          text="구글 계정으로 로그인"
-          onClick={handleGoogleLogin}
-          borderColor="var(--color-gray-dark)"
-          icon="/src/assets/icons/google-logo.svg"
-        />
+          {/* 구글 로그인 버튼 */}
+          <SocialButton
+            width={322}
+            text="구글 계정으로 로그인"
+            onClick={handleGoogleLogin}
+            borderColor="var(--color-gray-dark)"
+            icon="/icons/google-logo.svg"
+          />
 
-        {/* 페이스북 로그인 버튼 */}
-        <SocialButton
-          width={322}
-          text="페이스북 계정으로 로그인"
-          onClick={handleFacebookLogin}
-          borderColor="#2D9CDB"
-          icon="/src/assets/icons/facebook-logo.svg"
-        />
-        <EmailLoginSignup>
-          <StyledLink to="/login/email">이메일로 로그인</StyledLink>
-          <Separator>|</Separator>
-          <StyledLink to="/signup">회원가입</StyledLink>
-        </EmailLoginSignup>
-      </LoginSection>
-    </LoginContainer>
+          {/* 페이스북 로그인 버튼 */}
+          <SocialButton
+            width={322}
+            text="페이스북 계정으로 로그인"
+            onClick={handleFacebookLogin}
+            borderColor="#2D9CDB"
+            icon="/icons/facebook-logo.svg"
+          />
+          <EmailLoginSignup>
+            <StyledLink to="/login/email">이메일로 로그인</StyledLink>
+            <Separator>|</Separator>
+            <StyledLink to="/signup">회원가입</StyledLink>
+          </EmailLoginSignup>
+        </LoginSection>
+      </LoginContainer>
     </motion.div>
   );
 }

@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import type { Feed } from "../types/feed";
 import { fetchFeed, toggleLike } from "../services/feedService";
+import { getToken } from "../utils/tokenManager";
 
 export const useFeedData = () => {
   const [feedList, setFeedList] = useState<any[]>([]);
@@ -16,49 +17,53 @@ export const useFeedData = () => {
 
   //  피드 데이터 로드
 
-  const fetchPosts = async(token: string, limit?: number, skip?: number) => {
+  const fetchPosts = async (token: string, limit?: number, skip?: number) => {
     const query = new URLSearchParams();
-    if (limit) query.append('limit', limit.toString());
-    if (skip) query.append('skip', skip.toString());
+    if (limit) query.append("limit", limit.toString());
+    if (skip) query.append("skip", skip.toString());
 
-    const url = `https://dev.wenivops.co.kr/services/mandarin/post${query.toString() ? `?${query}` : ''}`;
+    const url = `https://dev.wenivops.co.kr/services/mandarin/post${
+      query.toString() ? `?${query}` : ""
+    }`;
 
     const res = await fetch(url, {
-      method: 'GET',
+      method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
-        'Content-type': 'application/json',
+        "Content-type": "application/json",
       },
     });
 
     if (!res.ok) {
       const err = await res.json();
-      throw new Error(err.message || '게시글 불러오기 실패');
+      throw new Error(err.message || "게시글 불러오기 실패");
     }
 
     return res.json(); // posts 배열 반환
-  }
+  };
 
-  useEffect(()=>{
-    const token = localStorage.getItem('authToken');
+  useEffect(() => {
+    const token = getToken();
     if (!token) return;
 
     const load = async () => {
       try {
         const data = await fetchPosts(token, 10, 0); // limit=10, skip=0
         const datalist = data.posts;
-        const filtered = datalist.filter((ele:any)=> ele.author.email.includes('pirate'))
+        const filtered = datalist.filter((ele: any) =>
+          ele.author.email.includes("pirate")
+        );
         setFeedList(filtered);
       } catch (err) {
-
       } finally {
-        setTimeout(()=> {setIsInitialLoading(false)}, 1000)
-
+        setTimeout(() => {
+          setIsInitialLoading(false);
+        }, 1000);
       }
     };
 
     load();
-  },[])
+  }, []);
 
   //  좋아요 토글 (낙관적 업데이트)
 
