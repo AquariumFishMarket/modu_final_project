@@ -6,7 +6,7 @@ import Login from "./pages/login/Login";
 import LoginEmail from "./pages/login/LoginEmail";
 import Signup from "./pages/signup/Signup";
 import ProfileSetup from "./pages/profile/ProfileSetup";
-import Profile from "./pages/profile/Profile";
+import Profile from "./pages/profile/components/Profile";
 import ProfileEdit from "./pages/profile/ProfileEdit";
 import SearchPage from "./pages/search/SearchPage";
 import PostWrite from "./pages/post/PostWrite";
@@ -22,16 +22,13 @@ import ChatList from "./pages/chat/ChatList";
 import ProductDetail from "./pages/product/ProductDetail";
 import ProductEdit from "./pages/product/ProductEdit";
 import Follow from "./pages/follow/follow";
-
 export default function RootRoute() {
   const location = useLocation();
-
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
         {/* 스플래시 - 앱 진입점 */}
         <Route path="/" element={<Splash />} />
-
         <Route element={<GlobalLayout />}>
           {/* 피드 */}
           <Route path="/feed" element={<FeedPage />} />

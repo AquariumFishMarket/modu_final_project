@@ -4,8 +4,10 @@ import FloatingChatbot from "../chatbot/FloatingChatbot";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { HeaderProvider, useHeader } from "../../contexts/HeaderContext";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import ScrollButton from "../common/buttons/ScrollButton";
+import { useFeedData } from "../../hooks/useFeedData";
 
 // import { relative } from "path";
 
@@ -46,7 +48,9 @@ function LayoutContent() {
   const location = useLocation();
   const { setHeaderConfig } = useHeader();
   const navigate = useNavigate();
-
+  const {
+    scrollContainerRef
+  } = useFeedData();
   // 경로별 헤더 자동 설정
   useEffect(() => {
     const path = location.pathname;
@@ -206,7 +210,6 @@ function LayoutContent() {
     location.pathname === "/profile" ||
     !!location.pathname.match(/^\/profile\/[^/]+$/);
 
-  const isChatRoomPage = location.pathname === "/chat-room";
   const isPostDetailPage = location.pathname.match(/^\/post\/[^/]+$/);
 
   return (
@@ -223,6 +226,7 @@ function LayoutContent() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.26, ease: "easeOut" }}
+            ref={scrollContainerRef}
           >
             <Outlet />
           </MainContent>
@@ -231,6 +235,7 @@ function LayoutContent() {
       </LayoutContainer>
       {/* 플로팅 챗봇 - position: fixed로 전역에 표시 */}
       <FloatingChatbot />
+      <ScrollButton scrollContainerRef={scrollContainerRef}></ScrollButton>
     </>
   );
 }

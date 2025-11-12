@@ -8,34 +8,54 @@ import {
   fetchPostDetail,
   fetchPostComments,
   createComment,
-  togglePostLike,
+  likePost,
+  unlikePost,
 } from "../../services/postService";
 
+interface Author {
+  _id: string;
+  username: string;
+  accountname: string;
+  intro: string;
+  image: string;
+  isfollow: boolean;
+  following: [];
+  follower: [];
+  followerCount: number;
+  followingCount: number;
+}
+
 interface Post {
-  postId: string;
-  userName: string;
-  userId: string;
-  avatarSrc: string;
-  avatarAlt: string;
+  id: string;
   content: string;
-  imageSrc?: string;
-  imageAlt?: string;
-  dateTime: string;
-  dateText: string;
-  likeCount: number;
+  image?: string;
+  createdAt: string;
+  updatedAt: string;
+  hearted: boolean;
+  heartCount: number;
+  comments: [];
   commentCount: number;
-  isLiked: boolean;
+  author: Author;
+}
+
+interface CommentAuthor {
+  _id: string;
+  username: string;
+  accountname: string;
+  intro: string;
+  image: string;
+  isfollow: boolean;
+  following: [];
+  follower: [];
+  followerCount: number;
+  followingCount: number;
 }
 
 interface Comment {
-  commentId: string;
-  userName: string;
-  userId: string;
-  avatarSrc: string;
-  avatarAlt: string;
+  id: string;
   content: string;
-  dateTime: string;
-  dateText: string;
+  createdAt: string;
+  author: CommentAuthor;
 }
 
 function PostDetail() {
@@ -69,19 +89,35 @@ function PostDetail() {
     loadPostData();
   }, [postId]);
 
-  const handleCommentSubmit = async () => {
-    if (!commentText.trim() || !postId) return;
+  const handleCommentSubmit = async (
+    text: string,
+    refObj: React.RefObject<HTMLTextAreaElement | null>
+  ) => {
+    console.log("댓글 등록 시작", { text, postId }); // 추가
+    if (!text.trim() || !postId) return;
 
     try {
-      await createComment(postId, commentText);
-      // 댓글 목록 새로고침
-      const updatedComments = await fetchPostComments(postId);
-      setComments(updatedComments);
-      setCommentText("");
+      const newComment = await createComment(postId, text);
 
-      // 댓글 수 업데이트
-      if (post) {
-        setPost({ ...post, commentCount: post.commentCount + 1 });
+      // 성공 시 textarea 초기화
+      if (refObj.current) {
+        refObj.current.value = "";
+        refObj.current.style.height = "auto";
+      }
+
+      if (newComment) {
+        setComments((prev) => [newComment, ...prev]);
+        setCommentText("");
+
+        // 댓글 수 업데이트
+        if (post) {
+          setPost({ ...post, commentCount: post.commentCount + 1 });
+        }
+      } else {
+        // fallback: 목록 새로고침
+        const updatedComments = await fetchPostComments(postId);
+        setComments(updatedComments);
+        setCommentText("");
       }
     } catch (error) {
       console.error("댓글 등록 실패:", error);
@@ -97,12 +133,21 @@ function PostDetail() {
     // 낙관적 업데이트
     setPost({
       ...post,
-      isLiked: !post.isLiked,
-      likeCount: post.isLiked ? post.likeCount - 1 : post.likeCount + 1,
+      hearted: !post.hearted,
+      heartCount: post.hearted ? post.heartCount - 1 : post.heartCount + 1,
     });
 
     try {
-      await togglePostLike(postId, currentIsLiked);
+
+      // API 호출 및 응답으로 상태 업데이트
+      const updatedPost = post.hearted
+        ? await unlikePost(postId)
+        : await likePost(postId);
+
+      if (updatedPost) {
+        setPost(updatedPost);
+      }
+
     } catch (error) {
       console.error("좋아요 처리 실패:", error);
       // 실패 시 롤백
@@ -130,19 +175,18 @@ function PostDetail() {
     <PostDetailContainer>
       {/* 게시글 카드 */}
       <PostCard
-        postId={post.postId}
-        userName={post.userName}
-        userId={post.userId}
-        avatarSrc={post.avatarSrc}
-        avatarAlt={post.avatarAlt}
+        postId={post.id}
+        userName={post.author.username}
+        userId={post.author.accountname}
+        avatarSrc={post.author.image}
+        avatarAlt={`${post.author.username} 프로필`}
         content={post.content}
-        imageSrc={post.imageSrc}
-        imageAlt={post.imageAlt}
-        dateTime={post.dateTime}
-        dateText={post.dateText}
-        likeCount={post.likeCount}
+        imageSrc={post.image}
+        imageAlt={post.image ? "게시글 이미지" : undefined}
+        dateTime={post.createdAt}
+        likeCount={post.heartCount}
         commentCount={post.commentCount}
-        isLiked={post.isLiked}
+        isLiked={post.hearted}
         onLikeClick={handleLikeClick}
       />
 
@@ -150,15 +194,15 @@ function PostDetail() {
       <CommentsSection>
         {comments.map((comment) => (
           <CommentField
-            key={comment.commentId}
-            commentId={comment.commentId}
-            userName={comment.userName}
-            userId={comment.userId}
-            avatarSrc={comment.avatarSrc}
-            avatarAlt={comment.avatarAlt}
+            key={comment.id}
+            commentId={comment.id}
+            userName={comment.author.username}
+            userId={comment.author.accountname}
+            avatarSrc={comment.author.image}
+            avatarAlt={`${comment.author.username} 프로필`}
             content={comment.content}
-            dateTime={comment.dateTime}
-            dateText={comment.dateText}
+            dateTime={comment.createdAt}
+            dateText={comment.createdAt}
           />
         ))}
       </CommentsSection>
@@ -167,13 +211,15 @@ function PostDetail() {
       <TextField
         left={
           <img
+
             src="/img/empty-profile.png"
+
             alt="내 프로필"
             style={{
-              width: '36px',
-              height: '36px',
-              borderRadius: '50%',
-              objectFit: 'cover'
+              width: "36px",
+              height: "36px",
+              borderRadius: "50%",
+              objectFit: "cover",
             }}
           />
         }

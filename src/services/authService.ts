@@ -18,14 +18,13 @@ export interface AuthResponse {
 }
 
 export interface LoginResponse {
-  user: {
-    _id: string;
-    username: string;
-    email: string;
-    accountname: string;
-    intro: string;
-    image: string;
-  };
+  _id: string;
+  username: string;
+  email: string;
+  accountname: string;
+  intro: string;
+  image: string;
+  refreshToken: string;
   token: string;
 }
 
@@ -76,8 +75,7 @@ export const checkAccountIdDuplicate = async (
 };
 
 // 임시 기본 이미지
-const DEFAULT_PROFILE_IMG =
-  "https://dev.wenivops.co.kr/services/mandarin/Ellipse.png";
+const DEFAULT_PROFILE_IMG = "public/img/empty-profile.png";
 
 // 회원가입
 export const signup = async (
@@ -121,27 +119,36 @@ export const login = async (
   email: string,
   password: string
 ): Promise<LoginResponse> => {
-  const response = await fetch(`${BASE_URL}/user/login`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      user: {
-        email: email,
-        password: password,
+  try {
+    console.log("🔐 로그인 API 호출 시작");
+
+    const response = await fetch(`${BASE_URL}/user/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
-    }),
-  });
+      body: JSON.stringify({
+        user: {
+          email: email,
+          password: password,
+        },
+      }),
+    });
 
-  const data = await response.json();
-  console.log("로그인 응답:", data);
+    console.log("📡 응답 상태:", response.status);
 
-  if (!response.ok) {
-    throw new Error("로그인에 실패했습니다.");
+    const data = await response.json();
+    console.log("📦 로그인 응답:", data);
+
+    if (!response.ok) {
+      throw new Error("로그인에 실패했습니다.");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("❌ 로그인 에러:", error);
+    throw error;
   }
-
-  return data;
 };
 
 // 프로필 업데이트 (username, accountname 설정)
@@ -205,18 +212,18 @@ export const updateProfile = async (
 // };
 
 // 로그아웃
-export const logout = async (token: string): Promise<void> => {
-  try {
-    // 서버에 로그아웃 요청 (선택사항 - API 명세에 없으면 생략 가능)
-    // await fetch(`${BASE_URL}/user/logout`, {
-    //   method: "POST",
-    //   headers: {
-    //     Authorization: `Bearer ${token}`,
-    //   },
-    // });
-    // 로컬 토큰 삭제는 항상 실행
-  } catch (err) {
-    console.error("로그아웃 요청 오류:", err);
-    // 서버 요청 실패해도 로컬 토큰은 삭제
-  }
-};
+// export const logout = async (token: string): Promise<void> => {
+//   try {
+//     // 서버에 로그아웃 요청 (선택사항 - API 명세에 없으면 생략 가능)
+//     // await fetch(`${BASE_URL}/user/logout`, {
+//     //   method: "POST",
+//     //   headers: {
+//     //     Authorization: `Bearer ${token}`,
+//     //   },
+//     // });
+//     // 로컬 토큰 삭제는 항상 실행
+//   } catch (err) {
+//     console.error("로그아웃 요청 오류:", err);
+//     // 서버 요청 실패해도 로컬 토큰은 삭제
+//   }
+// };

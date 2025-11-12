@@ -1,9 +1,10 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import type { Feed } from "../types/feed";
 import { fetchFeed, toggleLike } from "../services/feedService";
+import { getToken } from "../utils/tokenManager";
 
 export const useFeedData = () => {
-  const [feedList, setFeedList] = useState<Feed[]>([]);
+  const [feedList, setFeedList] = useState<any[]>([]);
   const [page, setPage] = useState<number>(1);
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -16,34 +17,53 @@ export const useFeedData = () => {
 
   //  피드 데이터 로드
 
-  const loadFeed = useCallback(
-    async (pageNum: number, append: boolean = true) => {
-      if (isLoading) return;
+  const fetchPosts = async (token: string, limit?: number, skip?: number) => {
+    const query = new URLSearchParams();
+    if (limit) query.append("limit", limit.toString());
+    if (skip) query.append("skip", skip.toString());
 
-      setIsLoading(true);
+    const url = `https://dev.wenivops.co.kr/services/mandarin/post${
+      query.toString() ? `?${query}` : ""
+    }`;
+
+    const res = await fetch(url, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.message || "게시글 불러오기 실패");
+    }
+
+    return res.json(); // posts 배열 반환
+  };
+
+  useEffect(() => {
+    const token = getToken();
+    if (!token) return;
+
+    const load = async () => {
       try {
-        const newFeed = await fetchFeed(pageNum);
-
-        if (newFeed.length === 0) {
-          setHasMore(false);
-        } else {
-          setFeedList((prev) => {
-            if (!append) return newFeed;
-
-            const existingIds = new Set(prev.map((f) => f.id));
-            const uniqueFeed = newFeed.filter((f) => !existingIds.has(f.id));
-            return [...prev, ...uniqueFeed];
-          });
-        }
+        const data = await fetchPosts(token, 10, 0); // limit=10, skip=0
+        const datalist = data.posts;
+        const filtered = datalist.filter((ele: any) =>
+          ele.author.email.includes("pirate")
+        );
+        setFeedList(filtered);
       } catch (err) {
-        console.error("피드 로딩 실패:", err);
       } finally {
-        setIsLoading(false);
-        setIsInitialLoading(false);
+        setTimeout(() => {
+          setIsInitialLoading(false);
+        }, 1000);
       }
-    },
-    [isLoading]
-  );
+    };
+
+    load();
+  }, []);
 
   //  좋아요 토글 (낙관적 업데이트)
 
@@ -139,16 +159,16 @@ export const useFeedData = () => {
 
   //  페이지 변경 시 데이터 로드
 
-  useEffect(() => {
-    if (page === 1 && feedList.length > 0) return; // 초기 로드 또는 새로고침 제외
-    loadFeed(page);
-  }, [page]);
+  // useEffect(() => {
+  //   if (page === 1 && feedList.length > 0) return; // 초기 로드 또는 새로고침 제외
+  //   loadFeed(page);
+  // }, [page]);
 
   //  초기 로드
 
-  useEffect(() => {
-    loadFeed(1, false); // 초기엔 덮어쓰기
-  }, []); // 마운트 시 딱 한 번만 실행
+  // useEffect(() => {
+  //   loadFeed(1, false); // 초기엔 덮어쓰기
+  // }, []); // 마운트 시 딱 한 번만 실행
 
   return {
     feedList,

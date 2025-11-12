@@ -9,6 +9,8 @@ import {
   UserId,
 } from "./PostHeader.styled";
 import MoreMenu from "../common/modal/MoreMenu";
+import { formatPostDate } from "../../utils/formatter/dateFormatter";
+import { deletePost, EditPost } from "../../services/postService";
 
 // API 연동 준비 (추후 사용)
 // import { Author } from "../../types/post";
@@ -23,7 +25,7 @@ interface PostHeaderProps {
   variant?: "post" | "comment";
   dateTime?: string;
   dateText?: string;
-  // onMoreClick?: (postId: string) => void;
+  onDelete?: () => void;
 
   // API 연동 준비 (추후 사용)
   // author: Author;
@@ -35,10 +37,9 @@ function PostHeader({
   avatarSrc,
   avatarAlt,
   postId,
-
   variant = "post",
   dateTime,
-  dateText,
+  onDelete,
 }: PostHeaderProps) {
   const navigate = useNavigate();
   const [imgSrc, setImgSrc] = useState(avatarSrc);
@@ -53,8 +54,16 @@ function PostHeader({
     navigate(`/post/${postId}/edit`);
   };
 
-  const handleDeletePost = () => {
-    console.log("게시글 삭제:", postId);
+  const handleDeletePost = async () => {
+    try {
+      const result = await deletePost(postId);
+      if (result) {
+        console.log("삭제 성공");
+        window.location.reload(); // 새로고침
+      }
+    } catch (error) {
+      console.error("삭제 실패", error);
+    }
   };
 
   return (
@@ -72,7 +81,7 @@ function PostHeader({
         {variant === "comment" ? (
           <>
             <UserName>{userName}</UserName>
-            {dateTime && dateText && (
+            {dateTime && (
               <time
                 dateTime={dateTime}
                 style={{
@@ -81,7 +90,7 @@ function PostHeader({
                   marginLeft: "0.6rem",
                 }}
               >
-                {dateText}
+                {formatPostDate(dateTime)}
               </time>
             )}
           </>

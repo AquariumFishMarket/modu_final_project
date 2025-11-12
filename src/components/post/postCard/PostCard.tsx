@@ -7,9 +7,11 @@ import {
   PostActions,
   ActionButton,
   PostTime,
-  HeartLabel
+  HeartLabel,
 } from "./PostCard.styled";
 import PostHeader from "../PostHeader";
+import { formatPostDate } from "../../../utils/formatter/dateFormatter";
+import { useNavigate } from "react-router-dom";
 
 // API 연동 준비 (추후 사용)
 // import { Post } from "../../../types/post";
@@ -25,7 +27,6 @@ interface PostCardProps {
   imageSrc?: string;
   imageAlt?: string;
   dateTime: string;
-  dateText: string;
   likeCount: number;
   commentCount: number;
   isLiked: boolean;
@@ -49,23 +50,29 @@ function PostCard({
   imageSrc,
   imageAlt,
   dateTime,
-  dateText,
   likeCount,
   commentCount,
   isLiked,
   onLikeClick,
   onCommentClick,
 }: PostCardProps) {
-  const [liked, setLiked] = useState(isLiked);
-  const [likes, setLikes] = useState(likeCount);
-  const [postImageSrc, setPostImageSrc] = useState(imageSrc);
+  const navigate = useNavigate();
 
-  // 낙관적 업데이트
+  if (imageSrc) {
+  }
+
+  const cutImageSrc = imageSrc?.split("/") as string[];
+  const [postImageSrc, setPostImageSrc] = useState<string | undefined>(
+    cutImageSrc[1]
+  );
+
+  // 게시글 상세보기
+  const handleCardClick = () => {
+    navigate(`/post/${postId}`);
+  };
+
+  // 부모 컴포넌트에서 관리하는 상태 사용 -> 좋아요 버튼
   const handleLikeClick = () => {
-    const newLikedState = !liked;
-    setLiked(newLikedState);
-    setLikes(newLikedState ? likes + 1 : likes - 1);
-
     if (onLikeClick) {
       onLikeClick();
     }
@@ -100,12 +107,12 @@ function PostCard({
     // }
   };
 
-  const handlePostImageError = () => {
-    setPostImageSrc("/img/cook.png");
-  };
+  // const handlePostImageError = () => {
+  //   setPostImageSrc("/img/cook.png");
+  // };
 
   return (
-    <PostCardContainer>
+    <PostCardContainer key={postId}>
       {/* 게시자 정보 */}
       <PostHeader
         userName={userName}
@@ -120,13 +127,12 @@ function PostCard({
 
       {/* 게시글 내용 */}
       <PostContent>
-        <PostMain>
+        <PostMain onClick={handleCardClick}>
           {content && <figcaption>{content}</figcaption>}
           {postImageSrc && (
             <img
-              src={postImageSrc}
+              src={`https://dev.wenivops.co.kr/services/mandarin/${postImageSrc}`}
               alt={imageAlt || "게시글 이미지"}
-              onError={handlePostImageError}
             />
           )}
         </PostMain>
@@ -149,28 +155,35 @@ function PostCard({
             <ActionButton
               aria-label="좋아요"
               onClick={handleLikeClick}
-              className={liked ? "liked" : ""}
+              className={isLiked ? "liked" : ""}
             >
-            <HeartLabel
-            $liked={liked}
-            aria-label="좋아요">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-              </svg>
-            </HeartLabel>
-              <span style={{ position: 'relative', top: '-1px' }}>{likes}</span>
+              <HeartLabel $liked={isLiked} aria-label="좋아요">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                </svg>
+              </HeartLabel>
+              <span style={{ position: "relative", top: "-1px" }}>
+                {likeCount}
+              </span>
             </ActionButton>
             <ActionButton aria-label="댓글" onClick={handleCommentClick}>
               <img src="/img/icon-message.svg" alt="" />
-              <span style={{ position: 'relative', top: '-1px' }}>{commentCount}</span>
+              <span style={{ position: "relative", top: "-1px" }}>
+                {commentCount}
+              </span>
             </ActionButton>
           </PostActions>
-          <PostTime dateTime={dateTime}>{dateText}</PostTime>
-        </PostFooter>
 
-        {/* API 연동 준비 (추후 사용) */}
-        {/* 당일 게시글 xx분전, 올해의 게시글은 MM/DD, 작년이전이면 YY/MM/DD 이런식으로 인스타처럼 만들면 좋을것 같습니다. */}
-        {/* <PostTime dateTime={post.createdAt}>{formatDate(post.createdAt)}</PostTime> */}
+          {/* 전체 게시글에는 날짜가 없어서 일단 추가 */}
+          {dateTime && (
+            <PostTime dateTime={dateTime}>{formatPostDate(dateTime)}</PostTime>
+          )}
+        </PostFooter>
       </PostContent>
     </PostCardContainer>
   );
