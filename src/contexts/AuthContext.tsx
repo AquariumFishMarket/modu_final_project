@@ -1,3 +1,4 @@
+// 로그인 상태 관리용
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { getToken, saveToken, removeToken } from "../utils/tokenManager";
 
@@ -9,8 +10,6 @@ export interface AuthUser {
   email: string;
   image: string;
   intro: string;
-  followerCount: number;
-  followingCount: number;
 }
 
 // Context 타입 정의
@@ -61,6 +60,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       }
 
       const data = await response.json();
+      console.log("📦 myinfo 응답:", data);
+
       return data.user;
     } catch (error) {
       console.error("사용자 정보 가져오기 실패:", error);

@@ -18,14 +18,13 @@ export interface AuthResponse {
 }
 
 export interface LoginResponse {
-  user: {
-    _id: string;
-    username: string;
-    email: string;
-    accountname: string;
-    intro: string;
-    image: string;
-  };
+  _id: string;
+  username: string;
+  email: string;
+  accountname: string;
+  intro: string;
+  image: string;
+  refreshToken: string;
   token: string;
 }
 
@@ -120,27 +119,36 @@ export const login = async (
   email: string,
   password: string
 ): Promise<LoginResponse> => {
-  const response = await fetch(`${BASE_URL}/user/login`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      user: {
-        email: email,
-        password: password,
+  try {
+    console.log("🔐 로그인 API 호출 시작");
+
+    const response = await fetch(`${BASE_URL}/user/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
-    }),
-  });
+      body: JSON.stringify({
+        user: {
+          email: email,
+          password: password,
+        },
+      }),
+    });
 
-  const data = await response.json();
-  console.log("로그인 응답:", data);
+    console.log("📡 응답 상태:", response.status);
 
-  if (!response.ok) {
-    throw new Error("로그인에 실패했습니다.");
+    const data = await response.json();
+    console.log("📦 로그인 응답:", data);
+
+    if (!response.ok) {
+      throw new Error("로그인에 실패했습니다.");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("❌ 로그인 에러:", error);
+    throw error;
   }
-
-  return data;
 };
 
 // 프로필 업데이트 (username, accountname 설정)

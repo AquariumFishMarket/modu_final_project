@@ -7,9 +7,10 @@ import {
   PostActions,
   ActionButton,
   PostTime,
-  HeartLabel
+  HeartLabel,
 } from "./PostCard.styled";
 import PostHeader from "../PostHeader";
+import { formatPostDate } from "../../../utils/formatter/dateFormatter";
 
 // API 연동 준비 (추후 사용)
 // import { Post } from "../../../types/post";
@@ -25,7 +26,6 @@ interface PostCardProps {
   imageSrc?: string;
   imageAlt?: string;
   dateTime: string;
-  dateText: string;
   likeCount: number;
   commentCount: number;
   isLiked: boolean;
@@ -49,7 +49,6 @@ function PostCard({
   imageSrc,
   imageAlt,
   dateTime,
-  dateText,
   likeCount,
   commentCount,
   isLiked,
@@ -151,21 +150,26 @@ function PostCard({
               onClick={handleLikeClick}
               className={liked ? "liked" : ""}
             >
-            <HeartLabel
-            $liked={liked}
-            aria-label="좋아요">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-              </svg>
-            </HeartLabel>
-              <span style={{ position: 'relative', top: '-1px' }}>{likes}</span>
+              <HeartLabel $liked={liked} aria-label="좋아요">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                </svg>
+              </HeartLabel>
+              <span style={{ position: "relative", top: "-1px" }}>{likes}</span>
             </ActionButton>
             <ActionButton aria-label="댓글" onClick={handleCommentClick}>
               <img src="/img/icon-message.svg" alt="" />
-              <span style={{ position: 'relative', top: '-1px' }}>{commentCount}</span>
+              <span style={{ position: "relative", top: "-1px" }}>
+                {commentCount}
+              </span>
             </ActionButton>
           </PostActions>
-          <PostTime dateTime={dateTime}>{dateText}</PostTime>
+          <PostTime dateTime={dateTime}>{formatPostDate(dateTime)}</PostTime>
         </PostFooter>
 
         {/* API 연동 준비 (추후 사용) */}

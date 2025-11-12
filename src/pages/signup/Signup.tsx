@@ -128,36 +128,6 @@ export default function Signup() {
 
     setIsSubmitting(true);
 
-    // try {
-    //   // API 명세에 따라 회원가입 시 필요한 모든 필드를 전달
-    //   // 이메일과 비밀번호로 회원가입 후 로그인 페이지로 이동
-    //   // 첫 로그인 시 프로필 설정 페이지에서 username, accountname 등을 입력받음
-
-    //   // 임시로 username과 accountname을 이메일 기반으로 생성
-    //   // (실제로는 별도 프로필 설정 페이지에서 입력받아야 함)
-    //   const tempUsername = email.split("@")[0]; // 이메일 앞부분을 임시 username으로
-    //   const tempAccountname = email.split("@")[0] + Date.now(); // 중복 방지를 위해 timestamp 추가
-
-    //   await signup(
-    //     tempUsername,
-    //     email,
-    //     password,
-    //     tempAccountname,
-    //     "", // intro (선택사항)
-    //     "" // image (선택사항, 기본 이미지 사용)
-    //   );
-
-    //   setError(null);
-    //   alert("회원가입이 완료되었습니다.");
-    //   navigate("/login/email");
-    // } catch (err) {
-    //   setError(
-    //     err instanceof Error ? err.message : "회원가입에 실패했습니다."
-    //   );
-    // } finally {
-    //   setIsSubmitting(false);
-    // }
-
     try {
       console.log("1. 회원가입 시작");
       await signup(email, password);
