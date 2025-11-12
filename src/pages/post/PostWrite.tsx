@@ -6,6 +6,7 @@ import styled from "styled-components";
 import { motion } from "motion/react";
 import { useNavigate } from "react-router-dom";
 import { useHeader } from "../../contexts/HeaderContext";
+import { ToastContainer, toast } from "react-toastify";
 
 const PostContainer = styled.div`
   height: 100%;
@@ -61,14 +62,33 @@ export default function PostWrite() {
   const navigate = useNavigate();
   const { setHeaderConfig } = useHeader();
   const [imgArr, setImgArr] = useState<File[]>([]); //file 배열이 필요할 경우 넣어주세요
+  const [content, setContent] = useState("");
   const [deleteIndex, setDeleteIdx] = useState<number | undefined>();
-  const [textHeight, setTextHeight] = useState("");
   const [textPlaceholder, setTextPlaceholder] = useState("게시글 입력하기..");
 
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
 
   // 폼 유효성 검사 (텍스트가 있거나 이미지가 있으면 유효)
-  const isFormValid = textHeight.trim().length > 0 || imgArr.length > 0;
+  const isFormValid = content.trim().length > 0 || imgArr.length > 0;
+
+  //toast 알림
+  const notify = (msg:string) => toast(msg,{
+    position: "top-center",
+    autoClose: 3000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+    theme: "light",
+    style: {
+      justifyContent: "center",
+    },
+    onClose: () => {
+      //navigate('/')
+    }
+    });
+
 
   // 헤더 설정
   useEffect(() => {
@@ -94,17 +114,71 @@ export default function PostWrite() {
     const target = e.target;
     target.style.height = "auto";
     target.style.height = target.scrollHeight + "px";
-
-    setTextHeight(target.value);
+    setContent(e.target.value);
   };
 
-  const handleSubmit = () => {
-    //게시글 전송 메서드 (test)
-    console.log("게시글 작성 완료:");
-    console.log("텍스트:", textHeight);
-    console.log("이미지:", imgArr);
+  const handleSubmit = async () => {
+    try {
+      // 토큰 불러오기
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        alert("토큰이 없습니다. 로그인 해주세요.");
+        return;
+      }
 
-    navigate("/"); // post feed로 이동?
+      let uploadedImagePath = "";
+
+      // 이미지 업로드 (선택한 이미지가 있으면)
+      if (imgArr.length > 0) {
+        const formData = new FormData();
+        formData.append("image", imgArr[0]); // 첫 번째 이미지만 업로드 예시
+
+        const uploadRes = await fetch("https://dev.wenivops.co.kr/services/mandarin/image/uploadfiles", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+          body: formData,
+        });
+
+        const uploadData = await uploadRes.json();
+
+        if (uploadRes.ok && uploadData.info?.length > 0) {
+          uploadedImagePath = uploadData.info[0].path; // 서버에서 반환한 이미지 경로
+        } else {
+          alert("이미지 업로드 실패");
+          return;
+        }
+      }
+
+      // 게시글 작성
+      const postRes = await fetch("https://dev.wenivops.co.kr/services/mandarin/post", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          post: {
+            content: content,           // textarea state
+            image: uploadedImagePath,   // 업로드된 이미지 경로
+          },
+        }),
+      });
+
+      const postData = await postRes.json();
+
+      if (postRes.ok) {
+        console.log("게시글 작성 성공:", postData);
+        notify('게시글 작성이 완료됐어요! 😊');
+        setContent("");  // textarea 초기화
+        setImgArr([]);   // 이미지 초기화
+      } else {
+        notify('게시글 작성이 실패했어요 🥲');
+        console.log(postData.message || "게시글 작성 실패");
+      }
+    } catch (err) {
+      console.error(err);
+      notify("오류가 발생했습니다 🥲");
+    }
   };
 
   useEffect(() => {
@@ -121,6 +195,7 @@ export default function PostWrite() {
 
   return (
     <div style={{ height: "100%", overflow: "hidden" }}>
+      <ToastContainer />
       <motion.div
         initial={{ y: "100%", opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -148,7 +223,6 @@ export default function PostWrite() {
               <TextArea
                 ref={textAreaRef}
                 placeholder={textPlaceholder}
-                value={textHeight}
                 onChange={handleTextChange}
               />
             </WriteZone>
