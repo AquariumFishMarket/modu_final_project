@@ -1,4 +1,12 @@
 import { useState, useRef, useEffect } from "react";
+import { getAuthHeaders } from "../utils/auth";
+
+// API Base URL
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api";
+
+// ⚠️ API 연동 모드 설정 (true: 실제 API 사용, false: 더미 데이터 사용)
+const USE_API = false;
 
 export interface UserData {
   userName: string;
@@ -84,10 +92,10 @@ const DUMMY_USERS: UserData[] = [
 ];
 
 //  사용자 검색 커스텀 훅
-
+//
 // SearchPage에서 사용
 //  const { searchResults, isLoading, currentKeyword, handleInputChange, inputValue } = useSearch();
-
+//
 // Header에서 사용 (검색 입력만)
 //  const { handleInputChange, inputValue, isLoading } = useSearch();
 
@@ -135,55 +143,58 @@ export function useSearch() {
     abortControllerRef.current = controller;
 
     try {
-      // 실제 API 호출로 교체 (주석 해제 필요)
-      // const response = await fetch(
-      //   `${API_BASE_URL}/user/search?keyword=${encodeURIComponent(keyword)}`,
-      //   {
-      //     headers: { Authorization: `Bearer ${token}` },
-      //     signal: controller.signal,
-      //   }
-      // );
-      // if (!response.ok) throw new Error('검색 실패');
-      // const data = await response.json();
-      //
-      // // Race condition 방지: 최신 요청만 반영
-      // if (requestId !== searchIdRef.current) {
-      //   return null;
-      // }
-      //
-      // return data.users as UserData[];
-
-      // 임시: 더미 데이터로 필터링 (API 연동 전까지 사용)
-      if (!keyword || typeof keyword !== "string") {
-        return [];
-      }
-
-      const lowerKeyword = keyword.toLowerCase().trim();
-
-      const filteredUsers = DUMMY_USERS.filter((user) => {
-        const userName =
-          user.userName && typeof user.userName === "string"
-            ? user.userName.toLowerCase()
-            : "";
-        const userId =
-          user.userId && typeof user.userId === "string"
-            ? user.userId.toLowerCase()
-            : "";
-
-        return (
-          userName.includes(lowerKeyword) || userId.includes(lowerKeyword)
+      if (USE_API) {
+        // 실제 API 호출
+        const response = await fetch(
+          `${API_BASE_URL}/user/search?keyword=${encodeURIComponent(keyword)}`,
+          {
+            headers: getAuthHeaders(),
+            signal: controller.signal,
+          }
         );
-      });
 
-      // API 응답 시뮬레이션 (로딩 효과)
-      await new Promise((resolve) => setTimeout(resolve, 300));
+        if (!response.ok) throw new Error("검색 실패");
+        const data = await response.json();
 
-      // Race condition 방지: 최신 요청만 반영
-      if (requestId !== searchIdRef.current) {
-        return null;
+        // Race condition 방지: 최신 요청만 반영
+        if (requestId !== searchIdRef.current) {
+          return null;
+        }
+
+        return data.users as UserData[];
+      } else {
+        // 임시: 더미 데이터로 필터링 (API 연동 전까지 사용)
+        if (!keyword || typeof keyword !== "string") {
+          return [];
+        }
+
+        const lowerKeyword = keyword.toLowerCase().trim();
+
+        const filteredUsers = DUMMY_USERS.filter((user) => {
+          const userName =
+            user.userName && typeof user.userName === "string"
+              ? user.userName.toLowerCase()
+              : "";
+          const userId =
+            user.userId && typeof user.userId === "string"
+              ? user.userId.toLowerCase()
+              : "";
+
+          return (
+            userName.includes(lowerKeyword) || userId.includes(lowerKeyword)
+          );
+        });
+
+        // API 응답 시뮬레이션 (로딩 효과)
+        await new Promise((resolve) => setTimeout(resolve, 300));
+
+        // Race condition 방지: 최신 요청만 반영
+        if (requestId !== searchIdRef.current) {
+          return null;
+        }
+
+        return filteredUsers;
       }
-
-      return filteredUsers;
     } catch (error) {
       // AbortError는 정상적인 중단이므로 무시
       if (error instanceof Error && error.name === "AbortError") {
