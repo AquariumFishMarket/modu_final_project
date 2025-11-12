@@ -11,7 +11,6 @@ import {
   ChatUserContainer,
   AllyHiddenTitle,
 } from "./Header.styled";
-
 import DefaultButton from "../common/buttons/Button";
 import MoreMenu from "../common/modal/MoreMenu";
 

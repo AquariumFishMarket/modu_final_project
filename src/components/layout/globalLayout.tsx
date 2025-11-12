@@ -1,5 +1,6 @@
 import Header from "./Header";
 import FooterNav from "./FooterNav";
+import FloatingChatbot from "../chatbot/FloatingChatbot";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { HeaderProvider, useHeader } from "../../contexts/HeaderContext";
@@ -209,24 +210,28 @@ function LayoutContent() {
   const isPostDetailPage = location.pathname.match(/^\/post\/[^/]+$/);
 
   return (
-    <LayoutContainer $isProfile={isProfilePage}>
-      <Header />
-      <AnimatePresence mode="wait">
-        <MainContent
-          key={location.pathname}
-          $hasFooter={shouldShowNav()}
-          $isProfile={isProfilePage}
-          $isPostDetail={!!isPostDetailPage}
-          as={motion.main}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.26, ease: "easeOut" }}
-        >
-          <Outlet />
-        </MainContent>
-      </AnimatePresence>
-      {shouldShowNav() && <FooterNav />}
-    </LayoutContainer>
+    <>
+      <LayoutContainer $isProfile={isProfilePage}>
+        <Header />
+        <AnimatePresence mode="wait">
+          <MainContent
+            key={location.pathname}
+            $hasFooter={shouldShowNav()}
+            $isProfile={isProfilePage}
+            $isPostDetail={!!isPostDetailPage}
+            as={motion.main}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.26, ease: "easeOut" }}
+          >
+            <Outlet />
+          </MainContent>
+        </AnimatePresence>
+        {shouldShowNav() && <FooterNav />}
+      </LayoutContainer>
+      {/* 플로팅 챗봇 - position: fixed로 전역에 표시 */}
+      <FloatingChatbot />
+    </>
   );
 }
 
