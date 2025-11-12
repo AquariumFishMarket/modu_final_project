@@ -1,17 +1,16 @@
 import { FollowUser } from "../data/dummyFollowData";
+import { getAuthHeaders } from "../utils/auth";
 
 // API Base URL (환경변수로 관리)
-const API_BASE_URL = "http://localhost:3000/api"; // 실제 배포 시 환경변수로 변경
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api";
 
 // 팔로워 목록 조회
 
 export async function fetchFollowers(userId: string): Promise<FollowUser[]> {
   const res = await fetch(`${API_BASE_URL}/user/${userId}/followers`, {
     method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      // `Bearer ${token}`, // 인증 토큰 추가 필요
-    },
+    headers: getAuthHeaders(),
   });
 
   if (!res.ok) {
@@ -27,10 +26,7 @@ export async function fetchFollowers(userId: string): Promise<FollowUser[]> {
 export async function fetchFollowing(userId: string): Promise<FollowUser[]> {
   const res = await fetch(`${API_BASE_URL}/user/${userId}/following`, {
     method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      // `Bearer ${token}`, // 인증 토큰 추가 필요
-    },
+    headers: getAuthHeaders(),
   });
 
   if (!res.ok) {
@@ -52,10 +48,7 @@ export async function toggleFollow(
 
   const res = await fetch(`${API_BASE_URL}/user/${targetUserId}/${endpoint}`, {
     method,
-    headers: {
-      "Content-Type": "application/json",
-      // `Bearer ${token}`, // 인증 토큰 추가 필요
-    },
+    headers: getAuthHeaders(),
   });
 
   if (!res.ok) {
