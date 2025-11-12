@@ -1,42 +1,120 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PostCard from "../../components/post/postCard/PostCard";
 import CommentField from "../../components/post/comment/CommentField";
 import TextField from "../../components/common/TextField";
-import { dummyPosts } from "../../data/dummyPosts";
 import { PostDetailContainer, CommentsSection } from "./PostDetail.styled";
+import {
+  fetchPostDetail,
+  fetchPostComments,
+  createComment,
+  togglePostLike,
+} from "../../services/postService";
 
-// 더미 댓글 데이터
-const dummyComments = [
-  {
-    commentId: "comment-1",
-    userName: "니모아빠",
-    userId: "@sajawamoooo",
-    avatarSrc: "/img/empty-profile.png",
-    avatarAlt: "사자와 무슨농장 프로필",
-    content: "게시글 넘나 이쁘네요!!",
-    dateTime: "2024-10-21T13:00:00",
-    dateText: "3분 전",
-  },
-  {
-    commentId: "comment-2",
-    userName: "김수산",
-    userId: "@kim_fish",
-    avatarSrc: "/img/empty-profile.png",
-    avatarAlt: "김수산 프로필",
-    content: "인사해요.",
-    dateTime: "2024-10-21T12:30:00",
-    dateText: "10분 전",
-  },
-];
+interface Post {
+  postId: string;
+  userName: string;
+  userId: string;
+  avatarSrc: string;
+  avatarAlt: string;
+  content: string;
+  imageSrc?: string;
+  imageAlt?: string;
+  dateTime: string;
+  dateText: string;
+  likeCount: number;
+  commentCount: number;
+  isLiked: boolean;
+}
+
+interface Comment {
+  commentId: string;
+  userName: string;
+  userId: string;
+  avatarSrc: string;
+  avatarAlt: string;
+  content: string;
+  dateTime: string;
+  dateText: string;
+}
 
 function PostDetail() {
   const { postId } = useParams<{ postId: string }>();
   const navigate = useNavigate();
   const [commentText, setCommentText] = useState("");
+  const [post, setPost] = useState<Post | null>(null);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // postId로 게시글 찾기
-  const post = dummyPosts.find((p) => p.postId === postId);
+  // 게시글 및 댓글 데이터 불러오기
+  useEffect(() => {
+    const loadPostData = async () => {
+      if (!postId) return;
+
+      try {
+        setIsLoading(true);
+        const [postData, commentsData] = await Promise.all([
+          fetchPostDetail(postId),
+          fetchPostComments(postId),
+        ]);
+        setPost(postData);
+        setComments(commentsData);
+      } catch (error) {
+        console.error("게시글 데이터 로드 실패:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadPostData();
+  }, [postId]);
+
+  const handleCommentSubmit = async () => {
+    if (!commentText.trim() || !postId) return;
+
+    try {
+      await createComment(postId, commentText);
+      // 댓글 목록 새로고침
+      const updatedComments = await fetchPostComments(postId);
+      setComments(updatedComments);
+      setCommentText("");
+
+      // 댓글 수 업데이트
+      if (post) {
+        setPost({ ...post, commentCount: post.commentCount + 1 });
+      }
+    } catch (error) {
+      console.error("댓글 등록 실패:", error);
+    }
+  };
+
+  const handleLikeClick = async () => {
+    if (!postId || !post) return;
+
+    const prevPost = post;
+    // 낙관적 업데이트
+    setPost({
+      ...post,
+      isLiked: !post.isLiked,
+      likeCount: post.isLiked ? post.likeCount - 1 : post.likeCount + 1,
+    });
+
+    try {
+      await togglePostLike(postId);
+    } catch (error) {
+      console.error("좋아요 처리 실패:", error);
+      // 실패 시 롤백
+      setPost(prevPost);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <PostDetailContainer>
+        <p>로딩 중...</p>
+      </PostDetailContainer>
+    );
+  }
 
   if (!post) {
     return (
@@ -45,19 +123,6 @@ function PostDetail() {
       </PostDetailContainer>
     );
   }
-
-  const handleCommentSubmit = () => {
-    if (commentText.trim()) {
-      // API 연동 시 댓글 등록 로직 추가
-      console.log("댓글 등록:", commentText);
-      setCommentText("");
-    }
-  };
-
-  const handleLikeClick = () => {
-    // API 연동 시 좋아요 토글 로직 추가
-    console.log("좋아요 클릭");
-  };
 
   return (
     <PostDetailContainer>
@@ -81,7 +146,7 @@ function PostDetail() {
 
       {/* 댓글 섹션 */}
       <CommentsSection>
-        {dummyComments.map((comment) => (
+        {comments.map((comment) => (
           <CommentField
             key={comment.commentId}
             commentId={comment.commentId}

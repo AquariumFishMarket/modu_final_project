@@ -2,16 +2,12 @@ import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useHeader } from "../../contexts/HeaderContext";
 import FollowUserCard from "../../components/common/follow/FollowUserCard";
+import type { FollowUser } from "../../data/dummyFollowData";
 import {
-  dummyFollowers,
-  dummyFollowing,
-  type FollowUser,
-} from "../../data/dummyFollowData";
-// import {
-//   fetchFollowers,
-//   fetchFollowing,
-//   toggleFollow,
-// } from "../../services/followService";
+  fetchFollowers,
+  fetchFollowing,
+  toggleFollow,
+} from "../../services/followService";
 import { FollowListContainer, EmptyState } from "./follow.styled";
 
 // 팔로우 목록 페이지
@@ -25,8 +21,8 @@ function Follow() {
 
   const { setHeaderConfig } = useHeader();
   const [users, setUsers] = useState<FollowUser[]>([]);
-  // const [isLoading, setIsLoading] = useState(false); // API 연동 시 사용
-  // const [error, setError] = useState<string | null>(null); // API 연동 시 사용
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // 헤더 설정
   useEffect(() => {
@@ -59,28 +55,24 @@ function Follow() {
 
     const isFollowers = type === "followers";
 
-    // 더미 데이터 사용
-    setUsers(isFollowers ? dummyFollowers : dummyFollowing);
+    const loadFollowList = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const data = isFollowers
+          ? await fetchFollowers(userId)
+          : await fetchFollowing(userId);
+        setUsers(data);
+      } catch (err) {
+        console.error("팔로우 목록 로드 실패:", err);
+        setError("목록을 불러오는데 실패했습니다.");
+        setUsers([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-    // API 연동 시
-    // const loadFollowList = async () => {
-    //   setIsLoading(true);
-    //   setError(null);
-    //   try {
-    //     const data = isFollowers
-    //       ? await fetchFollowers(userId)
-    //       : await fetchFollowing(userId);
-    //     setUsers(data);
-    //   } catch (err) {
-    //     console.error("팔로우 목록 로드 실패:", err);
-    //     setError("목록을 불러오는데 실패했습니다.");
-    //     setUsers([]);
-    //   } finally {
-    //     setIsLoading(false);
-    //   }
-    // };
-    //
-    // loadFollowList();
+    loadFollowList();
   }, [type, userId]);
 
   const handleFollowToggle = useCallback(
@@ -88,8 +80,8 @@ function Follow() {
       const target = users.find((u) => u.userId === targetUserId);
       if (!target) return;
 
-      // 롤백용 복사본 (API 연동 시 사용)
-      // const prevUsers = [...users];
+      // 롤백용 복사본
+      const prevUsers = [...users];
 
       // 낙관적 업데이트
       setUsers((prev) =>
@@ -98,19 +90,13 @@ function Follow() {
         )
       );
 
-      // 더미 데이터 사용 시에는 여기서 종료
-      // API 연동 시 아래 주석 해제
-      /*
       try {
         await toggleFollow(targetUserId, target.isFollowing);
       } catch (err) {
         console.error("팔로우 처리 실패:", err);
         // 실패 시 롤백
         setUsers(prevUsers);
-        // 에러 토스트 표시 등 추가 가능
-        // showErrorToast("팔로우 처리에 실패했습니다.");
       }
-      */
     },
     [users]
   );
