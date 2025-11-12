@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const Toast = () => {
-  const { message, show, hideToast } = useToastStore();
+  const { message } = useToastStore();
 
   useEffect(() => {
     if (message) {

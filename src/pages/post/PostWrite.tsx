@@ -74,22 +74,16 @@ export default function PostWrite() {
 
   //toast 알림
   const { setToast } = useToastStore();
-  // const notify = (msg:string) => toast(msg,{
-  //   position: "top-center",
-  //   autoClose: 3000,
-  //   hideProgressBar: false,
-  //   closeOnClick: true,
-  //   pauseOnHover: true,
-  //   draggable: true,
-  //   progress: undefined,
-  //   theme: "light",
-  //   style: {
-  //     justifyContent: "center",
-  //   },
-  //   onClose: () => {
-  //     //navigate('/')
-  //   }
-  //   });
+  const notify = (msg:string) => toast(msg,{
+    position: "top-center",
+    autoClose: 3000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+    theme: "light",
+    });
 
 
   // 헤더 설정
@@ -170,7 +164,6 @@ export default function PostWrite() {
 
       if (postRes.ok) {
         console.log("게시글 작성 성공:", postData);
-        //notify('게시글 작성이 완료됐어요! 😊');
         setToast('게시글 작성이 완료됐어요! 😊')
         setContent("");  // textarea 초기화
         setImgArr([]);   // 이미지 초기화
@@ -179,12 +172,12 @@ export default function PostWrite() {
         }
         navigate('/feed')
       } else {
-        //notify('게시글 작성이 실패했어요 🥲');
+        notify('게시글 작성이 실패했어요 🥲');
         console.log(postData.message || "게시글 작성 실패");
       }
     } catch (err) {
       console.error(err);
-      //notify("오류가 발생했습니다 🥲");
+      notify("오류가 발생했습니다 🥲");
     }
   };
 
