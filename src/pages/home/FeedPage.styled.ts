@@ -19,8 +19,6 @@ export const FeedSection = styled.section`
   width: calc(100% + 3rem);
   margin-inline: -1.5rem;
   background-color: #ffffff;
-
-  // scroll btn
   height: 100vh;
   overflow-y: auto;
 `;
@@ -42,4 +40,37 @@ export const EndMessageText = styled.p`
 export const InitialLoadingSection = styled.section`
   text-align: center;
   margin-top: 22rem;
+`;
+
+export const RefreshSpinnerWrapper = styled.div<{ $visible: boolean }>`
+  height: ${(props) => (props.$visible ? "8rem" : "0")};
+  opacity: ${(props) => (props.$visible ? 1 : 0)};
+  overflow: hidden;
+  transition: height 0.3s ease, opacity 0.3s ease;
+`;
+
+export const RefreshSpinner = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 8rem;
+  img {
+    width: 4rem;
+    height: 4rem;
+    animation: wiggle 1.2s ease-in-out infinite;
+    transform-origin: center;
+  }
+
+  @keyframes wiggle {
+    0%,
+    100% {
+      transform: rotate(0deg);
+    }
+    25% {
+      transform: rotate(6deg);
+    }
+    75% {
+      transform: rotate(-6deg);
+    }
+  }
 `;

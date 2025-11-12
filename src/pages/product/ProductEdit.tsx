@@ -4,7 +4,10 @@ import { FormSubmissionData } from "../../components/common/form/types";
 import { useHeader } from "../../contexts/HeaderContext";
 import { useEffect, useRef, useState } from "react";
 import { Product } from "../../types/product";
-import { getProductById } from "../../data/mockProducts";
+import {
+  fetchProductDetail,
+  updateProduct,
+} from "../../services/productService";
 import {
   getProductFields,
   formatPrice,
@@ -22,16 +25,20 @@ export default function ProductEdit() {
 
   // 기존 상품 데이터 불러오기
   useEffect(() => {
-    if (id) {
-      const foundProduct = getProductById(id);
-      if (foundProduct) {
-        setProduct(foundProduct);
-      } else {
+    const loadProduct = async () => {
+      if (!id) return;
+
+      try {
+        const productData = await fetchProductDetail(id);
+        setProduct(productData);
+      } catch (error) {
+        console.error("상품 정보 로드 실패:", error);
         // 상품을 찾을 수 없으면 상품 상세 페이지로 이동
         navigate(`/product/${id}`);
-        return;
       }
-    }
+    };
+
+    loadProduct();
   }, [id, navigate]);
 
   // 헤더 설정
@@ -60,15 +67,25 @@ export default function ProductEdit() {
   };
 
   // 폼 제출 핸들러
-  const handleSubmit = (data: FormSubmissionData) => {
-    console.log("상품 수정 완료:", data);
-    console.log("상품명:", data.formValues.productname);
-    console.log("가격:", data.formValues.price);
-    console.log("설명:", data.formValues.description);
-    console.log("링크:", data.formValues.link);
-    console.log("이미지 파일들:", data.imageFiles);
+  const handleSubmit = async (data: FormSubmissionData) => {
+    if (!id) return;
 
-    navigate(`/product/${id}`);
+    try {
+      const updatedProductData = {
+        itemName: data.formValues.productname,
+        price: parseInt(data.formValues.price.replace(/,/g, "")),
+        link: data.formValues.link,
+        description: data.formValues.description,
+        // TODO: 이미지 파일 업로드 처리
+        // itemImage: data.imageFiles
+      };
+
+      await updateProduct(id, updatedProductData);
+      navigate(`/product/${id}`);
+    } catch (error) {
+      console.error("상품 수정 실패:", error);
+      alert("상품 수정에 실패했습니다. 다시 시도해주세요.");
+    }
   };
 
   // 기존 데이터를 폼 초기값으로 변환

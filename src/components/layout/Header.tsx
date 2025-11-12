@@ -11,7 +11,6 @@ import {
   ChatUserContainer,
   AllyHiddenTitle,
 } from "./Header.styled";
-
 import DefaultButton from "../common/buttons/Button";
 import MoreMenu from "../common/modal/MoreMenu";
 
@@ -171,6 +170,7 @@ function Header() {
             width={90}
             height="medium"
             disabled={!config.inputState}
+            type={"button"}
             onClick={config.onButtonClick}
           />
         </Section>
@@ -207,7 +207,7 @@ function Header() {
             <IconButton onClick={config.onBackClick}>
               <img src="/img/icon-arrow-left.svg" alt="이전 페이지로 이동" />
             </IconButton>
-            <h2>{config.userName}</h2>
+            <h2 style={{ position: 'relative', top: '-1px' }}>{config.userName}</h2>
           </ChatUserContainer>
           <MoreMenu
             type="chatList"

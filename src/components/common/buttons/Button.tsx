@@ -7,6 +7,7 @@ interface DefaultButtonProps {
   disabled?: boolean;
   onClick?: () => void;
   href?: string;
+  type?: "submit" | "reset" | "button";
   variant?: "primary" | "secondary" | "white";
 }
 
@@ -63,6 +64,7 @@ export default function DefaultButton({
   disabled,
   onClick,
   href,
+  type,
   variant = "primary",
 }: DefaultButtonProps) {
   if (href) {
@@ -78,6 +80,7 @@ export default function DefaultButton({
         height={height}
         disabled={disabled}
         onClick={onClick}
+        type={type}
         variant={variant}
       >
         {text}
