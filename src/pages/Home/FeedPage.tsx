@@ -39,76 +39,76 @@ const FeedPage = () => {
   const isRefreshingRef = useRef(false);
 
   // 모바일: 터치로 새로고침
-  useEffect(() => {
-    const container = scrollContainerRef.current;
-    if (!container) return;
+  // useEffect(() => {
+  //   const container = scrollContainerRef.current;
+  //   if (!container) return;
 
-    const handleTouchStart = (e: TouchEvent) => {
-      if (container.scrollTop === 0) {
-        startY.current = e.touches[0].clientY;
-      } else {
-        startY.current = null;
-      }
-    };
+  //   const handleTouchStart = (e: TouchEvent) => {
+  //     if (container.scrollTop === 0) {
+  //       startY.current = e.touches[0].clientY;
+  //     } else {
+  //       startY.current = null;
+  //     }
+  //   };
 
-    const handleTouchMove = (e: TouchEvent) => {
-      if (startY.current === null) return;
-      const distance = e.touches[0].clientY - startY.current;
-      if (distance > 80 && !isRefreshingRef.current) {
-        isRefreshingRef.current = true;
-        triggerRefresh().finally(() => {
-          isRefreshingRef.current = false;
-        });
-      }
-    };
+  //   const handleTouchMove = (e: TouchEvent) => {
+  //     if (startY.current === null) return;
+  //     const distance = e.touches[0].clientY - startY.current;
+  //     if (distance > 80 && !isRefreshingRef.current) {
+  //       isRefreshingRef.current = true;
+  //       triggerRefresh().finally(() => {
+  //         isRefreshingRef.current = false;
+  //       });
+  //     }
+  //   };
 
-    container.addEventListener("touchstart", handleTouchStart);
-    container.addEventListener("touchmove", handleTouchMove);
+  //   container.addEventListener("touchstart", handleTouchStart);
+  //   container.addEventListener("touchmove", handleTouchMove);
 
-    return () => {
-      container.removeEventListener("touchstart", handleTouchStart);
-      container.removeEventListener("touchmove", handleTouchMove);
-    };
-  }, [feedList.length, triggerRefresh]);
+  //   return () => {
+  //     container.removeEventListener("touchstart", handleTouchStart);
+  //     container.removeEventListener("touchmove", handleTouchMove);
+  //   };
+  // }, [feedList.length, triggerRefresh]);
 
   // 데스크톱: 마우스 드래그로 새로고침
-  useEffect(() => {
-    const container = scrollContainerRef.current;
-    if (!container) return;
+  // useEffect(() => {
+  //   const container = scrollContainerRef.current;
+  //   if (!container) return;
 
-    let startY = 0;
-    let isDragging = false;
+  //   let startY = 0;
+  //   let isDragging = false;
 
-    const handlePointerDown = (e: PointerEvent) => {
-      if (container.scrollTop === 0) {
-        startY = e.clientY;
-        isDragging = true;
-      }
-    };
+  //   const handlePointerDown = (e: PointerEvent) => {
+  //     if (container.scrollTop === 0) {
+  //       startY = e.clientY;
+  //       isDragging = true;
+  //     }
+  //   };
 
-    const handlePointerMove = (e: PointerEvent) => {
-      if (!isDragging) return;
-      const distance = e.clientY - startY;
-      if (distance > 80 && !isRefreshing) {
-        isDragging = false;
-        triggerRefresh();
-      }
-    };
+  //   const handlePointerMove = (e: PointerEvent) => {
+  //     if (!isDragging) return;
+  //     const distance = e.clientY - startY;
+  //     if (distance > 80 && !isRefreshing) {
+  //       isDragging = false;
+  //       triggerRefresh();
+  //     }
+  //   };
 
-    const handlePointerUp = () => {
-      isDragging = false;
-    };
+  //   const handlePointerUp = () => {
+  //     isDragging = false;
+  //   };
 
-    container.addEventListener("pointerdown", handlePointerDown);
-    container.addEventListener("pointermove", handlePointerMove);
-    container.addEventListener("pointerup", handlePointerUp);
+  //   container.addEventListener("pointerdown", handlePointerDown);
+  //   container.addEventListener("pointermove", handlePointerMove);
+  //   container.addEventListener("pointerup", handlePointerUp);
 
-    return () => {
-      container.removeEventListener("pointerdown", handlePointerDown);
-      container.removeEventListener("pointermove", handlePointerMove);
-      container.removeEventListener("pointerup", handlePointerUp);
-    };
-  }, [feedList.length, isRefreshing, triggerRefresh]);
+  //   return () => {
+  //     container.removeEventListener("pointerdown", handlePointerDown);
+  //     container.removeEventListener("pointermove", handlePointerMove);
+  //     container.removeEventListener("pointerup", handlePointerUp);
+  //   };
+  // }, [feedList.length, isRefreshing, triggerRefresh]);
 
   // 페이지 애니메이션
   const pageVariants = {
@@ -171,7 +171,7 @@ const FeedPage = () => {
       <Toast></Toast>
       <FeedSection
         as="div"
-        ref={scrollContainerRef}
+
         style={{
           overflowY: isRefreshing ? "hidden" : "auto",
           pointerEvents: isRefreshing ? "none" : "auto",
@@ -215,7 +215,7 @@ const FeedPage = () => {
         )}
       </FeedSection>
 
-      <ScrollButton scrollContainerRef={scrollContainerRef} />
+
     </motion.div>
   );
 };
