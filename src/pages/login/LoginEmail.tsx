@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import AuthForm from "../../components/common/auth/AuthForm";
 import styled from "styled-components";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { login } from "../../services/authService";
+import { saveToken } from "../../utils/tokenManager";
 
 const LoginTitle = styled.h2`
   text-align: center;
@@ -21,9 +23,35 @@ const SignupLink = styled(Link)`
 `;
 
 export default function LoginEmail() {
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
+  const navigate = useNavigate();
+  const [error, setError] = useState<string>("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (
+    e: React.FormEvent<HTMLFormElement>
+  ): Promise<void> => {
     e.preventDefault();
     console.log("폼 제출:", e);
+    setError("");
+
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+
+    setIsSubmitting(true);
+
+    try {
+      const result = await login(email, password);
+
+      if (result.token) {
+        saveToken(result.token);
+        navigate("/");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "로그인에 실패합니다.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleButtonClick = (): void => {
@@ -49,12 +77,21 @@ export default function LoginEmail() {
   return (
     <>
       <LoginTitle>로그인</LoginTitle>
+
+      {error && (
+        <div style={{ color: "red", textAlign: "center", marginTop: "10px" }}>
+          {error}
+        </div>
+      )}
+
       <AuthForm
         fields={loginFields}
-        buttonText="로그인"
+        buttonText={isSubmitting ? "로그인 중..." : "로그인"}
         onSubmit={handleSubmit}
         onButtonClick={handleButtonClick}
+        disabled={isSubmitting}
       />
+
       <SignupLink to="/signup">이메일로 회원가입</SignupLink>
     </>
   );

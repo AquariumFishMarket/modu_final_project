@@ -5,8 +5,10 @@ import TextField from "../../components/common/TextField";
 import ImageUpButton from "../../components/common/imageUpload/UploadButton";
 import ImageContainer from "../../components/common/imageUpload/ImageContainer";
 import DefaultButton from "../../components/common/buttons/Button";
+import { mockResponsesByRoom } from "./mockChatData";
 
 import styled from "styled-components";
+import { pusher } from "../../App";
 
 const ChatContainer = styled.section`
   position: relative;
@@ -82,50 +84,84 @@ const Background = styled.div`
   background-color: rgba(0, 0, 0, 0.2);
   z-index: 100;
 `;
+const ChatNotice = styled.div`
+  width: fit-content;
+  margin: 0 auto;
+  font-size: var(--font-size-md);
+  background-color: #eeeeee;
+  padding: 10px 40px;
+  border-radius: 500px;
+`
 
-interface ChatMessage {
+export interface ChatMessage {
   id: string;
   userId: string;
   username: string;
   content: string;
   type: "text" | "image" | "system";
   timestamp: number;
+  isRead?: boolean;
 }
 
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzzPfbfdpUEbR5QPIfDS0Z8Yl5a_keypTw-HvCnK1CnUYOUbd2f4wdhkglQxMXsZvTDAA/exec";
+
+
 export default function ChatRoom() {
-  //채팅 방 번호
-  const { roomId } = useParams();
-  //소켓 저장
-  const socketRef = useRef<WebSocket | null>(null);
-  // 이미지 파일 저장 공간
+  const { roomId } = useParams<{ roomId: string }>();
   const [imgArr, setImgArr] = useState<File[]>([]);
-  // 텍스트 메시지 저장 공간
   const [deleteIndex, setDeleteIdx] = useState<number | undefined>();
   const [imgModalState, setImgModalState] = useState<boolean>(false);
-
-  //soket공간
-  const [message, setMessage] = useState<ChatMessage[]>([]);
-  // useEffect(()=>{
-  //     socketRef.current = new WebSocket("ws://example.com/websocket");
-
-  //     socketRef.current.onopen = () => console.log("연결됨");
-  //     socketRef.current.onmessage = (event) => {
-  //         // const newMessage = JSON.parse(event.data);
-  //         // setMessages((prev) => [...prev, newMessage])
-  //     }
-  //     socketRef.current.onerror = (err) => console.error("오류:", err);
-  //     socketRef.current.onclose = () => console.log("연결 종료");
-
-  //     // 컴포넌트 언마운트 시 연결 종료
-  //     return () => socketRef.current.close();
-  // },[])
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const messageRef = useRef<ChatMessage[]>([])
+  const scenarioRef = useRef<number>(0)
 
   useEffect(() => {
+    const channel = pusher.subscribe(`chat-${roomId}`);
+
+    channel.bind('message', (data: ChatMessage) => {
+      setMessages(prev => [...prev, data]);
+    });
+
+    return () => {
+      pusher.unsubscribe(`chat-${roomId}`);
+    };
+  }, [roomId]);
+
+  useEffect(()=>{
+    messageRef.current = messages;
+  }, [messages])
+
+  const handleIncommingMessage = (incoming:ChatMessage) => {
+    const updated = messageRef.current.map(msg =>
+      msg.userId === "me" ? { ...msg, isRead: true } : msg
+    );
+    setMessages([...updated, incoming])
+  }
+
+  // 답장 목 데이터 불러오는 함수
+  const sendMockResponse = (roomId: string, scenario:number, index = 0) => {
+    const messagesForRoom = mockResponsesByRoom[roomId][scenario];
+    if(mockResponsesByRoom[roomId].length == scenario) return;
+
+    messagesForRoom.forEach((ele,i)=> {
+      setTimeout(()=>{
+        setMessages(prev => [...prev, ele])
+        const incoming = ele;
+        handleIncommingMessage(incoming)
+      }, i * 1200 + 1000)
+    })
+
+    scenarioRef.current += 1;
+
+  };
+
+  // 이미지 삭제 처리
+  useEffect(() => {
     setImgArr((prev) => prev.filter((_, i) => i !== deleteIndex));
-    //초기화
     setDeleteIdx(undefined);
   }, [deleteIndex]);
 
+  // 이미지 모달 상태
   useEffect(() => {
     if (imgArr.length > 0) {
       setImgModalState(true);
@@ -136,21 +172,30 @@ export default function ChatRoom() {
 
   //이미지 전송 함수
   const handleSubmitImage = () => {
-    //이미지 파일 전송 코드 삽입 위치
-    // if(imgArr.length > 0) {
-    //     const imageMessages = imgArr.map((img)=>({
-    //         type: "image",
-    //         fileName: img.name,
-    //         timestamp: new Date().toISOString()
-    //     }))
-    //     socketRef.current?.send(JSON.stringify(imageMessages))
-    //     socketRef.current?.onmessage = (event) => {
-    //         const data = JSON.parse(event.data);
-    //         if (data.type === "ack") {
-    //             handleClose(); // 전송 성공 시에만 닫기
-    //         }
-    //     };
-    // }
+    if (imgArr.length === 0) return;
+
+    const newMessages = imgArr.map(img => ({
+      id: (Date.now() + Math.random()).toString(),
+      userId: "me",
+      username: "나",
+      type: "image",
+      content: URL.createObjectURL(img),
+      timestamp: Date.now(),
+      isRead: false,
+    }));
+
+    // 로컬 state에 추가
+    setMessages(prev => [...prev, ...newMessages as ChatMessage[]]);
+    handleClose();
+
+    // Apps Script 호출 (Pusher로 브로드캐스트)
+    newMessages.forEach(msg => {
+      fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ roomId, message: msg }),
+      }).catch(err => console.error("이미지 전송 실패", err));
+    });
   };
 
   //텍스트 전송 함수
@@ -158,12 +203,30 @@ export default function ChatRoom() {
     text: string,
     refObj: React.RefObject<HTMLTextAreaElement | null>
   ) => {
-    //text 자료 전송 코드 삽입 위치
-    console.log(text);
-    //전송 후 입력필드 초기화 함수
-    if (refObj.current) {
-      refObj.current.value = "";
-    }
+    if (!text.trim()) return;
+
+    const newMessage: ChatMessage = {
+      id: Date.now().toString(),
+      userId: "me",
+      username: "나",
+      content: text,
+      type: "text",
+      timestamp: Date.now(),
+      isRead: false,
+    };
+
+    setMessages(prev => [...prev, newMessage]);
+
+    if (refObj.current) refObj.current.value = "";
+
+    fetch(APPS_SCRIPT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ roomId, message: newMessage }),
+    }).catch(err => console.error("텍스트 전송 실패", err));
+
+    if(!roomId) return;
+    sendMockResponse(roomId,scenarioRef.current)
   };
 
   const handleClose = () => {
@@ -171,50 +234,41 @@ export default function ChatRoom() {
     setImgArr([]);
   };
 
+  if(!roomId) return;
+  const chatUsername = mockResponsesByRoom[roomId][0][0].username
+
   return (
     <>
       <ChatContainer>
         <h2 className="sr-only">ooo님의 채팅룸</h2>
-        <YourChat>
-          <ProfileImg thumbimg={false} width={42} />
-          <YourChatMessage>
-            <p>
-              어쩌구저쩌구...어쩌구저쩌구.. 어쩌구저쩌구...어쩌구저쩌구..
-              어쩌구저쩌구...어쩌구저쩌구.. 어쩌구저쩌구...어쩌구저쩌구..
-              어쩌구저쩌구...어쩌구저쩌구..
-            </p>
-          </YourChatMessage>
-          <YourTime>
-            <p>12:20</p>
-          </YourTime>
-        </YourChat>
-        <YourChat>
-          <ProfileImg thumbimg={false} width={42} />
-          <YourChatMessage>
-            <p>잉어킹 갸라도스</p>
-          </YourChatMessage>
-          <YourTime>
-            <p>12:23</p>
-          </YourTime>
-        </YourChat>
-        <YourChat>
-          <ProfileImg thumbimg={false} width={42} />
-          <YourChatMessage>
-            <img src="/img/fishking.png" alt="" />
-          </YourChatMessage>
-          <YourTime>
-            <p>12:24</p>
-          </YourTime>
-        </YourChat>
-        <MyChat>
-          <MyTime>
-            <p style={{ marginBottom: "4px" }}>안읽음</p>
-            <p>12:40</p>
-          </MyTime>
-          <MyChatMessage>
-            <p>말씀하시라고요</p>
-          </MyChatMessage>
-        </MyChat>
+        {messages.length == 0 && (
+          <ChatNotice>{chatUsername}님과 대화를 시작해볼까요? 😎</ChatNotice>
+        )}
+        {messages.map(msg => (
+          msg.userId === "me" ? (
+            <MyChat key={msg.id}>
+              <MyTime>
+                {!msg.isRead &&
+                <p style={{ marginBottom: "4px" }}>안읽음</p>
+                }
+                <p>{new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+              </MyTime>
+              <MyChatMessage>
+                {msg.type === "text" ? <p>{msg.content}</p> : <img src={msg.content} alt="" style={{ maxWidth: '100%' }} />}
+              </MyChatMessage>
+            </MyChat>
+          ) : (
+            <YourChat key={msg.id}>
+              <ProfileImg thumbimg={false} width={42} />
+              <YourChatMessage>
+                {msg.type === "text" ? <p>{msg.content}</p> : <img src={msg.content} style={{ maxWidth: '100%' }} />}
+              </YourChatMessage>
+              <YourTime>
+                <p>{new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+              </YourTime>
+            </YourChat>
+          )
+        ))}
       </ChatContainer>
 
       {imgModalState && (

@@ -24,7 +24,6 @@ import {
 } from "./Profile.styled";
 
 import DefaultButton from "../../components/common/buttons/Button";
-
 import SellingProducts from "./components/SellingProducts";
 import type { UserProfile } from "../../types/user";
 import PostCard from "../../components/post/postCard/PostCard";

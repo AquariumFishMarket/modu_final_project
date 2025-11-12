@@ -48,7 +48,6 @@ export const UserTextInfo = styled.div`
 
 export const UserName = styled.h2`
   font-size: var(--font-size-md);
-  font-family: "font-medium", "sans-serif";
   color: var(--color-black);
 `;
 

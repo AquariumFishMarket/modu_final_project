@@ -33,12 +33,9 @@ export const SectionCombine = styled.section`
 
 export const Title = styled.h2`
   font-size: var(--font-size-xl);
-  font-family: "font-medium", "sans-serif";
 `;
 
-export const SubTitle = styled.h2`
-  font-family: "font-medium", "sans-serif";
-`;
+export const SubTitle = styled.h2``;
 
 export const AllyHiddenTitle = styled.h2`
   position: absolute;
@@ -56,6 +53,7 @@ export const IconButton = styled.button`
   margin-inline: 0.1rem;
   border: none;
   background: #fff;
+  height: 22px;
 `;
 
 export const SearchForm = styled.form`

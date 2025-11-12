@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import BottomSheet, { SheetItem } from "./BottomSheet";
 import AlertModal from "./AlertModal";
+import { removeToken } from "../../../utils/tokenManager";
+import { useNavigate } from "react-router-dom";
 
 interface MoreMenuProps {
   type: "profile" | "post" | "comment" | "chat" | "chatList" | "product";
@@ -62,10 +64,11 @@ export default function MoreMenu({
   onDelete,
   onReport,
   onLeave,
-  onLogout,
+  onLogout: onLogoutProp,
   onSettings,
   onMarkAsSold,
 }: MoreMenuProps) {
+  const navigate = useNavigate();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [alertType, setAlertType] = useState<
     "delete" | "logout" | "sold" | null
@@ -97,6 +100,20 @@ export default function MoreMenu({
     closeSheet();
     setAlertType("sold");
     console.log("판매완료?");
+  };
+
+  // 실제 로그아웃 처리 함수
+  const performLogout = () => {
+    console.log("로그아웃 실행");
+
+    // 1. 토큰 삭제
+    removeToken();
+
+    // 2. 부모 컴포넌트의 onLogout 콜백 실행 (있으면)
+    onLogoutProp?.();
+
+    // 3. 로그인 페이지로 이동 (replace: true로 뒤로가기 방지)
+    navigate("/login/email", { replace: true });
   };
 
   return (
@@ -221,7 +238,7 @@ export default function MoreMenu({
         type={alertType}
         onConfirm={{
           delete: onDelete,
-          logout: onLogout,
+          logout: performLogout,
           sold: onMarkAsSold,
         }}
       />
