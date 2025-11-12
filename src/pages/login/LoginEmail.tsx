@@ -4,6 +4,7 @@ import styled from "styled-components";
 import { Link, useNavigate } from "react-router-dom";
 import { login } from "../../services/authService";
 import { saveToken } from "../../utils/tokenManager";
+import { useAuth } from "../../contexts/AuthContext";
 
 const LoginTitle = styled.h2`
   text-align: center;
@@ -24,6 +25,7 @@ const SignupLink = styled(Link)`
 
 export default function LoginEmail() {
   const navigate = useNavigate();
+  const { login: authLogin } = useAuth(); // AuthContext의 login 함수
   const [error, setError] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -43,8 +45,19 @@ export default function LoginEmail() {
     try {
       const result = await login(email, password);
 
-      if (result.token) {
-        saveToken(result.token);
+      if (result.token && result.user) {
+        // ✅ AuthContext에 로그인 정보 저장
+        authLogin(result.token, {
+          _id: result.user._id,
+          username: result.user.username,
+          accountname: result.user.accountname,
+          email: result.user.email,
+          image: result.user.image,
+          intro: result.user.intro,
+          followerCount: 0, // API 응답에 없으면 0으로 설정
+          followingCount: 0,
+        });
+
         navigate("/");
       }
     } catch (err) {

@@ -1,14 +1,17 @@
 import { BrowserRouter } from "react-router-dom";
 import RootRoute from "./rootRoute";
 import { SearchProvider } from "./contexts/SearchContext";
+import { AuthProvider } from "./contexts/AuthContext";
 
 function App() {
   return (
-    <BrowserRouter>
-      <SearchProvider>
-        <RootRoute />
-      </SearchProvider>
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <SearchProvider>
+          <RootRoute />
+        </SearchProvider>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 

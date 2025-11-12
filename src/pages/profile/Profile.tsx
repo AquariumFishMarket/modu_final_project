@@ -30,6 +30,8 @@ import PostCard from "../../components/post/postCard/PostCard";
 import PostStateBar from "../../components/post/PostStateBar";
 import PostGallery from "./components/PostGallery";
 import { dummyPosts, type Post } from "../../data/dummyPosts";
+import { getToken } from "../../utils/tokenManager";
+import { useAuth } from "../../contexts/AuthContext";
 
 //  Profile 컴포넌트
 //  - 내 프로필과 다른 유저의 프로필을 조건부 렌더링
@@ -44,28 +46,36 @@ import { dummyPosts, type Post } from "../../data/dummyPosts";
 function Profile() {
   const navigate = useNavigate();
   const { setHeaderConfig } = useHeader();
+  const { currentUser, isLoading: isAuthLoading } = useAuth();
 
   // URL 파라미터에서 userId 가져오기 (동적 라우팅 대비)
-  const { userId: paramUserId } = useParams<{ userId?: string }>();
+  const { accountname: paramAccountname } = useParams<{
+    accountname?: string;
+  }>();
 
-  // 실제 로그인된 사용자 ID는 Context API 또는 Redux에서 가져오기
-  // 임시: 더미 사용자 ID 설정
-  const [currentUserId] = useState<string>("my_user_id");
+  // 현재 로그인한 사용자의 accountname
+  const currentUserAccountname = currentUser?.accountname || "";
 
   // URL 파라미터가 있으면 해당 유저, 없으면 내 프로필
-  const targetUserId = paramUserId || currentUserId;
+  const targetAccountname = paramAccountname || currentUserAccountname;
+
+  // 내 프로필인지 다른 사람 프로필인지 구분
+  const isMyProfile = targetAccountname === currentUserAccountname;
 
   // 프로필 데이터 상태 관리
-  const [profileData, setProfileData] = useState<UserProfile>({
-    id: "my_user_id", // 임시: 내 프로필로 표시되도록 currentUserId와 동일하게 설정
-    userName: "물고기마켓",
-    userId: "@fishmarket",
-    profileImage: "/img/fish_profile.svg",
-    description: "안녕하세요! 물고기마켓입니다.",
-    followerCount: 128,
-    followingCount: 52,
-    isFollowing: false,
-  });
+  // const [profileData, setProfileData] = useState<UserProfile>({
+  //   _id: "my_user_id", // 임시: 내 프로필로 표시되도록 currentUserId와 동일하게 설정
+  //   username: "물고기마켓",
+  //   accountname: "@fishmarket",
+  //   image: "/img/fish_profile.svg",
+  //   intro: "안녕하세요! 물고기마켓입니다.",
+  //   followerCount: 128,
+  //   followingCount: 52,
+  //   isFollowing: false,
+  // });
+
+  // 프로필 데이터 상태 관리
+  const [profileData, setProfileData] = useState<UserProfile | null>(null);
 
   // 로딩 상태
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -76,73 +86,103 @@ function Profile() {
   // 포스트 상태 관리 (리스트 / 갤러리)
   const [postState, setPostState] = useState<"list" | "gallery">("list");
 
-  // 내 프로필인지 다른 사람 프로필인지 구분
-  const isMyProfile = profileData.id && profileData.id === currentUserId;
-
   // 팔로우 처리 중 상태 (중복 클릭 방지)
   const [isFollowLoading, setIsFollowLoading] = useState(false);
 
-  //  API: 프로필 데이터 가져오기
-  //  API 연동 시 주석 해제
+  //  ✅ 프로필 데이터 가져오기
+  const fetchProfileData = async (
+    accountname?: string
+  ): Promise<UserProfile | null> => {
+    try {
+      const token = getToken(); // 토큰 가져오기
+      let url = "https://dev.wenivops.co.kr/services/mandarin/user/myinfo";
+      const headers: Record<string, string> = {
+        Authorization: `Bearer ${token}`,
+      };
 
-  // const fetchProfileData = async (
-  //   accountname: string
-  // ): Promise<UserProfile | null> => {
-  //   try {
-  //     if (!accountname || accountname.trim() === "") {
-  //       throw new Error("유효하지 않은 사용자 ID입니다");
-  //     }
-  //
-  //     const response = await fetch(`/api/profile/${accountname}`);
-  //     if (!response.ok) throw new Error('프로필을 불러올 수 없습니다');
-  //     const data = await response.json();
-  //     return data;
-  //   } catch (error) {
-  //     console.error("프로필 데이터 가져오기 실패:", error);
-  //     return null;
-  //   }
-  // };
+      if (accountname && accountname !== currentUserAccountname) {
+        url = `https://dev.wenivops.co.kr/services/mandarin/profile/${accountname}`;
+        headers["Content-type"] = "application/json";
+      }
 
-  //  API: 사용자 게시글 피드 가져오기
-  //  API 연동 시 주석 해제
+      const response = await fetch(url, {
+        method: "GET",
+        headers,
+      });
 
-  // const fetchUserPosts = async (
-  //   userId: string
-  // ): Promise<Post[] | null> => {
-  //   try {
-  //     const response = await fetch(`/api/users/${userId}/posts`);
-  //     if (!response.ok) throw new Error('게시글 데이터 가져오기 실패');
-  //     const data = await response.json();
-  //     return data;
-  //   } catch (error) {
-  //     console.error("게시글 데이터 가져오기 실패:", error);
-  //     return null;
-  //   }
-  // };
+      if (!response.ok) throw new Error("프로필을 불러올 수 없습니다");
+
+      const data = await response.json();
+
+      // 다른 유저 프로필은 data.profile로 반환됨
+      // 내 프로필은 data.user
+      return accountname && accountname !== currentUserAccountname
+        ? data.profile
+        : data.user;
+    } catch (error) {
+      console.error("프로필 데이터 가져오기 실패:", error);
+      return null;
+    }
+  };
+
+  // ✅ 사용자 게시글 피드 가져오기
+  const fetchUserPosts = async (
+    accountname: string
+  ): Promise<Post[] | null> => {
+    try {
+      const token = getToken();
+      const limit = 1000;
+
+      const response = await fetch(
+        `https://dev.wenivops.co.kr/services/mandarin/post/${accountname}/userpost?limit=${limit}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) throw new Error("내 게시글 데이터 가져오기 실패");
+      const data = await response.json();
+      console.log("게시글 응답 전체:", data);
+      console.log(`${accountname}의 게시글 목록:`, data.post);
+
+      return Array.isArray(data.post) ? data.post : [];
+    } catch (error) {
+      console.error("게시글 데이터 가져오기 실패:", error);
+      return null;
+    }
+  };
 
   // API: 팔로우/언팔로우 처리 (낙관적 업데이트)
   //  API 연동 시 주석 해제된 부분 활성화
 
   const handleFollowToggle = async (): Promise<void> => {
-    if (isFollowLoading) return;
+    if (isFollowLoading || !profileData) return;
 
     const previousData = profileData;
-    const newFollowState = !profileData.isFollowing;
+    const newFollowState = !profileData.isfollow;
 
     // 낙관적 업데이트
-    setProfileData((prev) => ({
-      ...prev,
-      isFollowing: newFollowState,
-      followerCount: Math.max(
-        0,
-        newFollowState ? prev.followerCount + 1 : prev.followerCount - 1
-      ),
-    }));
+    setProfileData((prev) =>
+      prev
+        ? {
+            ...prev,
+            isfollow: newFollowState,
+            followerCount: Math.max(
+              0,
+              newFollowState ? prev.followerCount + 1 : prev.followerCount - 1
+            ),
+          }
+        : null
+    );
 
     setIsFollowLoading(true);
     try {
       // API 연동 시 주석 해제
-      // const response = await fetch(`/api/users/${profileData.id}/follow`, {
+      // const response = await fetch(`/api/users/${profileData.accountname}/follow`, {
       //   method: newFollowState ? 'POST' : 'DELETE',
       // });
       // if (!response.ok) throw new Error('팔로우 처리 실패');
@@ -163,12 +203,18 @@ function Profile() {
 
   // 팔로워 목록 클릭 핸들러
   const handleFollowerClick = (): void => {
-    navigate(`/profile/${encodeURIComponent(profileData.userId)}/followers`);
+    if (!profileData) return;
+    navigate(
+      `/profile/${encodeURIComponent(profileData.accountname)}/followers`
+    );
   };
 
   // 팔로잉 목록 클릭 핸들러
   const handleFollowingClick = (): void => {
-    navigate(`/profile/${encodeURIComponent(profileData.userId)}/following`);
+    if (!profileData) return;
+    navigate(
+      `/profile/${encodeURIComponent(profileData.accountname)}/following`
+    );
   };
 
   // 이미지 로드 에러 핸들러
@@ -226,12 +272,12 @@ function Profile() {
   // Web Share API 또는 클립보드 복사 기능 구현
 
   // const handleShareClick = async (): Promise<void> => {
-  //   const profileUrl = `${window.location.origin}/profile/${profileData.userId}`;
+  //   const profileUrl = `${window.location.origin}/profile/${profileData.accountname}`;
   //   try {
   //     if (navigator.share) {
   //       await navigator.share({
-  //         title: `${profileData.userName}의 프로필`,
-  //         text: profileData.description,
+  //         title: `${profileData.username}의 프로필`,
+  //         text: profileData.intro,
   //         url: profileUrl,
   //       });
   //     } else {
@@ -254,36 +300,84 @@ function Profile() {
       onBackClick: () => navigate(-1),
     });
 
-    // const loadProfileAndPosts = async (): Promise<void> => {
-    //   setIsLoading(true);
-    //   try {
-    //     // 1. 프로필 데이터 로드
-    //     const profileData = await fetchProfileData(targetUserId);
-    //     if (profileData) {
-    //       setProfileData(profileData);
-    //
-    //       // 2. 게시글 피드 로드
-    //       const posts = await fetchUserPosts(profileData.id);
-    //       if (posts) {
-    //         setUserPosts(posts);
-    //       }
-    //     }
-    //   } catch (error) {
-    //     console.error("데이터 로드 실패:", error);
-    //   } finally {
-    //     setIsLoading(false);
-    //   }
-    // };
-    //
-    // loadProfileAndPosts();
+    const loadProfileAndPosts = async (): Promise<void> => {
+      // AuthContext 로딩이 완료될 때까지 대기
+      if (isAuthLoading) return;
+
+      // 로그인하지 않은 경우
+      if (!currentUser) {
+        navigate("/login");
+        return;
+      }
+
+      setIsLoading(true);
+      try {
+        let profileToLoad;
+
+        // 내 프로필인 경우 currentUser 사용
+        if (isMyProfile) {
+          console.log("👤 내 프로필 데이터 설정");
+          profileToLoad = {
+            _id: currentUser._id,
+            username: currentUser.username,
+            accountname: currentUser.accountname,
+            email: currentUser.email,
+            image: currentUser.image,
+            intro: currentUser.intro,
+            followerCount: currentUser.followerCount,
+            followingCount: currentUser.followingCount,
+            isfollow: false, // 내 프로필은 팔로우 상태 없음
+          };
+        } else {
+          console.log("👥 다른 사용자 프로필 로드");
+          const fetchedProfile = await fetchProfileData(targetAccountname);
+          if (!fetchedProfile) {
+            throw new Error("프로필을 불러올 수 없습니다");
+          }
+          profileToLoad = fetchedProfile;
+        }
+
+        setProfileData(profileToLoad);
+
+        // 게시글 로드 (공통)
+        console.log("📝 게시글 로드 시작");
+        const posts = await fetchUserPosts(profileToLoad.accountname);
+        if (posts) {
+          setUserPosts(posts);
+        }
+      } catch (error) {
+        console.error("데이터 로드 실패:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadProfileAndPosts();
 
     // 임시: API 연동 전까지 더미 데이터 사용
-    setUserPosts(dummyPosts);
-    setIsLoading(false);
-  }, [targetUserId, setHeaderConfig, navigate]);
+    // setUserPosts(dummyPosts);
+    // setIsLoading(false);
+  }, [
+    targetAccountname,
+    currentUserAccountname,
+    currentUser,
+    isAuthLoading,
+    isMyProfile,
+    setHeaderConfig,
+    navigate,
+  ]);
+
+  // AuthContext 로딩 중일 때
+  if (isAuthLoading) {
+    return (
+      <ProfileSection>
+        <LoadingText>인증 확인 중...</LoadingText>
+      </ProfileSection>
+    );
+  }
 
   // 로딩 중일 때
-  if (isLoading) {
+  if (isLoading || !profileData) {
     return (
       <ProfileSection>
         <LoadingText>로딩 중...</LoadingText>
@@ -307,8 +401,8 @@ function Profile() {
             {/* 프로필 이미지 */}
             <ProfileImageBox>
               <ProfileImage
-                src={profileData.profileImage}
-                alt={`${profileData.userName}의 프로필 이미지`}
+                src={profileData.image}
+                alt={`${profileData.username}의 프로필 이미지`}
                 onError={handleImageError}
               />
             </ProfileImageBox>
@@ -322,13 +416,13 @@ function Profile() {
 
           {/* 유저 정보 (이름 + 아이디) */}
           <UserInfoBox>
-            <UserName>{profileData.userName}</UserName>
-            <UserId>{profileData.userId}</UserId>
+            <UserName>{profileData.username}</UserName>
+            <UserId>{profileData.accountname}</UserId>
           </UserInfoBox>
         </ProfileContainer>
 
         {/* 사용자 소개 */}
-        <UserDescription>{profileData.description}</UserDescription>
+        <UserDescription>{profileData.intro}</UserDescription>
 
         {/* 액션 버튼들 - 내 프로필 vs 다른 사람 프로필에 따라 다르게 렌더링 */}
         <ActionButtonsContainer>
@@ -363,9 +457,9 @@ function Profile() {
 
               {/* 팔로우/팔로잉 버튼 */}
               <DefaultButton
-                text={profileData.isFollowing ? "팔로잉" : "팔로우"}
+                text={profileData.isfollow ? "팔로잉" : "팔로우"}
                 height="medium"
-                variant={profileData.isFollowing ? "secondary" : "primary"}
+                variant={profileData.isfollow ? "secondary" : "primary"}
                 width={120}
                 onClick={handleFollowToggle}
               />
@@ -399,10 +493,10 @@ function Profile() {
                   <PostCard
                     key={post.postId}
                     postId={post.postId}
-                    userName={profileData.userName}
-                    userId={profileData.userId}
-                    avatarSrc={profileData.profileImage}
-                    avatarAlt={`${profileData.userName}의 프로필 이미지`}
+                    userName={profileData.username}
+                    userId={profileData.accountname}
+                    avatarSrc={profileData.image}
+                    avatarAlt={`${profileData.username}의 프로필 이미지`}
                     content={post.content}
                     imageSrc={post.imageSrc}
                     imageAlt={post.imageAlt}

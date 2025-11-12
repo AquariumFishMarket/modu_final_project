@@ -76,8 +76,7 @@ export const checkAccountIdDuplicate = async (
 };
 
 // 임시 기본 이미지
-const DEFAULT_PROFILE_IMG =
-  "https://dev.wenivops.co.kr/services/mandarin/Ellipse.png";
+const DEFAULT_PROFILE_IMG = "public/img/empty-profile.png";
 
 // 회원가입
 export const signup = async (
@@ -205,18 +204,18 @@ export const updateProfile = async (
 // };
 
 // 로그아웃
-export const logout = async (token: string): Promise<void> => {
-  try {
-    // 서버에 로그아웃 요청 (선택사항 - API 명세에 없으면 생략 가능)
-    // await fetch(`${BASE_URL}/user/logout`, {
-    //   method: "POST",
-    //   headers: {
-    //     Authorization: `Bearer ${token}`,
-    //   },
-    // });
-    // 로컬 토큰 삭제는 항상 실행
-  } catch (err) {
-    console.error("로그아웃 요청 오류:", err);
-    // 서버 요청 실패해도 로컬 토큰은 삭제
-  }
-};
+// export const logout = async (token: string): Promise<void> => {
+//   try {
+//     // 서버에 로그아웃 요청 (선택사항 - API 명세에 없으면 생략 가능)
+//     // await fetch(`${BASE_URL}/user/logout`, {
+//     //   method: "POST",
+//     //   headers: {
+//     //     Authorization: `Bearer ${token}`,
+//     //   },
+//     // });
+//     // 로컬 토큰 삭제는 항상 실행
+//   } catch (err) {
+//     console.error("로그아웃 요청 오류:", err);
+//     // 서버 요청 실패해도 로컬 토큰은 삭제
+//   }
+// };
