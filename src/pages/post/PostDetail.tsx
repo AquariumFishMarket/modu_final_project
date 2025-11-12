@@ -128,6 +128,8 @@ function PostDetail() {
     if (!postId || !post) return;
 
     const prevPost = post;
+    const currentIsLiked = post.isLiked;
+
     // 낙관적 업데이트
     setPost({
       ...post,
@@ -136,6 +138,7 @@ function PostDetail() {
     });
 
     try {
+
       // API 호출 및 응답으로 상태 업데이트
       const updatedPost = post.hearted
         ? await unlikePost(postId)
@@ -144,6 +147,7 @@ function PostDetail() {
       if (updatedPost) {
         setPost(updatedPost);
       }
+
     } catch (error) {
       console.error("좋아요 처리 실패:", error);
       // 실패 시 롤백
@@ -207,7 +211,9 @@ function PostDetail() {
       <TextField
         left={
           <img
-            src="/img/empty-profile.png" // TODO: API 연동 시 현재 로그인한 사용자 프로필 이미지로 변경
+
+            src="/img/empty-profile.png"
+
             alt="내 프로필"
             style={{
               width: "36px",

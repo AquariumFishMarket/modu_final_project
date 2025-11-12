@@ -70,6 +70,8 @@ export const useFeedData = () => {
   const handleLikeToggle = useCallback(
     async (feedId: string): Promise<void> => {
       const previousFeedList = feedList;
+      const targetFeed = feedList.find((feed) => feed.id === feedId);
+      if (!targetFeed) return;
 
       // 낙관적 업데이트
       setFeedList((prev) =>
@@ -87,7 +89,7 @@ export const useFeedData = () => {
       );
 
       try {
-        await toggleLike(feedId);
+        await toggleLike(feedId, targetFeed.isLiked);
       } catch (error) {
         console.error("좋아요 토글 실패:", error);
         // 실패 시 롤백
