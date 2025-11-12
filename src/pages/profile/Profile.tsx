@@ -32,8 +32,8 @@ import PostGallery from "./components/PostGallery";
 import { dummyPosts, type Post } from "../../data/dummyPosts";
 import { getToken } from "../../utils/tokenManager";
 import { useAuth } from "../../contexts/AuthContext";
-import { useUserPostsData } from "../../hooks/useUserPostsData";
-import type { Feed } from "../../types/feed";
+// import { useUserPostsData } from "../../hooks/useUserPostsData";
+// import type { Feed } from "../../types/feed";
 
 //  Profile 컴포넌트
 //  - 내 프로필과 다른 유저의 프로필을 조건부 렌더링
@@ -472,82 +472,82 @@ function Profile() {
       <SellingProducts isLastSection={postsList.length === 0} />
 
       {/* 게시글 로딩 중 */}
-      {isPostsInitialLoading && (
+      {/* {isPostsInitialLoading && (
         <MyFeedSection>
           <LoadingText>게시글 불러오는 중...</LoadingText>
         </MyFeedSection>
-      )}
+      )} */}
 
       {/* 게시글이 있을 때만 포스트 상태바와 피드 섹션 표시 */}
-      {!isPostsInitialLoading && postsList.length > 0 && (
-        <>
-          <PostStateBar postState={postState} setPostState={setPostState} />
+      {/* {!isPostsInitialLoading && postsList.length > 0 && ( */}
+      <>
+        <PostStateBar postState={postState} setPostState={setPostState} />
 
-          {/* 피드 섹션 - 모든 프로필에서 표시 */}
-          <MyFeedSection ref={scrollContainerRef}>
-            {postState === "list" ? (
-              <PostListContainer>
-                {postsList.map((post) => (
-                  <PostCard
-                    key={post.postId}
-                    postId={post.postId}
-                    userName={profileData.username}
-                    userId={profileData.accountname}
-                    avatarSrc={profileData.image}
-                    avatarAlt={`${profileData.username}의 프로필 이미지`}
-                    content={post.content}
-                    imageSrc={post.image}
-                    imageAlt="게시글 이미지"
-                    dateTime={post.createdAt}
-                    dateText={post.createdAt}
-                    likeCount={post.likeCount}
-                    commentCount={post.commentCount}
-                    isLiked={post.isLiked}
-                    onLikeClick={() => handlePostLikeToggle(post.id)}
-                    onCommentClick={() => navigate(`/post/${post.id}`)}
-                  />
-                ))}
+        {/* 피드 섹션 - 모든 프로필에서 표시 */}
+        <MyFeedSection>
+          {postState === "list" ? (
+            <PostListContainer>
+              {postsList.map((post) => (
+                <PostCard
+                  key={post.postId}
+                  postId={post.postId}
+                  userName={profileData.username}
+                  userId={profileData.accountname}
+                  avatarSrc={profileData.image}
+                  avatarAlt={`${profileData.username}의 프로필 이미지`}
+                  content={post.content}
+                  imageSrc={post.image}
+                  imageAlt="게시글 이미지"
+                  dateTime={post.createdAt}
+                  dateText={post.createdAt}
+                  likeCount={post.likeCount}
+                  commentCount={post.commentCount}
+                  isLiked={post.isLiked}
+                  onLikeClick={() => handlePostLikeToggle(post.id)}
+                  onCommentClick={() => navigate(`/post/${post.id}`)}
+                />
+              ))}
 
-                {/* IntersectionObserver 트리거 */}
-                <div ref={loadMoreTriggerRef} style={{ height: "1px" }} />
+              {/* IntersectionObserver 트리거 */}
+              {/* <div ref={loadMoreTriggerRef} style={{ height: "1px" }} />
 
                 {isPostsLoading && <LoadingText>불러오는 중...</LoadingText>}
                 {!hasMore && postsList.length > 0 && (
                   <LoadingText>더 이상 게시글이 없습니다.</LoadingText>
-                )}
-              </PostListContainer>
-            ) : (
-              <PostGallery
-                posts={postsList.map((post) => ({
-                  postId: post.id,
-                  userName: post.userName,
-                  userId: post.userId,
-                  avatarSrc: post.profileImg,
-                  avatarAlt: `${post.userName}의 프로필 이미지`,
-                  content: post.content,
-                  imageSrc: post.image,
-                  imageAlt: "게시글 이미지",
-                  dateTime: post.createdAt,
-                  dateText: post.createdAt,
-                  likeCount: post.likeCount,
-                  commentCount: post.commentCount,
-                  isLiked: post.isLiked,
-                }))}
-                onPostClick={(postId) => {
-                  navigate(`/post/${postId}`);
-                }}
-              />
-            )}
-          </MyFeedSection>
-        </>
-      )}
+                )} */}
+            </PostListContainer>
+          ) : (
+            <PostGallery
+              posts={postsList.map((post) => ({
+                postId: post.id,
+                userName: post.userName,
+                userId: post.userId,
+                avatarSrc: post.profileImg,
+                avatarAlt: `${post.userName}의 프로필 이미지`,
+                content: post.content,
+                imageSrc: post.image,
+                imageAlt: "게시글 이미지",
+                dateTime: post.createdAt,
+                dateText: post.createdAt,
+                likeCount: post.likeCount,
+                commentCount: post.commentCount,
+                isLiked: post.isLiked,
+              }))}
+              onPostClick={(postId) => {
+                navigate(`/post/${postId}`);
+              }}
+            />
+          )}
+        </MyFeedSection>
+      </>
+      {/* )} */}
 
       {/* 게시글이 없을 때 빈 상태 메시지 표시 */}
-      {!isPostsInitialLoading && postsList.length === 0 && (
-        <MyFeedSection>
-          <EmptyPostMessage>게시글이 없습니다.</EmptyPostMessage>
-        </MyFeedSection>
-      )}
+      {/* {!isPostsInitialLoading && postsList.length === 0 && ( */}
+      <MyFeedSection>
+        <EmptyPostMessage>게시글이 없습니다.</EmptyPostMessage>
+      </MyFeedSection>
+      {/* )} */}
     </>
   );
 }
