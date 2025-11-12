@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { useHeader } from "../../contexts/HeaderContext";
 import { ToastContainer, toast } from "react-toastify";
 
-const PostContainer = styled.div`
+const PostContainer = styled.section`
   height: 100%;
   margin: 0 auto;
 `;
@@ -171,6 +171,9 @@ export default function PostWrite() {
         notify('게시글 작성이 완료됐어요! 😊');
         setContent("");  // textarea 초기화
         setImgArr([]);   // 이미지 초기화
+        if (textAreaRef.current) {
+          textAreaRef.current.value = '';
+        }
       } else {
         notify('게시글 작성이 실패했어요 🥲');
         console.log(postData.message || "게시글 작성 실패");
@@ -204,6 +207,7 @@ export default function PostWrite() {
         style={{ height: "100%" }}
       >
         <PostContainer>
+          <h2 className="sr-only">게시물 업로드</h2>
           <ImageUploadContainer>
             <ImageUpButtonContainer>
               <ImageUpButton
@@ -222,6 +226,7 @@ export default function PostWrite() {
             <WriteZone>
               <TextArea
                 ref={textAreaRef}
+                id={'post-upload'}
                 placeholder={textPlaceholder}
                 onChange={handleTextChange}
               />
