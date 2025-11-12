@@ -1,5 +1,6 @@
 import React from "react";
 import styled from "styled-components";
+import { useState, useEffect } from "react";
 
 const ScrollBtnContainer = styled.div`
   position: fixed;
@@ -28,12 +29,26 @@ interface ScrollToTopButtonProps {
 export default function ScrollButton({
   scrollContainerRef,
 }: ScrollToTopButtonProps) {
+  const [showButton, setShowButton] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      setShowButton(scrollY > 100); // 100px 이상일 때 버튼 표시
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll); // 클린업
+  }, []);
+
   const handleUpClick = () => {
     //console.log("Top 버튼 클릭");
     scrollContainerRef.current?.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
+    <>
+    {showButton && (
     <ScrollBtnContainer>
       <TopButton onClick={handleUpClick} aria-label="맨 위로">
         {/* 위쪽 화살표 SVG */}
@@ -48,5 +63,7 @@ export default function ScrollButton({
         </svg>
       </TopButton>
     </ScrollBtnContainer>
+    )}
+    </>
   );
 }
