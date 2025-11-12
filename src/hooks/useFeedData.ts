@@ -14,9 +14,8 @@ export const useFeedData = () => {
   const observerRef = useRef<IntersectionObserver | null>(null);
   const loadMoreTriggerRef = useRef<HTMLDivElement>(null);
 
-  /**
-   * 피드 데이터 로드
-   */
+  //  피드 데이터 로드
+
   const loadFeed = useCallback(
     async (pageNum: number, append: boolean = true) => {
       if (isLoading) return;
@@ -46,9 +45,8 @@ export const useFeedData = () => {
     [isLoading]
   );
 
-  /**
-   * 좋아요 토글 (낙관적 업데이트)
-   */
+  //  좋아요 토글 (낙관적 업데이트)
+
   const handleLikeToggle = useCallback(
     async (feedId: string): Promise<void> => {
       const previousFeedList = feedList;
@@ -79,9 +77,8 @@ export const useFeedData = () => {
     [feedList]
   );
 
-  /**
-   * 새로고침
-   */
+  //  새로고침
+
   const triggerRefresh = useCallback(async () => {
     setIsRefreshing(true);
     try {
@@ -92,26 +89,31 @@ export const useFeedData = () => {
     } catch (error) {
       console.error("새로고침 실패:", error);
     } finally {
-      setTimeout(() => setIsRefreshing(false), 800);
+      // 데이터 실제 로드 후 200ms 후에만 복구
+      setTimeout(() => setIsRefreshing(false), 200);
     }
   }, []);
 
-  /**
-   * 다음 페이지 로드
-   */
+  //  다음 페이지 로드
   const loadNextPage = useCallback(() => {
-    if (hasMore && !isLoading) {
-      setPage((prev) => prev + 1);
-    }
-  }, [hasMore, isLoading]);
+    setPage((prev) => {
+      return prev + 1;
+    });
+  }, []); // deps 제거로 함수 재생성 방지
 
-  /**
-   * IntersectionObserver로 무한 스크롤 구현
-   */
+  //  IntersectionObserver로 무한 스크롤 구현
+
   useEffect(() => {
-    if (!loadMoreTriggerRef.current) return;
+    const trigger = loadMoreTriggerRef.current;
+    const container = scrollContainerRef.current;
 
-    observerRef.current = new IntersectionObserver(
+    if (!trigger || !container) return;
+
+    if (observerRef.current) {
+      observerRef.current.disconnect();
+    }
+
+    const observer = new IntersectionObserver(
       (entries) => {
         const [entry] = entries;
         if (entry.isIntersecting && hasMore && !isLoading) {
@@ -119,35 +121,32 @@ export const useFeedData = () => {
         }
       },
       {
-        root: scrollContainerRef.current,
-        rootMargin: "100px", // 바닥에 닿기 100px 전에 로딩 시작
+        root: container,
+        rootMargin: "100px",
         threshold: 0.1,
       }
     );
 
-    observerRef.current.observe(loadMoreTriggerRef.current);
+    observer.observe(trigger);
+    observerRef.current = observer;
 
     return () => {
-      if (observerRef.current) {
-        observerRef.current.disconnect();
-      }
+      observer.disconnect();
     };
-  }, [hasMore, isLoading, loadNextPage]);
+  }, [feedList.length, hasMore, isLoading, loadNextPage]);
 
-  /**
-   * 페이지 변경 시 데이터 로드
-   */
+  //  페이지 변경 시 데이터 로드
+
   useEffect(() => {
     if (page === 1 && feedList.length > 0) return; // 초기 로드 또는 새로고침 제외
     loadFeed(page);
   }, [page]);
 
-  /**
-   * 초기 로드
-   */
+  //  초기 로드
+
   useEffect(() => {
-    loadFeed(1);
-  }, []);
+    loadFeed(1, false); // 초기엔 덮어쓰기
+  }, []); // 마운트 시 딱 한 번만 실행
 
   return {
     feedList,
