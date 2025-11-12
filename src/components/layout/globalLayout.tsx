@@ -5,8 +5,6 @@ import styled from "styled-components";
 import { HeaderProvider, useHeader } from "../../contexts/HeaderContext";
 import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { mockResponsesByRoom } from "../../pages/chat/mockChatData";
-import { useParams } from "react-router-dom";
 
 // import { relative } from "path";
 
@@ -34,10 +32,11 @@ const MainContent = styled.main<{
   overflow-x: hidden;
   overflow-y: auto;
   position: relative; //스크롤 버튼을 위해
-  padding-bottom: ${(props) => {
+ / * padding-bottom: ${(props) => {
     if (props.$isProfile) return "0";
     return props.$hasFooter ? "110px" : "50px";
-  }};
+  }}; * /
+  padding-bottom: 110px;
   background-color: ${(props) =>
     props.$isChatRoom ? "var(--color-gray-light)" : "#fff"};
 `;
@@ -46,7 +45,6 @@ function LayoutContent() {
   const location = useLocation();
   const { setHeaderConfig } = useHeader();
   const navigate = useNavigate();
-  const { roomId } = useParams<{ roomId: string }>();
 
   // 경로별 헤더 자동 설정
   useEffect(() => {
@@ -171,15 +169,11 @@ function LayoutContent() {
     }
 
     // 채팅 방
-
     if (path.includes("/chat-room")) {
-      if(!roomId) return;
-      const messagesForRoom = mockResponsesByRoom[roomId];
-
       setHeaderConfig({
         show: true,
         type: "chat",
-        userName: messagesForRoom[0][0].username,
+        userName: "잉어킹",
         onBackClick: () => navigate(-1),
       });
       return;

@@ -19,10 +19,6 @@ export const FeedSection = styled.section`
   width: calc(100% + 3rem);
   margin-inline: -1.5rem;
   background-color: #ffffff;
-
-  // scroll btn
-  height: 100vh;
-  overflow-y: auto;
 `;
 
 export const FeedItemWrapper = styled.div`
