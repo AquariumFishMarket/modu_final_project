@@ -29,7 +29,8 @@ import type { UserProfile } from "../../types/user";
 import PostCard from "../../components/post/postCard/PostCard";
 import PostStateBar from "../../components/post/PostStateBar";
 import PostGallery from "./components/PostGallery";
-import { dummyPosts, type Post } from "../../data/dummyPosts";
+import { useUserPostsData } from "../../hooks/useUserPostsData";
+import type { Feed } from "../../types/feed";
 
 //  Profile 컴포넌트
 //  - 내 프로필과 다른 유저의 프로필을 조건부 렌더링
@@ -70,11 +71,19 @@ function Profile() {
   // 로딩 상태
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  // 게시글 피드 데이터 상태 관리
-  const [userPosts, setUserPosts] = useState<Post[]>([]);
-
   // 포스트 상태 관리 (리스트 / 갤러리)
   const [postState, setPostState] = useState<"list" | "gallery">("list");
+
+  // 무한 스크롤 훅 사용
+  const {
+    postsList,
+    isLoading: isPostsLoading,
+    isInitialLoading: isPostsInitialLoading,
+    hasMore,
+    scrollContainerRef,
+    loadMoreTriggerRef,
+    handleLikeToggle: handlePostLikeToggle,
+  } = useUserPostsData(profileData.userId);
 
   // 내 프로필인지 다른 사람 프로필인지 구분
   const isMyProfile = profileData.id && profileData.id === currentUserId;
@@ -191,36 +200,6 @@ function Profile() {
     navigate("/product/upload");
   };
 
-  // 게시글 좋아요 토글 핸들러 (낙관적 업데이트)
-  //  API 연동 시 주석 해제된 부분 활성화
-
-  const handleLikeToggle = async (postId: string): Promise<void> => {
-    const prevPosts = userPosts;
-
-    // 낙관적 업데이트
-    setUserPosts((prev) =>
-      prev.map((p) =>
-        p.postId === postId
-          ? {
-              ...p,
-              isLiked: !p.isLiked,
-              likeCount: p.isLiked ? p.likeCount - 1 : p.likeCount + 1,
-            }
-          : p
-      )
-    );
-
-    try {
-      // API 연동 시 주석 해제
-      // const response = await fetch(`/api/posts/${postId}/like`, {
-      //   method: "POST",
-      // });
-      // if (!response.ok) throw new Error("좋아요 처리 실패");
-    } catch (error) {
-      console.error("좋아요 처리 실패:", error);
-      setUserPosts(prevPosts);
-    }
-  };
 
   //  프로필 공유 버튼 클릭 핸들러
   // Web Share API 또는 클립보드 복사 기능 구현
@@ -277,8 +256,7 @@ function Profile() {
     //
     // loadProfileAndPosts();
 
-    // 임시: API 연동 전까지 더미 데이터 사용
-    setUserPosts(dummyPosts);
+    // 임시: API 연동 전까지 프로필만 로드
     setIsLoading(false);
   }, [targetUserId, setHeaderConfig, navigate]);
 
@@ -384,41 +362,70 @@ function Profile() {
       </ProfileSection>
 
       {/* 판매중인상품 영역 */}
-      <SellingProducts isLastSection={userPosts.length === 0} />
+      <SellingProducts isLastSection={postsList.length === 0} />
+
+      {/* 게시글 로딩 중 */}
+      {isPostsInitialLoading && (
+        <MyFeedSection>
+          <LoadingText>게시글 불러오는 중...</LoadingText>
+        </MyFeedSection>
+      )}
 
       {/* 게시글이 있을 때만 포스트 상태바와 피드 섹션 표시 */}
-      {!isLoading && userPosts.length > 0 && (
+      {!isPostsInitialLoading && postsList.length > 0 && (
         <>
           <PostStateBar postState={postState} setPostState={setPostState} />
 
           {/* 피드 섹션 - 모든 프로필에서 표시 */}
-          <MyFeedSection>
+          <MyFeedSection ref={scrollContainerRef}>
             {postState === "list" ? (
               <PostListContainer>
-                {userPosts.map((post) => (
+                {postsList.map((post) => (
                   <PostCard
-                    key={post.postId}
-                    postId={post.postId}
-                    userName={profileData.userName}
-                    userId={profileData.userId}
-                    avatarSrc={profileData.profileImage}
-                    avatarAlt={`${profileData.userName}의 프로필 이미지`}
+                    key={post.id}
+                    postId={post.id}
+                    userName={post.userName}
+                    userId={post.userId}
+                    avatarSrc={post.profileImg}
+                    avatarAlt={`${post.userName}의 프로필 이미지`}
                     content={post.content}
-                    imageSrc={post.imageSrc}
-                    imageAlt={post.imageAlt}
-                    dateTime={post.dateTime}
-                    dateText={post.dateText}
+                    imageSrc={post.image}
+                    imageAlt="게시글 이미지"
+                    dateTime={post.createdAt}
+                    dateText={post.createdAt}
                     likeCount={post.likeCount}
                     commentCount={post.commentCount}
                     isLiked={post.isLiked}
-                    onLikeClick={() => handleLikeToggle(post.postId)}
-                    onCommentClick={() => navigate(`/post/${post.postId}`)}
+                    onLikeClick={() => handlePostLikeToggle(post.id)}
+                    onCommentClick={() => navigate(`/post/${post.id}`)}
                   />
                 ))}
+
+                {/* IntersectionObserver 트리거 */}
+                <div ref={loadMoreTriggerRef} style={{ height: "1px" }} />
+
+                {isPostsLoading && <LoadingText>불러오는 중...</LoadingText>}
+                {!hasMore && postsList.length > 0 && (
+                  <LoadingText>더 이상 게시글이 없습니다.</LoadingText>
+                )}
               </PostListContainer>
             ) : (
               <PostGallery
-                posts={userPosts}
+                posts={postsList.map((post) => ({
+                  postId: post.id,
+                  userName: post.userName,
+                  userId: post.userId,
+                  avatarSrc: post.profileImg,
+                  avatarAlt: `${post.userName}의 프로필 이미지`,
+                  content: post.content,
+                  imageSrc: post.image,
+                  imageAlt: "게시글 이미지",
+                  dateTime: post.createdAt,
+                  dateText: post.createdAt,
+                  likeCount: post.likeCount,
+                  commentCount: post.commentCount,
+                  isLiked: post.isLiked,
+                }))}
                 onPostClick={(postId) => {
                   navigate(`/post/${postId}`);
                 }}
@@ -429,7 +436,7 @@ function Profile() {
       )}
 
       {/* 게시글이 없을 때 빈 상태 메시지 표시 */}
-      {!isLoading && userPosts.length === 0 && (
+      {!isPostsInitialLoading && postsList.length === 0 && (
         <MyFeedSection>
           <EmptyPostMessage>게시글이 없습니다.</EmptyPostMessage>
         </MyFeedSection>
