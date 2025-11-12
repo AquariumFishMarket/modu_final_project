@@ -10,6 +10,7 @@ import {
   LoadingText,
   EndMessageText,
   InitialLoadingSection,
+  RefreshSpinnerWrapper,
   RefreshSpinner,
 } from "./FeedPage.styled";
 import PostCard from "../../components/post/postCard/PostCard";
@@ -32,8 +33,9 @@ const FeedPage = () => {
   } = useFeedData();
 
   const startY = useRef<number | null>(null);
+  const isRefreshingRef = useRef(false);
 
-  /** 모바일: 터치로 새로고침 */
+  // 모바일: 터치로 새로고침
   useEffect(() => {
     const container = scrollContainerRef.current;
     if (!container) return;
@@ -49,9 +51,11 @@ const FeedPage = () => {
     const handleTouchMove = (e: TouchEvent) => {
       if (startY.current === null) return;
       const distance = e.touches[0].clientY - startY.current;
-      if (distance > 80 && !isRefreshing) {
-        startY.current = null;
-        triggerRefresh();
+      if (distance > 80 && !isRefreshingRef.current) {
+        isRefreshingRef.current = true;
+        triggerRefresh().finally(() => {
+          isRefreshingRef.current = false;
+        });
       }
     };
 
@@ -62,9 +66,9 @@ const FeedPage = () => {
       container.removeEventListener("touchstart", handleTouchStart);
       container.removeEventListener("touchmove", handleTouchMove);
     };
-  }, [isRefreshing, triggerRefresh, scrollContainerRef]);
+  }, [feedList.length, triggerRefresh]);
 
-  /** 데스크톱: 마우스 드래그로 새로고침 */
+  // 데스크톱: 마우스 드래그로 새로고침
   useEffect(() => {
     const container = scrollContainerRef.current;
     if (!container) return;
@@ -101,16 +105,16 @@ const FeedPage = () => {
       container.removeEventListener("pointermove", handlePointerMove);
       container.removeEventListener("pointerup", handlePointerUp);
     };
-  }, [isRefreshing, triggerRefresh, scrollContainerRef]);
+  }, [feedList.length, isRefreshing, triggerRefresh]);
 
-  /** 페이지 애니메이션 */
+  // 페이지 애니메이션
   const pageVariants = {
     initial: { opacity: 0, y: 10 },
     animate: { opacity: 1, y: 0, transition: { duration: 0.5 } },
     exit: { opacity: 0, transition: { duration: 0.3 } },
   };
 
-  /** 초기 로딩 */
+  // 초기 로딩
   if (isInitialLoading) {
     return (
       <motion.div
@@ -128,7 +132,7 @@ const FeedPage = () => {
     );
   }
 
-  /** 피드 없음 */
+  // 피드 없음
   if (feedList.length === 0) {
     return (
       <motion.div
@@ -152,7 +156,7 @@ const FeedPage = () => {
     );
   }
 
-  /** 피드 있음 */
+  //  피드 있음
   return (
     <motion.div
       initial="initial"
@@ -160,26 +164,13 @@ const FeedPage = () => {
       exit="exit"
       variants={pageVariants}
     >
-      <FeedSection
-        ref={scrollContainerRef}
-        style={{
-          overflowY: isRefreshing ? "hidden" : "auto",
-          pointerEvents: isRefreshing ? "none" : "auto",
-        }}
-      >
+      <FeedSection as="div" ref={scrollContainerRef}>
         {/* 새로고침 스피너 */}
-        <motion.div
-          initial={{ height: 0, opacity: 0 }}
-          animate={{
-            height: isRefreshing ? 80 : 0,
-            opacity: isRefreshing ? 1 : 0,
-          }}
-          transition={{ duration: 0.3 }}
-        >
+        <RefreshSpinnerWrapper $visible={isRefreshing}>
           <RefreshSpinner>
             <img src="/img/spinnerfish.png" alt="로딩 중..." />
           </RefreshSpinner>
-        </motion.div>
+        </RefreshSpinnerWrapper>
 
         {/* 피드 목록 */}
         {feedList.map((feed) => (
