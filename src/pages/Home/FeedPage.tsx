@@ -2,6 +2,9 @@ import { useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import DefaultButton from "../../components/common/buttons/Button";
+import Toast from "../../components/common/modal/Toast";
+
+
 import {
   EmptyFeedSection,
   LogoImage,
@@ -15,6 +18,7 @@ import {
 } from "./FeedPage.styled";
 import PostCard from "../../components/post/postCard/PostCard";
 import ScrollButton from "./components/ScrollButton";
+import { ToastContainer } from "react-toastify";
 import { useFeedData } from "../../hooks/useFeedData";
 
 const FeedPage = () => {
@@ -163,8 +167,19 @@ const FeedPage = () => {
       animate="animate"
       exit="exit"
       variants={pageVariants}
-    >
-      <FeedSection as="div" ref={scrollContainerRef}>
+
+  
+
+      <ToastContainer></ToastContainer>
+      <Toast></Toast>
+      <FeedSection as="div"
+        ref={scrollContainerRef}
+        style={{
+          overflowY: isRefreshing ? "hidden" : "auto",
+          pointerEvents: isRefreshing ? "none" : "auto",
+        }}
+      >
+
         {/* 새로고침 스피너 */}
         <RefreshSpinnerWrapper $visible={isRefreshing}>
           <RefreshSpinner>
@@ -172,7 +187,7 @@ const FeedPage = () => {
           </RefreshSpinner>
         </RefreshSpinnerWrapper>
 
-        {/* 피드 목록 */}
+
         {feedList.map((feed) => (
           <FeedItemWrapper key={feed.id}>
             <PostCard

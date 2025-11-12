@@ -25,8 +25,10 @@
     "react-spring": "^10.0.3",
     "react-spring-bottom-sheet": "^3.4.1",
     "react-swipeable-list": "^1.10.0",
+    "react-toastify": "^11.0.5",
     "socket.io-client": "^4.8.1",
-    "styled-components": "^6.1.19"
+    "styled-components": "^6.1.19",
+    "zustand": "^5.0.8"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
