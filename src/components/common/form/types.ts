@@ -1,5 +1,7 @@
 // 공통 Form 타입
 
+export type FormMode = "create" | "edit";
+
 export interface CommonFormRef {
   submitForm: () => void;
 }
@@ -16,12 +18,18 @@ export interface FormFieldConfig {
 }
 
 export interface FormSubmissionData {
-  // formData: FormData;
-  // imageFiles: File[];
-  // formValues: Record<string, string>;
+  [key: string]:
+    | string
+    | File
+    | null
+    | FormData
+    | File[]
+    | Record<string, string>;
+  // formData?: FormData;
+  // imageFiles?: File[];
+  // formValues?: Record<string, string>;
   // hasCustomImage?: boolean;
   // useDefaultImage?: boolean;
-  [key: string]: string | File | null;
 }
 
 export interface ValidationErrors {
@@ -39,6 +47,13 @@ export interface BaseFormProps {
 export type CreateFormProps = BaseFormProps;
 
 export interface EditFormProps extends BaseFormProps {
+  initialValues?: { [key: string]: string };
+  initialImages?: File[];
+  existingImageUrls?: string[];
+}
+
+export interface UnitedFormProps extends BaseFormProps {
+  mode: FormMode;
   initialValues?: { [key: string]: string };
   initialImages?: File[];
   existingImageUrls?: string[];
