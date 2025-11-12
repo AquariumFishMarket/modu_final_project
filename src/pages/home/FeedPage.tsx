@@ -19,7 +19,6 @@ import PostCard from "../../components/post/postCard/PostCard";
 import { ToastContainer } from "react-toastify";
 import { useFeedData } from "../../hooks/useFeedData";
 
-
 const FeedPage = () => {
   const navigate = useNavigate();
   const {
@@ -43,7 +42,6 @@ const FeedPage = () => {
     animate: { opacity: 1, y: 0, transition: { duration: 0.5 } },
     exit: { opacity: 0, transition: { duration: 0.3 } },
   };
-
 
   // 모바일: 터치로 새로고침
   // useEffect(() => {
@@ -118,22 +116,22 @@ const FeedPage = () => {
   // }, [feedList.length, isRefreshing, triggerRefresh]);
 
   // 초기 로딩
-    if (isInitialLoading) {
-      return (
-        <motion.div
-          initial="initial"
-          animate="animate"
-          exit="exit"
-          variants={pageVariants}
-        >
-          <main>
-            <InitialLoadingSection>
-              <p>불러오는 중...</p>
-            </InitialLoadingSection>
-          </main>
-        </motion.div>
-      );
-    }
+  if (isInitialLoading) {
+    return (
+      <motion.div
+        initial="initial"
+        animate="animate"
+        exit="exit"
+        variants={pageVariants}
+      >
+        <main>
+          <InitialLoadingSection>
+            <p>불러오는 중...</p>
+          </InitialLoadingSection>
+        </main>
+      </motion.div>
+    );
+  }
 
   // 피드 없음
   // if (feedList.length === 0) {
@@ -181,8 +179,7 @@ const FeedPage = () => {
           content={feed.content}
           imageSrc={feed.image}
           imageAlt="게시글 이미지"
-          dateTime={feed.updatedAt} //api 명세 없는부분
-          dateText={feed.updatedAt} //api 명세 없는부분
+          dateTime={feed.createdAt} //api 명세 없는부분
           likeCount={feed.author.hearts.length}
           commentCount={feed.comments.length}
           isLiked={feed.isLiked}

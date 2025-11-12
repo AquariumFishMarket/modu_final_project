@@ -9,6 +9,7 @@ import {
   UserId,
 } from "./PostHeader.styled";
 import MoreMenu from "../common/modal/MoreMenu";
+import { formatPostDate } from "../../utils/formatter/dateFormatter";
 
 // API 연동 준비 (추후 사용)
 // import { Author } from "../../types/post";
@@ -38,7 +39,6 @@ function PostHeader({
 
   variant = "post",
   dateTime,
-  dateText,
 }: PostHeaderProps) {
   const navigate = useNavigate();
   const [imgSrc, setImgSrc] = useState(avatarSrc);
@@ -72,7 +72,7 @@ function PostHeader({
         {variant === "comment" ? (
           <>
             <UserName>{userName}</UserName>
-            {dateTime && dateText && (
+            {dateTime && (
               <time
                 dateTime={dateTime}
                 style={{
@@ -81,7 +81,7 @@ function PostHeader({
                   marginLeft: "0.6rem",
                 }}
               >
-                {dateText}
+                {formatPostDate(dateTime)}
               </time>
             )}
           </>

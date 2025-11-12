@@ -11,6 +11,7 @@ import {
 } from "./PostCard.styled";
 import PostHeader from "../PostHeader";
 import { formatPostDate } from "../../../utils/formatter/dateFormatter";
+import { useNavigate } from "react-router-dom";
 
 // API 연동 준비 (추후 사용)
 // import { Post } from "../../../types/post";
@@ -55,22 +56,23 @@ function PostCard({
   onLikeClick,
   onCommentClick,
 }: PostCardProps) {
-  if(imageSrc) {
+  const navigate = useNavigate();
+
+  if (imageSrc) {
   }
 
-  const cutImageSrc = imageSrc?.split('/') as string[]
+  const cutImageSrc = imageSrc?.split("/") as string[];
+  const [postImageSrc, setPostImageSrc] = useState<string | undefined>(
+    cutImageSrc[1]
+  );
 
+  // 게시글 상세보기
+  const handleCardClick = () => {
+    navigate(`/post/${postId}`);
+  };
 
-  const [liked, setLiked] = useState(isLiked);
-  const [likes, setLikes] = useState(likeCount);
-  const [postImageSrc, setPostImageSrc] = useState<string | undefined>(cutImageSrc[1]);
-
-  // 낙관적 업데이트
+  // 부모 컴포넌트에서 관리하는 상태 사용 -> 좋아요 버튼
   const handleLikeClick = () => {
-    const newLikedState = !liked;
-    setLiked(newLikedState);
-    setLikes(newLikedState ? likes + 1 : likes - 1);
-
     if (onLikeClick) {
       onLikeClick();
     }
@@ -125,7 +127,7 @@ function PostCard({
 
       {/* 게시글 내용 */}
       <PostContent>
-        <PostMain>
+        <PostMain onClick={handleCardClick}>
           {content && <figcaption>{content}</figcaption>}
           {postImageSrc && (
             <img
@@ -153,9 +155,9 @@ function PostCard({
             <ActionButton
               aria-label="좋아요"
               onClick={handleLikeClick}
-              className={liked ? "liked" : ""}
+              className={isLiked ? "liked" : ""}
             >
-              <HeartLabel $liked={liked} aria-label="좋아요">
+              <HeartLabel $liked={isLiked} aria-label="좋아요">
                 <svg
                   width="20"
                   height="20"
@@ -165,7 +167,9 @@ function PostCard({
                   <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                 </svg>
               </HeartLabel>
-              <span style={{ position: "relative", top: "-1px" }}>{likes}</span>
+              <span style={{ position: "relative", top: "-1px" }}>
+                {likeCount}
+              </span>
             </ActionButton>
             <ActionButton aria-label="댓글" onClick={handleCommentClick}>
               <img src="/img/icon-message.svg" alt="" />
@@ -174,12 +178,12 @@ function PostCard({
               </span>
             </ActionButton>
           </PostActions>
-          <PostTime dateTime={dateTime}>{formatPostDate(dateTime)}</PostTime>
-        </PostFooter>
 
-        {/* API 연동 준비 (추후 사용) */}
-        {/* 당일 게시글 xx분전, 올해의 게시글은 MM/DD, 작년이전이면 YY/MM/DD 이런식으로 인스타처럼 만들면 좋을것 같습니다. */}
-        {/* <PostTime dateTime={post.createdAt}>{formatDate(post.createdAt)}</PostTime> */}
+          {/* 전체 게시글에는 날짜가 없어서 일단 추가 */}
+          {dateTime && (
+            <PostTime dateTime={dateTime}>{formatPostDate(dateTime)}</PostTime>
+          )}
+        </PostFooter>
       </PostContent>
     </PostCardContainer>
   );
