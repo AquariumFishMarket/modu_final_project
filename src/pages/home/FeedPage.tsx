@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import DefaultButton from "../../components/common/buttons/Button";
 import Toast from "../../components/common/modal/Toast";
 
-
 import {
   EmptyFeedSection,
   LogoImage,
@@ -168,26 +167,22 @@ const FeedPage = () => {
       exit="exit"
       variants={pageVariants}
     >
-
-      <FeedSection as="div" ref={scrollContainerRef}>
-
       <ToastContainer></ToastContainer>
       <Toast></Toast>
-      <FeedSection as="div"
+      <FeedSection
+        as="div"
         ref={scrollContainerRef}
         style={{
           overflowY: isRefreshing ? "hidden" : "auto",
           pointerEvents: isRefreshing ? "none" : "auto",
         }}
       >
-
         {/* 새로고침 스피너 */}
         <RefreshSpinnerWrapper $visible={isRefreshing}>
           <RefreshSpinner>
             <img src="/img/spinnerfish.png" alt="로딩 중..." />
           </RefreshSpinner>
         </RefreshSpinnerWrapper>
-
 
         {feedList.map((feed) => (
           <FeedItemWrapper key={feed.id}>
