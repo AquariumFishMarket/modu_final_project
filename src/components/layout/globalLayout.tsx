@@ -33,10 +33,11 @@ const MainContent = styled.main<{
   overflow-x: hidden;
   overflow-y: auto;
   position: relative; //스크롤 버튼을 위해
-  padding-bottom: ${(props) => {
+ / * padding-bottom: ${(props) => {
     if (props.$isProfile) return "0";
     return props.$hasFooter ? "110px" : "50px";
-  }};
+  }}; * /
+  padding-bottom: 110px;
   background-color: ${(props) =>
     props.$isChatRoom ? "var(--color-gray-light)" : "#fff"};
 `;

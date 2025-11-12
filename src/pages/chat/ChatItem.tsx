@@ -47,6 +47,7 @@ const TextContainer = styled.div`
         -webkit-line-clamp: 1; /* 표시할 최대 줄 수 */
         overflow: hidden;
         text-overflow: ellipsis;
+        line-height: 1.4;
     }
 `
 const UserName = styled.p`
