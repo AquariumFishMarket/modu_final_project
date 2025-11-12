@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Product } from "../../types/product";
-import { getProductById } from "../../data/mockProducts";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
+import {
+  fetchProductDetail,
+  toggleProductLike,
+} from "../../services/productService";
 
 // 시간 표시 유틸리티 함수 추가
 const getRelativeTime = (createdAt: string): string => {
@@ -210,18 +213,22 @@ export default function ProductDetail() {
   const canPurchase = !isSold && product?.link;
 
   useEffect(() => {
-    if (id) {
-      const foundProduct = getProductById(id);
-      setProduct(foundProduct || null);
+    const loadProduct = async () => {
+      if (!id) return;
 
-      // 🆕 초기 찜 개수와 사용자의 찜 상태를 서버에서 가져오기
-      if (foundProduct) {
-        setLikeCount(foundProduct.interactions?.likes || 0);
-
-        // TODO: 실제로는 서버 API 호출
-        // checkUserLikeStatus(foundProduct.id).then(setIsLiked);
+      try {
+        const productData = await fetchProductDetail(id);
+        setProduct(productData);
+        setLikeCount(productData.interactions?.likes || 0);
+        // TODO: 사용자의 찜 상태 가져오기 (API 추가 필요)
+        // setIsLiked(productData.isLiked);
+      } catch (error) {
+        console.error("상품 정보 로드 실패:", error);
+        setProduct(null);
       }
-    }
+    };
+
+    loadProduct();
   }, [id]);
 
   if (!product) {
@@ -241,20 +248,22 @@ export default function ProductDetail() {
 
   // 찜하기 토글
   const handleLikeToggle = async () => {
+    if (!product) return;
+
+    const prevLikedState = isLiked;
+    const prevLikeCount = likeCount;
+
     try {
       // 낙관적 업데이트 (UI 먼저 업데이트)
       const newLikedState = !isLiked;
       setIsLiked(newLikedState);
       setLikeCount((prev) => (newLikedState ? prev + 1 : prev - 1));
 
-      // 🆕 실제로는 서버 API 호출
-      // await toggleProductLike(product.id, newLikedState);
-
-      console.log(`찜 ${newLikedState ? "추가" : "제거"}:`, product.id);
+      await toggleProductLike(product.id);
     } catch (error) {
       // 실패시 원래 상태로 롤백
-      setIsLiked(!isLiked);
-      setLikeCount((prev) => (isLiked ? prev + 1 : prev - 1));
+      setIsLiked(prevLikedState);
+      setLikeCount(prevLikeCount);
       console.error("찜하기 실패:", error);
     }
   };

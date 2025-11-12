@@ -5,91 +5,12 @@ import { getAuthHeaders } from "../utils/auth";
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api";
 
-// ⚠️ API 연동 모드 설정 (true: 실제 API 사용, false: 더미 데이터 사용)
-const USE_API = false;
-
 export interface UserData {
   userName: string;
   userId: string;
   userImage: string;
   isFollowing: boolean; // 팔로우 상태
 }
-
-// 더미 사용자 데이터 (API 연동 전까지 임시 사용)
-const DUMMY_USERS: UserData[] = [
-  {
-    userName: "김수산",
-    userId: "kim_fish",
-    userImage: "/img/fish_profile.png",
-    isFollowing: false,
-  },
-  {
-    userName: "이해산",
-    userId: "lee_seafood",
-    userImage: "/img/fish_profile.png",
-    isFollowing: true,
-  },
-  {
-    userName: "박대구",
-    userId: "park_codfish",
-    userImage: "/img/fish_profile.png",
-    isFollowing: false,
-  },
-  {
-    userName: "최광어",
-    userId: "choi_flatfish",
-    userImage: "/img/fish_profile.png",
-    isFollowing: true,
-  },
-  {
-    userName: "정연어",
-    userId: "jung_salmon",
-    userImage: "/img/fish_profile.png",
-    isFollowing: false,
-  },
-  {
-    userName: "강고등어",
-    userId: "kang_mackerel",
-    userImage: "/img/fish_profile.png",
-    isFollowing: false,
-  },
-  {
-    userName: "조참치",
-    userId: "cho_tuna",
-    userImage: "/img/fish_profile.png",
-    isFollowing: true,
-  },
-  {
-    userName: "윤새우",
-    userId: "yoon_shrimp",
-    userImage: "/img/fish_profile.png",
-    isFollowing: false,
-  },
-  {
-    userName: "장게장",
-    userId: "jang_crab",
-    userImage: "/img/fish_profile.png",
-    isFollowing: true,
-  },
-  {
-    userName: "오징어마켓",
-    userId: "squid_market",
-    userImage: "/img/fish_profile.png",
-    isFollowing: false,
-  },
-  {
-    userName: "전복상회",
-    userId: "abalone_shop",
-    userImage: "/img/fish_profile.png",
-    isFollowing: true,
-  },
-  {
-    userName: "해산물왕",
-    userId: "seafood_king",
-    userImage: "/img/fish_profile.png",
-    isFollowing: false,
-  },
-];
 
 //  사용자 검색 커스텀 훅
 //
@@ -143,58 +64,24 @@ export function useSearch() {
     abortControllerRef.current = controller;
 
     try {
-      if (USE_API) {
-        // 실제 API 호출
-        const response = await fetch(
-          `${API_BASE_URL}/user/search?keyword=${encodeURIComponent(keyword)}`,
-          {
-            headers: getAuthHeaders(),
-            signal: controller.signal,
-          }
-        );
-
-        if (!response.ok) throw new Error("검색 실패");
-        const data = await response.json();
-
-        // Race condition 방지: 최신 요청만 반영
-        if (requestId !== searchIdRef.current) {
-          return null;
+      // 실제 API 호출
+      const response = await fetch(
+        `${API_BASE_URL}/user/search?keyword=${encodeURIComponent(keyword)}`,
+        {
+          headers: getAuthHeaders(),
+          signal: controller.signal,
         }
+      );
 
-        return data.users as UserData[];
-      } else {
-        // 임시: 더미 데이터로 필터링 (API 연동 전까지 사용)
-        if (!keyword || typeof keyword !== "string") {
-          return [];
-        }
+      if (!response.ok) throw new Error("검색 실패");
+      const data = await response.json();
 
-        const lowerKeyword = keyword.toLowerCase().trim();
-
-        const filteredUsers = DUMMY_USERS.filter((user) => {
-          const userName =
-            user.userName && typeof user.userName === "string"
-              ? user.userName.toLowerCase()
-              : "";
-          const userId =
-            user.userId && typeof user.userId === "string"
-              ? user.userId.toLowerCase()
-              : "";
-
-          return (
-            userName.includes(lowerKeyword) || userId.includes(lowerKeyword)
-          );
-        });
-
-        // API 응답 시뮬레이션 (로딩 효과)
-        await new Promise((resolve) => setTimeout(resolve, 300));
-
-        // Race condition 방지: 최신 요청만 반영
-        if (requestId !== searchIdRef.current) {
-          return null;
-        }
-
-        return filteredUsers;
+      // Race condition 방지: 최신 요청만 반영
+      if (requestId !== searchIdRef.current) {
+        return null;
       }
+
+      return data.users as UserData[];
     } catch (error) {
       // AbortError는 정상적인 중단이므로 무시
       if (error instanceof Error && error.name === "AbortError") {

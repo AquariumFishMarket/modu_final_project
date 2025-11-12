@@ -15,7 +15,10 @@ import {
   ErrorMessage,
 } from "./SellingProducts.styled";
 import type { Product } from "../../../types/product";
-import { dummyProducts } from "../../../data/dummyProducts";
+import { getAuthHeaders } from "../../../utils/auth";
+
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api";
 
 interface SellingProductsProps {
   isLastSection?: boolean;
@@ -50,16 +53,16 @@ function SellingProducts({ isLastSection = false }: SellingProductsProps) {
         setIsLoading(true);
         setError(null);
 
-        // API 연동 시 주석 해제
-        // const response = await fetch('/api/products/selling', {
-        //   signal: controller.signal
-        // });
-        // if (!response.ok) throw new Error('상품을 불러오는데 실패했습니다');
-        // const data = await response.json();
-        // setProducts(data.products);
+        const response = await fetch(`${API_BASE_URL}/products/selling`, {
+          headers: getAuthHeaders(),
+          signal: controller.signal,
+        });
 
-        // 임시: API 연동 전까지 더미 데이터 사용
-        setProducts(dummyProducts);
+        if (!response.ok)
+          throw new Error("상품을 불러오는데 실패했습니다");
+
+        const data = await response.json();
+        setProducts(data.products);
       } catch (error) {
         if (error instanceof Error && error.name === "AbortError") {
           return;
