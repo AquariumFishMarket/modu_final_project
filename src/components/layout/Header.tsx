@@ -170,6 +170,7 @@ function Header() {
             width={90}
             height="medium"
             disabled={!config.inputState}
+            type={"button"}
             onClick={config.onButtonClick}
           />
         </Section>
