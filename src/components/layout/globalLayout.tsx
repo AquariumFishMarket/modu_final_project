@@ -108,6 +108,7 @@ function LayoutContent() {
   const { scrollContainerRef } = useFeedData();
 
   const fetchFeeds = useFeedStore((state) => state.fetchFeeds);
+const refreshFeed = useFeedStore((state) => state.refreshFeed);
 
   useEffect(() => {
     const path = location.pathname;
@@ -142,7 +143,7 @@ function LayoutContent() {
         currentPullRef.current = Math.min(distance, 120);
       }
 
-      if( distance > 70) {
+      if( distance > 60) {
         preventDefault();
         isLetterRef.current = true;
       }
@@ -157,7 +158,7 @@ function LayoutContent() {
         isLetterRef.current = false;
 
         if(hasMoveRef.current && currentPullRef.current > 80) {
-          fetchFeeds();
+          refreshFeed();
         }
 
         hasMoveRef.current = false;

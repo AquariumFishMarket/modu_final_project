@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
@@ -13,10 +13,8 @@ import { useFeedStore } from "../../contexts/useFeedStore";
 
 const FeedPage = () => {
   const navigate = useNavigate();
-  const {
-    handleLikeToggle,
-  } = useFeedData();
-
+  const { handleLikeToggle } = useFeedData();
+  const observer = useRef<IntersectionObserver | null>(null);
 
   // 페이지 애니메이션
   const pageVariants = {
@@ -28,10 +26,30 @@ const FeedPage = () => {
   const feedList = useFeedStore((state) => state.feedList)
   const isLoading = useFeedStore((state) => state.isInitialLoading);
   const fetchFeeds = useFeedStore((state) => state.fetchFeeds);
+  const hasMore = useFeedStore((state) => state.hasMore);
+ const isRefreshing = useFeedStore((state) => state.isRefreshing);
 
   useEffect(()=>{
     fetchFeeds();
   },[])
+
+
+  const lastCardRef = useCallback((node: HTMLElement | null) => {
+    if (!node) return;
+    if (observer.current) observer.current.disconnect(); // 이전 observer 정리
+
+    observer.current = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          //console.log("마지막 카드 감지");
+          fetchFeeds(true);
+        }
+      },
+      { threshold: 1 }
+    );
+
+    observer.current.observe(node);
+  }, [hasMore,isRefreshing]);
 
   // 초기 로딩
     if (isLoading) {
@@ -86,9 +104,12 @@ const FeedPage = () => {
       <ToastContainer></ToastContainer>
       <Toast></Toast>
 
-      {feedList.map((feed) => (
+      {feedList.map((feed,idx) => {
+        const isLast = idx === feedList.length - 1;
+
+        return (
         <PostCard
-          key={feed.id}
+          key={`${feed.id}-${idx}`}
           postId={feed.id}
           userName={feed.author.username}
           userId={feed.author.accountname}
@@ -104,8 +125,11 @@ const FeedPage = () => {
           isLiked={feed.isLiked}
           onLikeClick={() => handleLikeToggle(feed.id)}
           onCommentClick={() => navigate(`/post/${feed.id}`)}
+          ref={isLast? lastCardRef : null}
         />
-      ))}
+        )
+      })}
+
     </motion.div>
   );
 };
