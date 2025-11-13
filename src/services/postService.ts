@@ -47,7 +47,8 @@ interface PostDetailApiResponse {
 }
 
 interface CommentsApiResponse {
-  comment: Comment[];
+  comment?: Comment[];
+  comments?: Comment[];
 }
 
 interface CommentApiResponse {
@@ -171,6 +172,40 @@ export async function deletePost(postId: string): Promise<boolean> {
   }
 }
 
+// 게시글 신고
+export async function reportPost(postId: string): Promise<boolean> {
+  try {
+    const token = getToken();
+
+
+
+    const response = await fetch(`${BASE_URL}/post/${postId}/report`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error("존재하지 않는 게시글 ID입니다.");
+      }
+      if (response.status === 401) {
+        throw new Error("유효하지 않은 토큰입니다.");
+      }
+      throw new Error("게시글 신고 실패");
+    }
+
+    const data = await response.json();
+
+    return true;
+  } catch (error) {
+    console.error("게시글 신고 실패:", error);
+    throw error;
+  }
+}
+
 // 게시글 좋아요
 
 export async function likePost(postId: string): Promise<PostDetail | null> {
@@ -241,13 +276,16 @@ export async function fetchPostComments(postId: string): Promise<Comment[]> {
   try {
     const token = getToken();
 
-    const response = await fetch(`${BASE_URL}/post/${postId}/comments`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-type": "application/json",
-      },
-    });
+    const response = await fetch(
+      `${BASE_URL}/post/${postId}/comments?limit=1000`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-type": "application/json",
+        },
+      }
+    );
 
     if (!response.ok) {
       if (response.status === 404) {
@@ -257,7 +295,13 @@ export async function fetchPostComments(postId: string): Promise<Comment[]> {
     }
 
     const data: CommentsApiResponse = await response.json();
-    return data.comment || [];
+
+
+    // comments (복수형)일 수도 있으므로 둘 다 체크
+    const comments = data.comment || data.comments || [];
+
+
+    return comments;
   } catch (error) {
     console.error("댓글 목록 조회 실패:", error);
     return [];
@@ -304,6 +348,92 @@ export async function createComment(
   }
 }
 
+// 댓글 수정
+export async function updateComment(
+  postId: string,
+  commentId: string,
+  content: string
+): Promise<Comment | null> {
+  try {
+    const token = getToken();
+
+    const response = await fetch(
+      `${BASE_URL}/post/${postId}/comments/${commentId}`,
+      {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify({
+          comment: {
+            content: content,
+          },
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error("유효하지 않은 댓글 ID입니다.");
+      }
+      if (response.status === 403) {
+        throw new Error("수정 권한이 없습니다. 로그인 정보를 확인하세요.");
+      }
+      if (response.status === 401) {
+        throw new Error("유효하지 않은 토큰입니다.");
+      }
+      throw new Error("댓글 수정 실패");
+    }
+
+    const data: CommentApiResponse = await response.json();
+    console.log("updateComment API 응답:", data);
+    return data.comment;
+  } catch (error) {
+    console.error("댓글 수정 실패:", error);
+    throw error;
+  }
+}
+
+// 댓글 신고
+
+export async function reportComment(
+  postId: string,
+  commentId: string
+): Promise<boolean> {
+  try {
+    const token = getToken();
+
+
+    const response = await fetch(
+      `${BASE_URL}/post/${postId}/comments/${commentId}/report`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-type": "application/json",
+        },
+      }
+    );
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error("유효하지 않은 게시글 또는 댓글 ID입니다.");
+      }
+      if (response.status === 401) {
+        throw new Error("유효하지 않은 토큰입니다.");
+      }
+      throw new Error("댓글 신고 실패");
+    }
+
+    const data = await response.json();
+    return true;
+  } catch (error) {
+    console.error("댓글 신고 실패:", error);
+    throw error;
+  }
+}
+
 // 댓글 삭제
 
 export async function deleteComment(
@@ -343,82 +473,6 @@ export async function deleteComment(
     return true;
   } catch (error) {
     console.error("댓글 삭제 실패:", error);
-    throw error;
-  }
-}
-
-//  댓글 좋아요
-
-export async function likeComment(
-  postId: string,
-  commentId: string
-): Promise<Comment | null> {
-  try {
-    const token = getToken();
-
-    const response = await fetch(
-      `${BASE_URL}/post/${postId}/comments/${commentId}/heart`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-type": "application/json",
-        },
-      }
-    );
-
-    if (!response.ok) {
-      if (response.status === 404) {
-        throw new Error("존재하지 않는 댓글 ID입니다.");
-      }
-      if (response.status === 401) {
-        throw new Error("유효하지 않은 토큰입니다.");
-      }
-      throw new Error("댓글 좋아요 처리 실패");
-    }
-
-    const data: CommentApiResponse = await response.json();
-    return data.comment;
-  } catch (error) {
-    console.error("댓글 좋아요 처리 실패:", error);
-    throw error;
-  }
-}
-
-//  댓글 좋아요 취소
-
-export async function unlikeComment(
-  postId: string,
-  commentId: string
-): Promise<Comment | null> {
-  try {
-    const token = getToken();
-
-    const response = await fetch(
-      `${BASE_URL}/post/${postId}/comments/${commentId}/unheart`,
-      {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-type": "application/json",
-        },
-      }
-    );
-
-    if (!response.ok) {
-      if (response.status === 404) {
-        throw new Error("존재하지 않는 댓글 ID입니다.");
-      }
-      if (response.status === 401) {
-        throw new Error("유효하지 않은 토큰입니다.");
-      }
-      throw new Error("댓글 좋아요 취소 실패");
-    }
-
-    const data: CommentApiResponse = await response.json();
-    return data.comment;
-  } catch (error) {
-    console.error("댓글 좋아요 취소 실패:", error);
     throw error;
   }
 }

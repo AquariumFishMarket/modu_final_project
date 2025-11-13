@@ -5,13 +5,23 @@ import styled, { keyframes } from "styled-components";
 interface AlertModalProps {
   isOpen: boolean;
   onClose: () => void;
-  type: "delete" | "logout" | "block" | "report" | "sold" | null;
+  type:
+    | "delete"
+    | "deleteComment"
+    | "logout"
+    | "block"
+    | "report"
+    | "reportPost"
+    | "sold"
+    | null;
   onConfirm?: {
     delete?: () => void;
+    deleteComment?: () => void;
     logout?: () => void;
     block?: () => void;
     report?: () => void;
-    sold?: () => void; // sold 확인 함수 추가!
+    reportPost?: () => void;
+    sold?: () => void;
   };
 }
 
@@ -117,6 +127,11 @@ export default function AlertModal({
           message: "게시글을 삭제할까요?",
           confirmText: "삭제",
         };
+      case "deleteComment":
+        return {
+          message: "댓글을 삭제하시겠습니까?",
+          confirmText: "삭제",
+        };
       case "logout":
         return {
           message: "로그아웃 하시겠어요?",
@@ -130,6 +145,11 @@ export default function AlertModal({
       case "report":
         return {
           message: "이 게시글을 신고할까요?",
+          confirmText: "신고",
+        };
+      case "reportPost":
+        return {
+          message: "게시글을 신고하시겠습니까?",
           confirmText: "신고",
         };
       case "sold":
