@@ -5,11 +5,18 @@ import { getAuthHeaders } from "../utils/auth";
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api";
 
+// API 응답 형식
 export interface UserData {
-  userName: string;
-  userId: string;
-  userImage: string;
-  isFollowing: boolean; // 팔로우 상태
+  _id: string;
+  username: string;
+  accountname: string;
+  intro: string;
+  image: string;
+  isfollow: boolean;
+  following: string[];
+  follower: string[];
+  followerCount: number;
+  followingCount: number;
 }
 
 //  사용자 검색 커스텀 훅
@@ -66,22 +73,36 @@ export function useSearch() {
     try {
       // 실제 API 호출
       const response = await fetch(
-        `${API_BASE_URL}/user/search?keyword=${encodeURIComponent(keyword)}`,
+        `${API_BASE_URL}/user/searchuser/?keyword=${encodeURIComponent(keyword)}`,
         {
           headers: getAuthHeaders(),
           signal: controller.signal,
         }
       );
 
-      if (!response.ok) throw new Error("검색 실패");
-      const data = await response.json();
-
       // Race condition 방지: 최신 요청만 반영
       if (requestId !== searchIdRef.current) {
         return null;
       }
 
-      return data.users as UserData[];
+      // 에러 응답 처리
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "검색 실패");
+      }
+
+      // 성공 응답 처리
+      const data = await response.json();
+
+      // 응답 형식에 따라 처리 (배열 직접 반환 또는 객체 내 배열)
+      if (Array.isArray(data)) {
+        return data as UserData[];
+      } else if (data.users && Array.isArray(data.users)) {
+        return data.users as UserData[];
+      } else {
+        console.error("예상치 못한 API 응답 형식:", data);
+        return [];
+      }
     } catch (error) {
       // AbortError는 정상적인 중단이므로 무시
       if (error instanceof Error && error.name === "AbortError") {

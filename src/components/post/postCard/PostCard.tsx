@@ -30,9 +30,11 @@ interface PostCardProps {
   likeCount: number;
   commentCount: number;
   isLiked: boolean;
+  isMyPost?: boolean; // 내 게시글인지 여부
   onLikeClick?: () => void;
   onCommentClick?: () => void;
   onMoreClick?: () => void;
+  onReportClick?: () => void; // 신고 핸들러
 
   // API 연동 준비 (추후 사용)
   // post: Post;
@@ -55,8 +57,10 @@ const PostCard = forwardRef<HTMLDivElement, PostCardProps>(
   likeCount,
   commentCount,
   isLiked,
+  isMyPost,
   onLikeClick,
   onCommentClick,
+  onReportClick
 }, ref
 ) => {
   const navigate = useNavigate();
@@ -123,6 +127,8 @@ const PostCard = forwardRef<HTMLDivElement, PostCardProps>(
         avatarSrc={avatarSrc}
         avatarAlt={avatarAlt}
         postId={postId}
+        isMyPost={isMyPost}
+        onReport={onReportClick}
       />
 
       {/* API 연동 준비 (추후 사용) */}

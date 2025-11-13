@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import EditForm from "../../components/common/form/EditForm";
-import { FormSubmissionData } from "../../components/common/form/types";
+import { FormData } from "../../components/common/form/types";
 import { useHeader } from "../../contexts/HeaderContext";
 import { useState, useEffect, useRef } from "react";
 
@@ -99,12 +99,12 @@ export default function ProfileEdit() {
   };
 
   // 폼 제출 핸들러
-  const handleSubmit = (data: FormSubmissionData) => {
+  const handleSubmit = (data: FormData) => {
     console.log("프로필 수정 완료:", data);
-    console.log("사용자 이름:", data.formValues.username);
-    console.log("계정 ID:", data.formValues.accountId);
-    console.log("소개:", data.formValues.introduction);
-    console.log("프로필 이미지:", data.imageFiles);
+    console.log("사용자 이름:", data.username);
+    console.log("계정 ID:", data.accountId);
+    console.log("소개:", data.intro);
+    console.log("프로필 이미지:", data.image);
 
     // 수정 완료 후 프로필 페이지로 이동
     navigate("/profile");

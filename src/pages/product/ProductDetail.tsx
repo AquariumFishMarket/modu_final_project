@@ -23,35 +23,54 @@ const ProductContainer = styled.section`
   margin: 0 auto;
 `;
 
-const ProductImages = styled.img<{ $hasThumbnails: boolean }>`
+const ProductImage = styled.img`
   width: 100%;
   height: 300px;
   object-fit: cover;
   border-radius: 12px;
-  margin-bottom: ${(props) => (props.$hasThumbnails ? "16px" : "30px")};
+  margin-bottom: 15px;
 `;
 
-const ThumbnailContainer = styled.div`
-  display: flex;
-  gap: 8px;
-  margin-bottom: 20px;
-  overflow-x: auto;
-`;
+// const ThumbnailContainer = styled.div`
+//   display: flex;
+//   gap: 8px;
+//   margin-bottom: 20px;
+//   overflow-x: auto;
+// `;
 
-const Thumbnail = styled.img<{ $isSelected: boolean }>`
-  width: 60px;
-  height: 60px;
-  object-fit: cover;
-  border-radius: 6px;
-  cursor: pointer;
-  border: ${(props) =>
-    props.$isSelected ? "2px solid var(--color-primary-600)" : "none"};
-  flex-shrink: 0;
+// const Thumbnail = styled.img<{ $isSelected: boolean }>`
+//   width: 60px;
+//   height: 60px;
+//   object-fit: cover;
+//   border-radius: 6px;
+//   cursor: pointer;
+//   border: ${(props) =>
+//     props.$isSelected ? "2px solid var(--color-primary-600)" : "none"};
+//   flex-shrink: 0;
 
-  &:hover {
-    opacity: 0.8;
-  }
-`;
+//   &:hover {
+//     opacity: 0.8;
+//   }
+// `;
+
+// const SellerSection = styled.div`
+//   display: flex;
+//   padding-bottom: 10px;
+//   border-bottom: 1px solid var(--color-gray-medium);
+
+//   img {
+//     width: 40px;
+//     height: 40px;
+//     margin-right: 15px;
+//   }
+
+//   p {
+//     font-size: var(--font-size-lg);
+//     font-weight: 500;
+//     display: flex;
+//     align-items: center;
+//   }
+// `;
 
 const SoldTag = styled.span`
   display: inline-block;
@@ -102,13 +121,13 @@ const StatItem = styled.span`
   gap: 4px;
 `;
 
-const Description = styled.p`
-  line-height: 1.6;
-  white-space: pre-wrap;
-  color: var(--color-gray-dark);
-  font-size: var(--font-size-md);
-  font-weight: 500;
-`;
+// const Description = styled.p`
+//   line-height: 1.6;
+//   white-space: pre-wrap;
+//   color: var(--color-gray-dark);
+//   font-size: var(--font-size-md);
+//   font-weight: 500;
+// `;
 
 const BottomActionBar = styled.div`
   position: fixed;
@@ -204,7 +223,7 @@ const ContentWrapper = styled.div`
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
   const [product, setProduct] = useState<Product | null>(null);
-  const [selectedImageIdx, setSelectedImageIdx] = useState(0);
+  // const [selectedImageIdx, setSelectedImageIdx] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
 
@@ -214,16 +233,37 @@ export default function ProductDetail() {
 
   useEffect(() => {
     const loadProduct = async () => {
-      if (!id) return;
+      if (!id) {
+        console.log("상품 ID 없음");
+        return;
+      }
 
       try {
         const productData = await fetchProductDetail(id);
+        console.log("📦 상품 데이터:", productData);
+        console.log("이미지 URL:", productData.itemImage);
+
+        // ✅ itemImage가 유효한지 확인
+        if (
+          !productData.itemImage ||
+          productData.itemImage.includes("undefined")
+        ) {
+          console.warn("⚠️ 유효하지 않은 이미지 URL");
+          productData.itemImage = "/img/basic-img.jpg"; // 기본 이미지
+        }
+
         setProduct(productData);
         setLikeCount(productData.interactions?.likes || 0);
         // TODO: 사용자의 찜 상태 가져오기 (API 추가 필요)
         // setIsLiked(productData.isLiked);
       } catch (error) {
         console.error("상품 정보 로드 실패:", error);
+
+        // ✅ 에러 메시지 표시
+        if (error instanceof Error) {
+          alert(error.message);
+        }
+
         setProduct(null);
       }
     };
@@ -235,15 +275,8 @@ export default function ProductDetail() {
     return <div>상품을 찾을 수 없습니다.</div>;
   }
 
-  // 이미지 배열로 변환
-  const images = Array.isArray(product.itemImage)
-    ? product.itemImage
-    : [product.itemImage];
-
-  const mainImage = images[selectedImageIdx] || images[0];
-
-  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
-    e.currentTarget.src = "/img/default-fish.jpg"; // 물고기 마켓 기본 이미지 넣기
+  const handleImageError = () => {
+    console.error("이미지 로드 실패:", product.itemImage);
   };
 
   // 찜하기 토글
@@ -288,16 +321,17 @@ export default function ProductDetail() {
     <>
       <ContentWrapper>
         <ProductContainer>
+          <h2 className="sr-only">판매상품 상세 페이지</h2>
+
           {/* 메인 이미지 */}
-          <ProductImages
-            src={mainImage}
+          <ProductImage
+            src={product.itemImage}
             alt={product.itemName}
             onError={handleImageError}
-            $hasThumbnails={images.length > 1}
           />
 
           {/* 썸네일 이미지들 */}
-          {images.length > 1 && (
+          {/* {images.length > 1 && (
             <ThumbnailContainer>
               {images.map((image, index) => (
                 <Thumbnail
@@ -310,7 +344,16 @@ export default function ProductDetail() {
                 />
               ))}
             </ThumbnailContainer>
-          )}
+          )} */}
+
+          {/* 판매자 부분 */}
+          {/* <SellerSection>
+            <img
+              src={product.author.image}
+              alt={`${product.author}의 프로필 이미지`}
+            />
+            <p>{product.author.accountname}</p>
+          </SellerSection> */}
 
           {/* 판매 완료 태그 */}
           {isSold && <SoldTag>거래완료</SoldTag>}
@@ -339,7 +382,7 @@ export default function ProductDetail() {
             </StatsGroup>
           </ProductStats>
 
-          <Description>{product.description}</Description>
+          {/* <Description>{product.description}</Description> */}
         </ProductContainer>
       </ContentWrapper>
 

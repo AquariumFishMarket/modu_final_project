@@ -5,7 +5,6 @@ export const PostDetailContainer = styled.section`
   margin: 0 auto;
   background: white;
   /* min-height: 100vh; */
-  padding-bottom: 8rem;
 `;
 
 export const CommentsSection = styled.section`

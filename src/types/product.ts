@@ -3,17 +3,32 @@ export interface Product {
   id: string;
   itemName: string;
   price: number;
-  /** 이미지가 한 장일 수도, 여러 장일 수도 있음 */
-  itemImage: string | string[];
-  description: string;
-  status: "selling" | "sold" /* 추가 */;
-  link?: string;
+  itemImage: string;
+  link: string;
+  createdAt: string;
+  updatedAt: string;
+  author: Author;
+  /* 나중에 구현할 필드들 */
+  // itemImage: string | string[];
+  // status: "selling" | "sold" /* 추가 */;
+  // description: string;
+  // interactions?: {
+  //   views: number;
+  //   likes: number;
+  //   chatCount: number;
+  // };
+}
 
-  /* 추가 필요한 필드들 */
-  createdAt?: string;
-  interactions?: {
-    views: number;
-    likes: number;
-    chatCount: number;
-  };
+// 작성자 타입 정의
+export interface Author {
+  id: string;
+  username: string;
+  accountname: string;
+  intro: string;
+  image: string;
+  isfollow: boolean;
+  following: string[];
+  follower: string[];
+  followerCount: number;
+  followingCount: number;
 }
