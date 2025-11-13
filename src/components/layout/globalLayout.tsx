@@ -116,41 +116,40 @@ function LayoutContent() {
     const container = scrollContainerRef.current;
     if (!container) return;
 
-
-    const handleMouseDown = (e: MouseEvent) => {
-      // 맨 위에서만 새로고침 동작
+    const handleDragStart = (clientY: number) => {
       if (container.scrollTop === 0) {
         isDraggingRef.current = true;
-        startYRef.current = e.clientY;
-        hasMoveRef.current = false;
-        //글자 셋팅
+        startYRef.current = clientY;
         isLetterRef.current = false;
+        hasMoveRef.current = false;
       }
     };
 
-    const handleMouseMove = (e: MouseEvent) => {
+
+    const handleDragMove = (clientY: number, preventDefault: () => void) => {
       if (!isDraggingRef.current) return;
 
-      const distance = e.clientY - startYRef.current;
+      const distance = clientY - startYRef.current;
 
       if(Math.abs(distance) > 7) {
         hasMoveRef.current = true
       }
 
       if (distance > 0) {
-        e.preventDefault();
+        preventDefault();
         setPull(Math.min(distance, 120)); // 최대 100px까지만
         container.style.transform = `translateY(${Math.min(distance, 120)}px)`;
         currentPullRef.current = Math.min(distance, 120);
       }
 
       if( distance > 70) {
-        e.preventDefault();
+        preventDefault();
         isLetterRef.current = true;
       }
     };
 
-    const handleMouseUp = (e:MouseEvent) => {
+
+    const handleDragEnd = () => {
       if (isDraggingRef.current) {
         isDraggingRef.current = false;
         container.style.transform = `translateY(0px)`;
@@ -165,14 +164,32 @@ function LayoutContent() {
       }
     };
 
+    const handleMouseDown = (e: MouseEvent) => handleDragStart(e.clientY);
+    const handleMouseMove = (e: MouseEvent) => handleDragMove(e.clientY, () => e.preventDefault());
+    const handleMouseUp = () => handleDragEnd();
+
+    const handleTouchStart = (e: TouchEvent) => handleDragStart(e.touches[0].clientY);
+    const handleTouchMove = (e: TouchEvent) => handleDragMove(e.touches[0].clientY, () => e.preventDefault());
+    const handleTouchEnd = () => handleDragEnd();
+
+
     container.addEventListener("mousedown", handleMouseDown);
     container.addEventListener("mousemove", handleMouseMove);
     container.addEventListener("mouseup", handleMouseUp);
+
+    container.addEventListener("touchstart", handleTouchStart);
+    container.addEventListener("touchmove", handleTouchMove);
+    container.addEventListener("touchend", handleMouseUp);
 
     return () => {
       container.removeEventListener("mousedown", handleMouseDown);
       container.removeEventListener("mousemove", handleMouseMove);
       container.removeEventListener("mouseup", handleMouseUp);
+
+      container.removeEventListener("touchstart", handleTouchStart);
+      container.removeEventListener("touchmove", handleTouchMove);
+      container.removeEventListener("touchend", handleMouseUp);
+
     };
   }, []);
 
