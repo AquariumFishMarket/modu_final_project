@@ -37,16 +37,20 @@ export default function ProductAdd() {
     setIsFormValid(isValid);
   };
 
-  // 폼 제출 핸들러 정의
+  // 폼 제출 핸들러
   const handleSubmit = async (data: FormData) => {
     try {
-      const imageUrl = await uploadImage(data.itemImage as File);
+      let imageUrl = "";
+
+      if (data.itemImage) {
+        imageUrl = await uploadImage(data.itemImage as File);
+      }
 
       const productData: ProductRequest = {
         itemName: data.itemName as string,
         price: Number((data.price as string)?.replace(/,/g, "") || 0),
         link: data.link as string,
-        itemImage: imageUrl, // 업로드 후 받은 URL
+        itemImage: imageUrl,
       };
 
       console.log("📤 API 전송 데이터:", productData);

@@ -172,7 +172,8 @@ const CreateForm = forwardRef<CommonFormRef, CreateFormProps>(
 
       // onSubmit 호출 - FormData 형식으로 전달
       if (onSubmit) {
-        console.log("폼 값:", formValues);
+        console.log("📝 폼 값:", formValues);
+        console.log("🖼️ 이미지 파일:", imgFiles);
 
         // FormData 형식으로 변환
         const submissionData: Record<string, string | File | undefined> = {
@@ -187,8 +188,6 @@ const CreateForm = forwardRef<CommonFormRef, CreateFormProps>(
             submissionData.itemImage = imgFiles[0];
           }
         }
-
-        console.log("📤 submissionData:", submissionData);
 
         onSubmit(submissionData);
       }

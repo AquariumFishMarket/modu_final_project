@@ -1,5 +1,6 @@
 import type { Product } from "../types/product";
 import { getToken } from "../utils/tokenManager";
+import { ProductRequest } from "../components/common/form/types";
 
 const API_BASE_URL = "https://dev.wenivops.co.kr/services/mandarin";
 
@@ -8,12 +9,9 @@ const API_BASE_URL = "https://dev.wenivops.co.kr/services/mandarin";
  * @param productData 상품 등록 데이터
  * @returns product
  */
-export const fetchProductUpload = async (productData: {
-  itemName: string;
-  price: number;
-  link: string;
-  itemImage: string;
-}): Promise<Product> => {
+export const fetchProductUpload = async (
+  productData: ProductRequest
+): Promise<Product> => {
   const token = getToken();
 
   const response = await fetch(`${API_BASE_URL}/product`, {
@@ -80,7 +78,7 @@ export const fetchProductDetail = async (
 
   const data = await response.json();
 
-  console.log("📦상품 조회: ", data.product);
+  console.log("📦상품 데이터: ", data.product);
 
   return data.product;
 };
