@@ -27,29 +27,46 @@ const FeedPage = () => {
   const isLoading = useFeedStore((state) => state.isInitialLoading);
   const fetchFeeds = useFeedStore((state) => state.fetchFeeds);
   const hasMore = useFeedStore((state) => state.hasMore);
- const isRefreshing = useFeedStore((state) => state.isRefreshing);
+  const isRefreshing = useFeedStore((state) => state.isRefreshing);
+  const isInitialLized = useFeedStore((state) => state.isInitialLized)
+
+  // ref로 최신 상태 유지 (콜백 재생성 방지)
+  const hasMoreRef = useRef(hasMore);
+  const isRefreshingRef = useRef(isRefreshing);
+  useEffect(() => { hasMoreRef.current = hasMore; }, [hasMore]);
+  useEffect(() => { isRefreshingRef.current = isRefreshing; }, [isRefreshing]);
+  const loadInProgressRef = useRef(false);
 
   useEffect(()=>{
-    fetchFeeds();
-  },[])
+    if(isInitialLized) return;
+    fetchFeeds(false);
+  },[isInitialLized])
 
 
   const lastCardRef = useCallback((node: HTMLElement | null) => {
     if (!node) return;
-    if (observer.current) observer.current.disconnect(); // 이전 observer 정리
+    if (observer.current) observer.current.disconnect();
 
     observer.current = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          //console.log("마지막 카드 감지");
-          fetchFeeds(true);
-        }
+        if (!entry.isIntersecting) return;
+
+        // 현재 상태 확인 (ref 사용해 최신 값 참조)
+        if (!hasMoreRef.current) return;
+        if (isRefreshingRef.current) return;
+        if (loadInProgressRef.current) return;
+
+        loadInProgressRef.current = true;
+        // 중복 호출 방지: fetch 완료/오류 시 플래그 해제
+        fetchFeeds(true).finally(() => {
+          loadInProgressRef.current = false;
+        });
       },
       { threshold: 1 }
     );
 
     observer.current.observe(node);
-  }, [hasMore,isRefreshing]);
+  }, [fetchFeeds]);
 
   // 초기 로딩
     if (isLoading) {
@@ -103,33 +120,39 @@ const FeedPage = () => {
     >
       <ToastContainer></ToastContainer>
       <Toast></Toast>
-
       {feedList.map((feed,idx) => {
         const isLast = idx === feedList.length - 1;
 
         return (
-        <PostCard
-          key={`${feed.id}-${idx}`}
-          postId={feed.id}
-          userName={feed.author.username}
-          userId={feed.author.accountname}
-          avatarSrc={feed.profileImg}
-          avatarAlt={`${feed.author.username} 프로필`}
-          content={feed.content}
-          imageSrc={feed.image}
-          imageAlt="게시글 이미지"
-          dateTime={feed.updatedAt} //api 명세 없는부분
-          dateText={feed.updatedAt} //api 명세 없는부분
-          likeCount={feed.author.hearts.length}
-          commentCount={feed.comments.length}
-          isLiked={feed.isLiked}
-          onLikeClick={() => handleLikeToggle(feed.id)}
-          onCommentClick={() => navigate(`/post/${feed.id}`)}
-          ref={isLast? lastCardRef : null}
-        />
+          <PostCard
+            key={`${feed.id}-${idx}`}
+            postId={feed.id}
+            userName={feed.author.username}
+            userId={feed.author.accountname}
+            avatarSrc={feed.profileImg}
+            avatarAlt={`${feed.author.username} 프로필`}
+            content={feed.content}
+            imageSrc={feed.image}
+            imageAlt="게시글 이미지"
+            dateTime={feed.updatedAt} //api 명세 없는부분
+            //dateText={feed.updatedAt} //api 명세 없는부분
+            likeCount={feed.author.hearts.length}
+            commentCount={feed.comments.length}
+            isLiked={feed.isLiked}
+            onLikeClick={() => handleLikeToggle(feed.id)}
+            onCommentClick={() => navigate(`/post/${feed.id}`)}
+            ref={isLast? lastCardRef : null}
+          />
         )
-      })}
 
+      })}
+      { isRefreshing && hasMore && <div style={{ textAlign: 'center', padding: '20px', color: '#999' }}>로딩중..</div>}
+
+      {!isRefreshing && (
+        <div style={{ textAlign: 'center', padding: '20px', color: '#999' }}>
+          마지막 페이지입니다.
+        </div>
+      )}
     </motion.div>
   );
 };
