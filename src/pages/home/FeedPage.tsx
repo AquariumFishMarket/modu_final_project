@@ -1,41 +1,22 @@
 import { useRef, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import DefaultButton from "../../components/common/buttons/Button";
+
 import Toast from "../../components/common/modal/Toast";
 
-import {
-  EmptyFeedSection,
-  LogoImage,
-  FeedSection,
-  FeedItemWrapper,
-  LoadingText,
-  EndMessageText,
-  InitialLoadingSection,
-  RefreshSpinnerWrapper,
-  RefreshSpinner,
-} from "./FeedPage.styled";
+import { InitialLoadingSection } from "./FeedPage.styled";
 import PostCard from "../../components/post/postCard/PostCard";
 import { ToastContainer } from "react-toastify";
 import { useFeedData } from "../../hooks/useFeedData";
-
+//zustand 전역
+import { useFeedStore } from "../../contexts/useFeedStore";
 
 const FeedPage = () => {
   const navigate = useNavigate();
   const {
-    feedList,
-    isLoading,
-    isInitialLoading,
-    isRefreshing,
-    hasMore,
-    scrollContainerRef,
-    loadMoreTriggerRef,
     handleLikeToggle,
-    triggerRefresh,
   } = useFeedData();
 
-  const startY = useRef<number | null>(null);
-  const isRefreshingRef = useRef(false);
 
   // 페이지 애니메이션
   const pageVariants = {
@@ -44,81 +25,16 @@ const FeedPage = () => {
     exit: { opacity: 0, transition: { duration: 0.3 } },
   };
 
+  const feedList = useFeedStore((state) => state.feedList)
+  const isLoading = useFeedStore((state) => state.isInitialLoading);
+  const fetchFeeds = useFeedStore((state) => state.fetchFeeds);
 
-  // 모바일: 터치로 새로고침
-  // useEffect(() => {
-  //   const container = scrollContainerRef.current;
-  //   if (!container) return;
-
-  //   const handleTouchStart = (e: TouchEvent) => {
-  //     if (container.scrollTop === 0) {
-  //       startY.current = e.touches[0].clientY;
-  //     } else {
-  //       startY.current = null;
-  //     }
-  //   };
-
-  //   const handleTouchMove = (e: TouchEvent) => {
-  //     if (startY.current === null) return;
-  //     const distance = e.touches[0].clientY - startY.current;
-  //     if (distance > 80 && !isRefreshingRef.current) {
-  //       isRefreshingRef.current = true;
-  //       triggerRefresh().finally(() => {
-  //         isRefreshingRef.current = false;
-  //       });
-  //     }
-  //   };
-
-  //   container.addEventListener("touchstart", handleTouchStart);
-  //   container.addEventListener("touchmove", handleTouchMove);
-
-  //   return () => {
-  //     container.removeEventListener("touchstart", handleTouchStart);
-  //     container.removeEventListener("touchmove", handleTouchMove);
-  //   };
-  // }, [feedList.length, triggerRefresh]);
-
-  // 데스크톱: 마우스 드래그로 새로고침
-  // useEffect(() => {
-  //   const container = scrollContainerRef.current;
-  //   if (!container) return;
-
-  //   let startY = 0;
-  //   let isDragging = false;
-
-  //   const handlePointerDown = (e: PointerEvent) => {
-  //     if (container.scrollTop === 0) {
-  //       startY = e.clientY;
-  //       isDragging = true;
-  //     }
-  //   };
-
-  //   const handlePointerMove = (e: PointerEvent) => {
-  //     if (!isDragging) return;
-  //     const distance = e.clientY - startY;
-  //     if (distance > 80 && !isRefreshing) {
-  //       isDragging = false;
-  //       triggerRefresh();
-  //     }
-  //   };
-
-  //   const handlePointerUp = () => {
-  //     isDragging = false;
-  //   };
-
-  //   container.addEventListener("pointerdown", handlePointerDown);
-  //   container.addEventListener("pointermove", handlePointerMove);
-  //   container.addEventListener("pointerup", handlePointerUp);
-
-  //   return () => {
-  //     container.removeEventListener("pointerdown", handlePointerDown);
-  //     container.removeEventListener("pointermove", handlePointerMove);
-  //     container.removeEventListener("pointerup", handlePointerUp);
-  //   };
-  // }, [feedList.length, isRefreshing, triggerRefresh]);
+  useEffect(()=>{
+    fetchFeeds();
+  },[])
 
   // 초기 로딩
-    if (isInitialLoading) {
+    if (isLoading) {
       return (
         <motion.div
           initial="initial"
