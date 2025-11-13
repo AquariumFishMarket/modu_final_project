@@ -10,6 +10,8 @@ import {
   createComment,
   likePost,
   unlikePost,
+  likeComment,
+  unlikeComment,
 } from "../../services/postService";
 
 interface Author {
@@ -56,6 +58,8 @@ interface Comment {
   content: string;
   createdAt: string;
   author: CommentAuthor;
+  hearted: boolean;
+  heartCount: number;
 }
 
 function PostDetail() {
@@ -155,6 +159,44 @@ function PostDetail() {
     }
   };
 
+  const handleCommentLikeClick = async (commentId: string) => {
+    if (!postId) return;
+
+    const prevComments = [...comments];
+    const commentIndex = comments.findIndex((c) => c.id === commentId);
+    if (commentIndex === -1) return;
+
+    const currentComment = comments[commentIndex];
+
+    // 낙관적 업데이트
+    const updatedComments = [...comments];
+    updatedComments[commentIndex] = {
+      ...currentComment,
+      hearted: !currentComment.hearted,
+      heartCount: currentComment.hearted
+        ? currentComment.heartCount - 1
+        : currentComment.heartCount + 1,
+    };
+    setComments(updatedComments);
+
+    try {
+      // API 호출
+      const updatedComment = currentComment.hearted
+        ? await unlikeComment(postId, commentId)
+        : await likeComment(postId, commentId);
+
+      if (updatedComment) {
+        const newComments = [...comments];
+        newComments[commentIndex] = updatedComment;
+        setComments(newComments);
+      }
+    } catch (error) {
+      console.error("댓글 좋아요 처리 실패:", error);
+      // 실패 시 롤백
+      setComments(prevComments);
+    }
+  };
+
   if (isLoading) {
     return (
       <PostDetailContainer>
@@ -203,6 +245,9 @@ function PostDetail() {
             content={comment.content}
             dateTime={comment.createdAt}
             dateText={comment.createdAt}
+            isLiked={comment.hearted}
+            likeCount={comment.heartCount}
+            onLikeClick={() => handleCommentLikeClick(comment.id)}
           />
         ))}
       </CommentsSection>

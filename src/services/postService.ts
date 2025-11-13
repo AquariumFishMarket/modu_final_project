@@ -1,4 +1,3 @@
-// import { getAuthHeaders } from "../utils/auth";
 import { getToken } from "../utils/tokenManager";
 
 // API Base URL
@@ -16,53 +15,19 @@ export interface Author {
   follower: [];
   followerCount: number;
   followingCount: number;
-
-// 댓글 응답 타입
-interface CommentResponse {
-  id: string;
-  content: string;
-  createdAt: string;
-  author?: Author;
 }
 
-// 게시글 응답 타입
-interface PostApiResponse {
-  id: string;
-  content: string;
-  image?: string;
-  createdAt: string;
-  author?: Author;
-  heartCount: number;
-  commentCount: number;
-  hearted: boolean;
-}
-
-// 게시글 상세 응답 타입
-interface PostDetailApiResponse {
-  post: PostApiResponse;
-}
-
-// 댓글 목록 응답 타입
-interface CommentsApiResponse {
-  comment: CommentResponse[];
-}
-
-// 댓글 작성 응답 타입
-interface CreateCommentApiResponse {
-  comment: CommentResponse;
-}
-
+// 댓글 타입
 export interface Comment {
-  commentId: string;
-  userName: string;
-  userId: string;
-  avatarSrc: string;
-  avatarAlt: string;
+  id: string;
   content: string;
-  dateTime: string;
-  dateText: string;
+  createdAt: string;
+  author: Author;
+  hearted: boolean;
+  heartCount: number;
 }
 
+// 게시글 상세 타입
 export interface PostDetail {
   id: string;
   content: string;
@@ -71,38 +36,30 @@ export interface PostDetail {
   updatedAt: string;
   hearted: boolean;
   heartCount: number;
-  comments: [];
+  comments: Comment[];
   commentCount: number;
   author: Author;
 }
 
-export interface CommentAuthor {
-  _id: string;
-  username: string;
-  accountname: string;
-  intro: string;
-  image: string;
-  isfollow: boolean;
-  following: [];
-  follower: [];
-  followerCount: number;
-  followingCount: number;
+// API 응답 래퍼 타입
+interface PostDetailApiResponse {
+  post: PostDetail;
 }
 
-export interface Comment {
-  id: string;
-  content: string;
-  createdAt: string;
-  author: CommentAuthor;
+interface CommentsApiResponse {
+  comment: Comment[];
 }
 
+interface CommentApiResponse {
+  comment: Comment;
+}
 
 //  게시글 상세 조회
+
 export async function fetchPostDetail(
   postId: string
 ): Promise<PostDetail | null> {
   try {
-
     const token = getToken();
 
     const response = await fetch(`${BASE_URL}/post/${postId}`, {
@@ -111,7 +68,6 @@ export async function fetchPostDetail(
         Authorization: `Bearer ${token}`,
         "Content-type": "application/json",
       },
-
     });
 
     if (!response.ok) {
@@ -124,19 +80,15 @@ export async function fetchPostDetail(
       throw new Error("게시글 조회 실패");
     }
 
-
-    const data = await response.json();
-
-    return data.post as PostDetail;
-
+    const data: PostDetailApiResponse = await response.json();
+    return data.post;
   } catch (error) {
     console.error("게시글 상세 조회 실패:", error);
     return null;
   }
 }
 
-
-//  게시글 수정
+// 게시글 수정
 
 export async function EditPost(
   postId: string,
@@ -158,7 +110,6 @@ export async function EditPost(
           image: image || "",
         },
       }),
-
     });
 
     if (!response.ok) {
@@ -171,15 +122,12 @@ export async function EditPost(
       if (response.status === 401) {
         throw new Error("유효하지 않은 토큰입니다.");
       }
+      throw new Error("게시글 수정 실패");
     }
 
-
-    const data = await response.json();
-
+    const data: PostDetailApiResponse = await response.json();
     console.log("수정된 게시글: ", data.post);
-
-    return data.post as PostDetail;
-
+    return data.post;
   } catch (error) {
     console.error("게시글 수정 실패:", error);
     throw error;
@@ -216,7 +164,6 @@ export async function deletePost(postId: string): Promise<boolean> {
     }
 
     console.log("deletePost API 응답:", response.status);
-
     return true;
   } catch (error) {
     console.error("게시글 삭제 실패:", error);
@@ -224,7 +171,7 @@ export async function deletePost(postId: string): Promise<boolean> {
   }
 }
 
-//  게시글 좋아요
+// 게시글 좋아요
 
 export async function likePost(postId: string): Promise<PostDetail | null> {
   try {
@@ -248,16 +195,15 @@ export async function likePost(postId: string): Promise<PostDetail | null> {
       throw new Error("좋아요 처리 실패");
     }
 
-    const data = await response.json();
-
-    return data.post as PostDetail;
+    const data: PostDetailApiResponse = await response.json();
+    return data.post;
   } catch (error) {
     console.error("좋아요 처리 실패:", error);
     throw error;
   }
 }
 
-// 게시글 좋아요 취소
+//  게시글 좋아요 취소
 
 export async function unlikePost(postId: string): Promise<PostDetail | null> {
   try {
@@ -281,33 +227,50 @@ export async function unlikePost(postId: string): Promise<PostDetail | null> {
       throw new Error("좋아요 취소 실패");
     }
 
-    const data = await response.json();
-
-    return data.post as PostDetail;
+    const data: PostDetailApiResponse = await response.json();
+    return data.post;
   } catch (error) {
     console.error("좋아요 취소 실패:", error);
     throw error;
   }
 }
 
-//  게시글 좋아요 토글
+//  댓글 목록 조회
 
-// export async function togglePostLike(
-//   postId: string,
-//   isCurrentlyLiked: boolean
-// ): Promise<PostDetail | null> {
-//   return isCurrentlyLiked ? unlikePost(postId) : likePost(postId);
-// }
+export async function fetchPostComments(postId: string): Promise<Comment[]> {
+  try {
+    const token = getToken();
+
+    const response = await fetch(`${BASE_URL}/post/${postId}/comments`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error("존재하지 않는 게시글 ID입니다.");
+      }
+      throw new Error("댓글 조회 실패");
+    }
+
+    const data: CommentsApiResponse = await response.json();
+    return data.comment || [];
+  } catch (error) {
+    console.error("댓글 목록 조회 실패:", error);
+    return [];
+  }
+}
 
 //  댓글 작성
-
 
 export async function createComment(
   postId: string,
   content: string
 ): Promise<Comment | null> {
   try {
-
     const token = getToken();
 
     const response = await fetch(`${BASE_URL}/post/${postId}/comments`, {
@@ -319,7 +282,6 @@ export async function createComment(
       body: JSON.stringify({
         comment: {
           content: content,
-
         },
       }),
     });
@@ -334,50 +296,13 @@ export async function createComment(
       throw new Error("댓글 작성 실패");
     }
 
-
-    const data = await response.json();
-
-    return data.comment as Comment;
-
+    const data: CommentApiResponse = await response.json();
+    return data.comment;
   } catch (error) {
     console.error("댓글 작성 실패:", error);
     return null;
   }
 }
-
-//  댓글 리스트 조회
-
-export async function fetchPostComments(postId: string): Promise<Comment[]> {
-  try {
-    const token = getToken();
-
-    const response = await fetch(`${BASE_URL}/post/${postId}/comments`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-type": "application/json",
-      },
-
-    });
-
-    if (!response.ok) {
-      if (response.status === 404) {
-        throw new Error("존재하지 않는 게시글 ID입니다.");
-      }
-      throw new Error("댓글 조회 실패");
-    }
-
-    const data = await response.json();
-
-    return (data.comment || []) as Comment[];
-  } catch (error) {
-    console.error("댓글 목록 조회 실패:", error);
-    return [];
-  }
-}
-
-//  댓글 수정
-
 
 // 댓글 삭제
 
@@ -411,14 +336,89 @@ export async function deleteComment(
       if (response.status === 401) {
         throw new Error("유효하지 않은 토큰입니다.");
       }
-      throw new Error("게시글 삭제 실패");
+      throw new Error("댓글 삭제 실패");
     }
 
     console.log("deleteComment API 응답:", response.status);
-
     return true;
   } catch (error) {
     console.error("댓글 삭제 실패:", error);
+    throw error;
+  }
+}
+
+//  댓글 좋아요
+
+export async function likeComment(
+  postId: string,
+  commentId: string
+): Promise<Comment | null> {
+  try {
+    const token = getToken();
+
+    const response = await fetch(
+      `${BASE_URL}/post/${postId}/comments/${commentId}/heart`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-type": "application/json",
+        },
+      }
+    );
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error("존재하지 않는 댓글 ID입니다.");
+      }
+      if (response.status === 401) {
+        throw new Error("유효하지 않은 토큰입니다.");
+      }
+      throw new Error("댓글 좋아요 처리 실패");
+    }
+
+    const data: CommentApiResponse = await response.json();
+    return data.comment;
+  } catch (error) {
+    console.error("댓글 좋아요 처리 실패:", error);
+    throw error;
+  }
+}
+
+//  댓글 좋아요 취소
+
+export async function unlikeComment(
+  postId: string,
+  commentId: string
+): Promise<Comment | null> {
+  try {
+    const token = getToken();
+
+    const response = await fetch(
+      `${BASE_URL}/post/${postId}/comments/${commentId}/unheart`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-type": "application/json",
+        },
+      }
+    );
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error("존재하지 않는 댓글 ID입니다.");
+      }
+      if (response.status === 401) {
+        throw new Error("유효하지 않은 토큰입니다.");
+      }
+      throw new Error("댓글 좋아요 취소 실패");
+    }
+
+    const data: CommentApiResponse = await response.json();
+    return data.comment;
+  } catch (error) {
+    console.error("댓글 좋아요 취소 실패:", error);
     throw error;
   }
 }
