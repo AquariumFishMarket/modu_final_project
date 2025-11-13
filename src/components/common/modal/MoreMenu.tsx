@@ -8,6 +8,8 @@ import { useAuth } from "../../../contexts/AuthContext";
 interface MoreMenuProps {
   type: "profile" | "post" | "comment" | "chat" | "chatList" | "product";
   size?: "sm" | "md" | "lg";
+  isMyComment?: boolean; // 댓글일 때 내 댓글인지 여부
+  isMyPost?: boolean; // 게시글일 때 내 게시글인지 여부
   onEdit?: () => void;
   onDelete?: () => void;
   onReport?: () => void;
@@ -60,6 +62,8 @@ const MoreButton = styled.button<{ $size: "sm" | "md" | "lg" }>`
 export default function MoreMenu({
   type,
   size = "lg",
+  isMyComment,
+  isMyPost,
   onEdit,
   onDelete,
   onReport,
@@ -71,7 +75,7 @@ export default function MoreMenu({
   const navigate = useNavigate();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [alertType, setAlertType] = useState<
-    "delete" | "logout" | "sold" | null
+    "delete" | "deleteComment" | "logout" | "sold" | "reportPost" | null
   >(null);
   const { logout } = useAuth();
 
@@ -91,6 +95,12 @@ export default function MoreMenu({
     console.log("삭제 버튼 클릭, 모달 오픈");
   };
 
+  const handleDeleteComment = () => {
+    closeSheet();
+    setAlertType("deleteComment");
+
+  };
+
   const handleLogout = () => {
     closeSheet();
     setAlertType("logout");
@@ -101,6 +111,12 @@ export default function MoreMenu({
     closeSheet();
     setAlertType("sold");
     console.log("판매완료?");
+  };
+
+  const handleReportPost = () => {
+    closeSheet();
+    setAlertType("reportPost");
+
   };
 
   // 실제 로그아웃 처리 함수
@@ -152,45 +168,75 @@ export default function MoreMenu({
         {/* 게시글 */}
         {type === "post" && (
           <>
-            <SheetItem
-              onClick={() => {
-                onEdit?.();
-                closeSheet();
-              }}
-            >
-              수정
-            </SheetItem>
-            <SheetItem onClick={handleDelete}>삭제</SheetItem>
+            {isMyPost ? (
+              // 내 게시글: 수정, 삭제
+              <>
+                {onEdit && (
+                  <SheetItem
+                    onClick={() => {
+                      onEdit();
+                      closeSheet();
+                    }}
+                  >
+                    수정
+                  </SheetItem>
+                )}
+                {onDelete && (
+                  <SheetItem className="danger" onClick={handleDelete}>
+                    삭제
+                  </SheetItem>
+                )}
+              </>
+            ) : (
+              // 다른 사람 게시글: 신고하기만
+              <>
+                {onReport && (
+                  <SheetItem className="danger" onClick={handleReportPost}>
+                    신고하기
+                  </SheetItem>
+                )}
+              </>
+            )}
           </>
         )}
 
         {/* 댓글 */}
         {type === "comment" && (
           <>
-            {onEdit && (
-              <SheetItem
-                onClick={() => {
-                  onEdit();
-                  closeSheet();
-                }}
-              >
-                수정
-              </SheetItem>
-            )}
-            {onDelete && (
-              <SheetItem className="danger" onClick={handleDelete}>
-                삭제
-              </SheetItem>
-            )}
-            {onReport && (
-              <SheetItem
-                onClick={() => {
-                  onReport();
-                  closeSheet();
-                }}
-              >
-                신고
-              </SheetItem>
+            {isMyComment ? (
+              // 내 댓글: 수정, 삭제
+              <>
+                {onEdit && (
+                  <SheetItem
+                    onClick={() => {
+                      onEdit();
+                      closeSheet();
+                    }}
+                  >
+                    수정
+                  </SheetItem>
+                )}
+                {onDelete && (
+                  <SheetItem className="danger" onClick={handleDeleteComment}>
+                    삭제
+                  </SheetItem>
+                )}
+              </>
+            ) : (
+              // 다른 사람 댓글: 신고하기만
+              <>
+                {onReport && (
+                  <SheetItem
+                    className="danger"
+                    onClick={() => {
+                      onReport();
+                      closeSheet();
+                    }}
+                  >
+                    신고하기
+                  </SheetItem>
+                )}
+              </>
             )}
           </>
         )}
@@ -234,8 +280,10 @@ export default function MoreMenu({
         type={alertType}
         onConfirm={{
           delete: onDelete,
+          deleteComment: onDelete,
           logout: performLogout,
           sold: onMarkAsSold,
+          reportPost: onReport,
         }}
       />
     </>
