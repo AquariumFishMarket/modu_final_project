@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   ProductSection,
   ProductTitle,
@@ -10,18 +10,17 @@ import {
   ProductInfoBox,
   ProductName,
   ProductPrice,
-  EmptyMessage,
-  LoadingMessage,
-  ErrorMessage,
+  // EmptyMessage,
+  // LoadingMessage,
+  // ErrorMessage,
 } from "./SellingProducts.styled";
 import type { Product } from "../../../types/product";
-import { getAuthHeaders } from "../../../utils/auth";
-
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api";
+import { fetchProductList } from "../../../services/productService";
+import { useAuth } from "../../../contexts/AuthContext";
 
 interface SellingProductsProps {
   isLastSection?: boolean;
+  accountname?: string;
 }
 
 // 가격 포맷터 (성능 최적화 및 일관성)
@@ -29,8 +28,14 @@ const priceFormatter = new Intl.NumberFormat("ko-KR", {
   style: "decimal",
 });
 
-function SellingProducts({ isLastSection = false }: SellingProductsProps) {
+function SellingProducts({
+  isLastSection = false,
+  accountname,
+}: SellingProductsProps) {
   const navigate = useNavigate();
+  const params = useParams<{ userId?: string }>();
+  const { currentUser } = useAuth();
+
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -42,27 +47,29 @@ function SellingProducts({ isLastSection = false }: SellingProductsProps) {
   const scrollLeftRef = useRef(0);
   const dragDistanceRef = useRef(0); // 드래그 이동량 추적 (성능 최적화)
 
-  //  API: 판매 중인 상품 목록 가져오기
-  //  API 연동 시 주석 해제
-
+  // ✅ 판매 중인 상품 목록 가져오기
   useEffect(() => {
     const controller = new AbortController();
 
     const fetchProducts = async () => {
+      const targetAccountname =
+        accountname || params.userId || currentUser?.accountname;
+
+      if (!targetAccountname) {
+        console.error("accountname이 없습니다");
+        setIsLoading(false);
+        return;
+      }
+
       try {
         setIsLoading(true);
         setError(null);
 
-        const response = await fetch(`${API_BASE_URL}/products/selling`, {
-          headers: getAuthHeaders(),
-          signal: controller.signal,
-        });
+        const result = await fetchProductList(targetAccountname);
 
-        if (!response.ok)
-          throw new Error("상품을 불러오는데 실패했습니다");
+        console.log(`${targetAccountname}의 상품 리스트:`, result);
 
-        const data = await response.json();
-        setProducts(data.products);
+        setProducts(result.product);
       } catch (error) {
         if (error instanceof Error && error.name === "AbortError") {
           return;
@@ -78,7 +85,7 @@ function SellingProducts({ isLastSection = false }: SellingProductsProps) {
     fetchProducts();
 
     return () => controller.abort();
-  }, []);
+  }, [accountname, params.userId, currentUser?.accountname]);
 
   // 드래그 스크롤 시작 (마우스)
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -139,10 +146,8 @@ function SellingProducts({ isLastSection = false }: SellingProductsProps) {
     // 실제로 드래그 했을 때만 클릭 이벤트 무시 (5px 이상 이동)
     if (dragDistanceRef.current > 5) return;
 
-    // 상품 상세 페이지로 이동
-    if (product.link) {
-      navigate(product.link);
-    }
+    // ✅ 상품 상세 페이지로 이동
+    navigate(`/product/${product.id}`);
   };
 
   // 상품 이미지 URL 가져오기 (안전하게 처리)

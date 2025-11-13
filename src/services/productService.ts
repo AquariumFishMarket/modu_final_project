@@ -78,7 +78,7 @@ export const fetchProductDetail = async (
 
   const data = await response.json();
 
-  console.log("📦상품 데이터: ", data.product);
+  console.log("📦상품 조회: ", data.product);
 
   return data.product;
 };
@@ -163,9 +163,11 @@ export const deleteProduct = async (productId: string): Promise<void> => {
 /**
  * 상품 리스트 -> 판매중인 물품
  * @param accountname 판매자 계정ID
- * @return { data, product: [] }
+ * @return { data: number, product: Product[] }
  */
-export const fetchProductList = async (accountname: string): Promise<void> => {
+export const fetchProductList = async (
+  accountname: string
+): Promise<{ data: number; product: Product[] }> => {
   const token = getToken();
 
   const response = await fetch(`${API_BASE_URL}/product/${accountname}`, {
@@ -188,7 +190,7 @@ export const fetchProductList = async (accountname: string): Promise<void> => {
 
   const data = await response.json();
 
-  console.log("📦상품 리스트: ", data); // { data, product: [] }
+  console.log("📦 상품 리스트: ", data); // { data, product: [] }
 
   return data;
 };
