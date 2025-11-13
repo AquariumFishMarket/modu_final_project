@@ -15,7 +15,7 @@ import { useFeedStore } from "../../contexts/useFeedStore";
 // import { relative } from "path";
 
 const LayoutContainer = styled.div<{ $isProfile?: boolean }>`
-position: relative;
+  position: relative;
   max-width: 600px;
   width: 100%;
   height: 100vh;
@@ -52,6 +52,11 @@ const MainContent = styled.main<{
 `;
 
 const RefreshAlert = styled.div<{$letter: boolean, $height: number}>`
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  background: var(--color-primary-100);
   position: absolute;
   top: 48px;
   width: 100%;
@@ -63,25 +68,33 @@ const RefreshAlert = styled.div<{$letter: boolean, $height: number}>`
   text-align: center;
   padding: 25px 0;
   margin-bottom: 10px;
-  animation : ${(props)=>props.$height > 0 && 'opacityStype 0.7s ease-in-out'};
-  letter-spacing : ${(props)=>props.$letter ? '2px' : '0'};
+  animation : ${(props)=>props.$height > 0 && 'opacityStype 1s ease-in-out'};
   font-size: 1.8rem;
   font-weight: 600;
   p {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 3px;
+    gap: ${(props) => (props.$height > 30 ? '8px' : '3px')};
+    transition: gap 0.5s ease;
   }
   span {
     display: inline-block;
-    width: ${(props)=>props.$letter ? 'auto' : '0'};
-    height: ${(props)=>props.$letter ? 'auto' : '0'};
-    opacity: ${(props)=>props.$letter ? '1' : '0'};
+    position: relative;
+    max-width: ${(props) => (props.$height > 30 ? '80px' : '0px')};
+    top: ${(props) => (props.$height > 30 ? '0' : '-20px')};
+    opacity: ${(props) => (props.$height > 30 ? '1' : '0')};
+    transform: ${(props) =>
+      props.$height > 30 ? 'translateY(0)' : 'translateY(-15px)'};
+    transition:
+      transform 0.6s ease,
+      opacity 0.6s ease,
+      top 0.6s ease;
     overflow: hidden;
-    transition: all 0.7s;
     color: var(--color-primary-500);
+    will-change: transform, opacity, top;
   }
+
 
   @keyframes opacityStype {
     0% {
@@ -92,6 +105,135 @@ const RefreshAlert = styled.div<{$letter: boolean, $height: number}>`
     }
   }
 `
+const Fish1 = styled.img<{$transform: number}>`
+    position: absolute;
+    top: -35px;
+    left: -50px;
+    transform: scale3d(0.5, 0.5, 0.5);
+    opacity: 0;
+    animation : ${(props)=>props.$transform > 60 && 'animations 0.7s forwards'};
+    @keyframes animations {
+      0% {
+        top: -35px;
+        left: -50px;
+        opacity: 0;
+        transform: scale3d(0.3, 0.3, 0.3);
+      }
+      100% {
+        top: -50px;
+        left: -76px;
+        opacity: 1;
+        transform: scale3d(0.5, 0.5, 0.5);
+      }
+    }
+`
+const Fish2 = styled.img<{$transform: number}>`
+    position: absolute;
+    bottom: -35px;
+    right: -50px;
+    transform: scale3d(0.5, 0.5, 0.5) scaleX(-1);
+    opacity: 0;
+    animation : ${(props)=>props.$transform > 60 && 'animations2 0.7s forwards'};
+    @keyframes animations2 {
+      0% {
+        bottom: -35px;
+        right: -50px;
+        opacity: 0;
+        transform: scale3d(0.3, 0.3, 0.3) scaleX(-1);
+      }
+      100% {
+        bottom: -50px;
+        right: -76px;
+        opacity: 1;
+        transform: scale3d(0.5, 0.5, 0.5) scaleX(-1);
+      }
+    }
+`
+const Seashall = styled.img<{$transform: number}>`
+    position: absolute;
+    bottom: -25px;
+    right: 0;
+    transform: scale3d(0.7, 0.7, 0.7);
+    opacity: 0;
+    animation : ${(props)=>props.$transform > 60 && 'animations3 0.7s forwards'};
+    @keyframes animations3 {
+      0% {
+        bottom: -25px;
+        right: 0;
+        opacity: 0;
+        transform: scale3d(0.7, 0.7, 0.7);
+      }
+      100% {
+        bottom: -40px;
+        right: -10px;
+        opacity: 1;
+        transform: scale3d(1,1,1);
+      }
+    }
+`
+const Coral = styled.img<{$transform: number}>`
+    position: absolute;
+    top: -10px;
+    left: -60px;
+    transform: scale3d(0.7, 0.7, 0.7);
+    opacity: 0;
+    animation : ${(props)=>props.$transform > 60 && 'animations4 0.7s forwards'};
+    @keyframes animations4 {
+      0% {
+        top: -10px;
+        left: -60px;
+        opacity: 0;
+        transform: scale3d(0.5, 0.5, 0.5);
+      }
+      100% {
+        top: -10px;
+        left: -100px;
+        opacity: 1;
+        transform: scale3d(1,1,1);
+      }
+    }
+`
+const Drop = styled.img<{$transform: number}>`
+    position: absolute;
+    top: -35px;
+    right: -30px;
+    transform: scale3d(0.4, 0.4, 0.4);
+    opacity: 0;
+    animation : ${(props)=>props.$transform > 60 && 'animations5 0.7s forwards'};
+    @keyframes animations5 {
+      0% {
+        top: -35px;
+        right: -30px;
+        opacity: 0;
+      }
+      100% {
+        top: -35px;
+        right: -45px;
+        opacity: 1;
+      }
+    }
+`
+const Drop2 = styled.img<{$transform: number}>`
+    position: absolute;
+    bottom: -40px;
+    left: -60px;
+    transform: scale3d(0.6, 0.6, 0.6);
+    opacity: 0;
+    animation : ${(props)=>props.$transform > 60 && 'animations6 0.7s forwards'};
+    @keyframes animations6 {
+      0% {
+        bottom: -40px;
+        left: -60px;
+        opacity: 0;
+      }
+      100% {
+        bottom: -40px;
+        left: -60px;
+        opacity: 1;
+      }
+    }
+`
+
 
 function LayoutContent() {
   const location = useLocation();
@@ -106,9 +248,7 @@ function LayoutContent() {
   const isLetterRef = useRef(false);
   const hasMoveRef = useRef(false);
   const { scrollContainerRef } = useFeedData();
-
-  const fetchFeeds = useFeedStore((state) => state.fetchFeeds);
-const refreshFeed = useFeedStore((state) => state.refreshFeed);
+  const refreshFeed = useFeedStore((state) => state.refreshFeed);
 
   useEffect(() => {
     const path = location.pathname;
@@ -138,7 +278,7 @@ const refreshFeed = useFeedStore((state) => state.refreshFeed);
 
       if (distance > 0) {
         preventDefault();
-        setPull(Math.min(distance, 120)); // 최대 100px까지만
+        setPull(Math.min(distance, 120)); // 최대 드래그
         container.style.transform = `translateY(${Math.min(distance, 120)}px)`;
         currentPullRef.current = Math.min(distance, 120);
       }
@@ -171,8 +311,6 @@ const refreshFeed = useFeedStore((state) => state.refreshFeed);
 
     const handleTouchStart = (e: TouchEvent) => handleDragStart(e.touches[0].clientY);
     const handleTouchMove = (e: TouchEvent) => handleDragMove(e.touches[0].clientY, () => e.preventDefault());
-    const handleTouchEnd = () => handleDragEnd();
-
 
     container.addEventListener("mousedown", handleMouseDown);
     container.addEventListener("mousemove", handleMouseMove);
@@ -361,9 +499,18 @@ const refreshFeed = useFeedStore((state) => state.refreshFeed);
     <>
       <LayoutContainer $isProfile={isProfilePage}>
         <Header />
-        {pull !==0 && (
+
+      {pull !==0 && (
         <RefreshAlert $letter={isLetterRef.current} $height={pull}>
-          <p>땡겨서 <span>피쉬마켓</span> 새로고침</p>
+          <div style={{ position: 'relative' }}>
+            <Fish1 src="/img/fish-character.png" $transform={pull} alt="물고기"/>
+            <Seashall src="/img/seashall-character.png" $transform={pull} alt="조개껍질"></Seashall>
+            <p>땡겨서 <span>피쉬마켓</span> 새로고침</p>
+            <Fish2 src="/img/fish-character.png" $transform={pull} alt="물고기"/>
+            <Coral src="/img/coral-character.png" $transform={pull} alt="산호"/>
+            <Drop src="/img/drop.png" $transform={pull} alt="물방울"/>
+            <Drop2 src="/img/drop.png" $transform={pull} alt="물방울"/>
+          </div>
         </RefreshAlert>
         )}
         <AnimatePresence mode="wait">
