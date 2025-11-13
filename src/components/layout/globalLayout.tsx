@@ -101,12 +101,12 @@ function LayoutContent() {
   //drag 이벤트
   const [pull, setPull] = useState(0);
   const startYRef = useRef(0);
+  const currentPullRef = useRef(0);
   const isDraggingRef = useRef(false);
+  const isLetterRef = useRef(false);
+  const hasMoveRef = useRef(false);
+  const { scrollContainerRef } = useFeedData();
 
-  const isLetterRef = useRef(false)
-  const {
-    scrollContainerRef
-  } = useFeedData();
   const fetchFeeds = useFeedStore((state) => state.fetchFeeds);
 
   useEffect(() => {
@@ -122,7 +122,7 @@ function LayoutContent() {
       if (container.scrollTop === 0) {
         isDraggingRef.current = true;
         startYRef.current = e.clientY;
-
+        hasMoveRef.current = false;
         //글자 셋팅
         isLetterRef.current = false;
       }
@@ -132,10 +132,16 @@ function LayoutContent() {
       if (!isDraggingRef.current) return;
 
       const distance = e.clientY - startYRef.current;
+
+      if(Math.abs(distance) > 7) {
+        hasMoveRef.current = true
+      }
+
       if (distance > 0) {
         e.preventDefault();
         setPull(Math.min(distance, 120)); // 최대 100px까지만
         container.style.transform = `translateY(${Math.min(distance, 120)}px)`;
+        currentPullRef.current = Math.min(distance, 120);
       }
 
       if( distance > 70) {
@@ -144,15 +150,18 @@ function LayoutContent() {
       }
     };
 
-    const handleMouseUp = () => {
+    const handleMouseUp = (e:MouseEvent) => {
       if (isDraggingRef.current) {
         isDraggingRef.current = false;
         container.style.transform = `translateY(0px)`;
         setPull(0);
-
         isLetterRef.current = false;
 
-        fetchFeeds();
+        if(hasMoveRef.current && currentPullRef.current > 80) {
+          fetchFeeds();
+        }
+
+        hasMoveRef.current = false;
       }
     };
 
