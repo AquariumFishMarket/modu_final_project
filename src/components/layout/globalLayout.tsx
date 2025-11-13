@@ -36,9 +36,9 @@ const MainContent = styled.main<{
   overflow-y: auto;
   position: relative; //스크롤 버튼을 위해
  / * padding-bottom: ${(props) => {
-    if (props.$isProfile) return "0";
-    return props.$hasFooter ? "110px" : "50px";
-  }}; * /
+   if (props.$isProfile) return "0";
+   return props.$hasFooter ? "110px" : "50px";
+ }}; * /
   padding-bottom: 110px;
   background-color: ${(props) =>
     props.$isChatRoom ? "var(--color-gray-light)" : "#fff"};
@@ -48,9 +48,7 @@ function LayoutContent() {
   const location = useLocation();
   const { setHeaderConfig } = useHeader();
   const navigate = useNavigate();
-  const {
-    scrollContainerRef
-  } = useFeedData();
+  const { scrollContainerRef } = useFeedData();
   // 경로별 헤더 자동 설정
   useEffect(() => {
     const path = location.pathname;
@@ -131,10 +129,10 @@ function LayoutContent() {
     }
 
     // 상품 추가
-    if (path === "/product/add") {
+    if (path === "/product") {
       setHeaderConfig({
         show: true,
-        type: "productAdd",
+        type: "product",
         onBackClick: () => navigate(-1),
       });
       return;

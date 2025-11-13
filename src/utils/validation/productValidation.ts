@@ -52,29 +52,29 @@ export const formatPrice = (price: string): string => {
 };
 
 // 상품 설명 유효성 검사 (10-500자)
-export const validateDescription = (description: string): string | null => {
-  const trimmedDesc = description.trim();
+// export const validateDescription = (description: string): string | null => {
+//   const trimmedDesc = description.trim();
 
-  if (!trimmedDesc) {
-    return "상품 설명을 입력해주세요.";
-  }
+//   if (!trimmedDesc) {
+//     return "상품 설명을 입력해주세요.";
+//   }
 
-  if (trimmedDesc.length < 10) {
-    return "상품 설명은 10자 이상 입력해주세요.";
-  }
+//   if (trimmedDesc.length < 10) {
+//     return "상품 설명은 10자 이상 입력해주세요.";
+//   }
 
-  if (trimmedDesc.length > 500) {
-    return "상품 설명은 500자 이하로 입력해주세요.";
-  }
+//   if (trimmedDesc.length > 500) {
+//     return "상품 설명은 500자 이하로 입력해주세요.";
+//   }
 
-  return null;
-};
+//   return null;
+// };
 
 // 상품 필드 설정 객체
 export const getProductFields = () => {
   const fields = [
     {
-      name: "productname",
+      name: "itemName",
       label: "상품명",
       placeholder: "2-10자 이내여야 합니다.",
       required: true,
@@ -94,15 +94,15 @@ export const getProductFields = () => {
       placeholder: "URL을 입력해 주세요.",
       required: false,
     },
-    {
-      name: "description",
-      label: "상품 설명",
-      placeholder: "상품에 대한 자세한 설명을 입력해주세요.",
-      required: true,
-      validator: validateDescription,
-      type: "textarea" as const,
-      maxLength: 500,
-    },
+    // {
+    //   name: "description",
+    //   label: "상품 설명",
+    //   placeholder: "상품에 대한 자세한 설명을 입력해주세요.",
+    //   required: true,
+    //   validator: validateDescription,
+    //   type: "textarea" as const,
+    //   maxLength: 500,
+    // },
   ];
 
   return fields;

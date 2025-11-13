@@ -130,7 +130,7 @@ function Header() {
       )}
 
       {/* 상품 등록 */}
-      {config.type === "productAdd" && (
+      {config.type === "product" && (
         <Section>
           <IconButton onClick={config.onBackClick}>
             <img src="/img/icon-arrow-left.svg" alt="이전 페이지로 이동" />
@@ -207,7 +207,9 @@ function Header() {
             <IconButton onClick={config.onBackClick}>
               <img src="/img/icon-arrow-left.svg" alt="이전 페이지로 이동" />
             </IconButton>
-            <h2 style={{ position: 'relative', top: '-1px' }}>{config.userName}</h2>
+            <h2 style={{ position: "relative", top: "-1px" }}>
+              {config.userName}
+            </h2>
           </ChatUserContainer>
           <MoreMenu
             type="chatList"

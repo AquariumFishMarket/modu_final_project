@@ -113,13 +113,11 @@ const CreateForm = forwardRef<CommonFormRef, CreateFormProps>(
         return;
       }
 
-      console.log(`${fieldName} 유효성 검사 시작:`, value);
       setValidationStatus((prev) => ({ ...prev, [fieldName]: "checking" }));
       setErrors((prev) => ({ ...prev, [fieldName]: "" }));
 
       try {
         const errorMessage = await field.validator(value);
-        console.log(`${fieldName} 검사 결과:`, errorMessage);
 
         if (errorMessage) {
           setErrors((prev) => ({ ...prev, [fieldName]: errorMessage }));
@@ -127,8 +125,8 @@ const CreateForm = forwardRef<CommonFormRef, CreateFormProps>(
         } else {
           setValidationStatus((prev) => ({ ...prev, [fieldName]: "success" }));
         }
-      } catch (err) {
-        console.error(`${fieldName} 검사 오류:`, err);
+      } catch (error) {
+        console.error(`${fieldName} 검사 오류:`, error);
         setErrors((prev) => ({
           ...prev,
           [fieldName]: "검사 중 오류가 발생했습니다.",
@@ -172,19 +170,25 @@ const CreateForm = forwardRef<CommonFormRef, CreateFormProps>(
         return false;
       }
 
-      // onSubmit 호출 - FormSubmissionData 형식으로 전달
+      // onSubmit 호출 - FormData 형식으로 전달
       if (onSubmit) {
-        console.log("onSubmit 호출:", formValues);
+        console.log("폼 값:", formValues);
 
-        // FormSubmissionData 형식으로 변환
-        const submissionData: Record<string, string | File | null> = {
+        // FormData 형식으로 변환
+        const submissionData: Record<string, string | File | undefined> = {
           ...formValues,
         };
 
         // 이미지 파일이 있으면 추가
-        if (formType === "profile" && imgFiles.length > 0) {
-          submissionData.profileImage = imgFiles[0];
+        if (imgFiles.length > 0) {
+          if (formType === "profile") {
+            submissionData.image = imgFiles[0];
+          } else if (formType === "product") {
+            submissionData.itemImage = imgFiles[0];
+          }
         }
+
+        console.log("📤 submissionData:", submissionData);
 
         onSubmit(submissionData);
       }
@@ -254,7 +258,7 @@ const CreateForm = forwardRef<CommonFormRef, CreateFormProps>(
 
             <FormBtnContainer $formType={formType}>
               <ImageUpButton
-                multiple={formType === "product"}
+                multiple={false} // 상품도 단일 이미지
                 colortype="color"
                 size="small"
                 imgArr={imgFiles}
@@ -271,7 +275,7 @@ const CreateForm = forwardRef<CommonFormRef, CreateFormProps>(
                 {field.required && <RequiredCheck>*</RequiredCheck>}
               </label>
 
-              {/* 🆕 조건부 렌더링 - textarea vs input */}
+              {/* 조건부 렌더링 - textarea vs input */}
               {field.type === "textarea" ? (
                 <textarea
                   id={field.name}
