@@ -12,9 +12,6 @@ import MoreMenu from "../common/modal/MoreMenu";
 import { formatPostDate } from "../../utils/formatter/dateFormatter";
 import { deletePost, EditPost } from "../../services/postService";
 
-// API 연동 준비 (추후 사용)
-// import { Author } from "../../types/post";
-
 interface PostHeaderProps {
   userName: string;
   userId: string;
@@ -25,10 +22,11 @@ interface PostHeaderProps {
   variant?: "post" | "comment";
   dateTime?: string;
   dateText?: string;
-  onDelete?: () => void;
-
-  // API 연동 준비 (추후 사용)
-  // author: Author;
+  isMyComment?: boolean; // 댓글일 때 내 댓글인지 여부
+  isMyPost?: boolean; // 게시글일 때 내 게시글인지 여부
+  onEdit?: () => void; // 댓글 수정 핸들러
+  onDelete?: () => void; // 댓글 삭제 핸들러
+  onReport?: () => void; // 댓글/게시글 신고 핸들러
 }
 
 function PostHeader({
@@ -39,7 +37,11 @@ function PostHeader({
   postId,
   variant = "post",
   dateTime,
+  isMyComment,
+  isMyPost,
+  onEdit,
   onDelete,
+  onReport,
 }: PostHeaderProps) {
   const navigate = useNavigate();
   const [imgSrc, setImgSrc] = useState(avatarSrc);
@@ -106,39 +108,21 @@ function PostHeader({
         <MoreMenu
           type="comment"
           size="md"
-          onEdit={handleEditPost}
-          onDelete={handleDeletePost}
+          isMyComment={isMyComment}
+          onEdit={onEdit}
+          onDelete={onDelete}
+          onReport={onReport}
         />
       ) : (
         <MoreMenu
           type="post"
           size="sm"
+          isMyPost={isMyPost}
           onEdit={handleEditPost}
           onDelete={handleDeletePost}
+          onReport={onReport}
         />
       )}
-
-      {/* <MoreButton aria-label={variant === "comment" ? "댓글 더보기" : "게시글 더보기"} onClick={() => onMoreClick?.(postId)}>
-         <img src="/img/icon-more-vertical.svg" alt="" />
-       </MoreButton> */}
-
-      {/* API 연동 준비 (추후 사용) */}
-      {/* <UserInfo>
-        <UserAvatar
-          src={author.image || "/img/fish-logo-GB.png"}
-          alt={`${author.username} 프로필 이미지`}
-        />
-        <UserDetails>
-          <UserName>{author.username}</UserName>
-          <UserId>@{author.accountname}</UserId>
-        </UserDetails>
-      </UserInfo>
-      <MoreButton
-        aria-label="게시글 더보기"
-        onClick={handleMoreClick}
-      >
-        <img src="/img/icon-more-vertical.svg" alt="" />
-      </MoreButton> */}
     </StyledPostHeader>
   );
 }
