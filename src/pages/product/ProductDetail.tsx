@@ -28,7 +28,7 @@ const ProductImage = styled.img`
   height: 300px;
   object-fit: cover;
   border-radius: 12px;
-  margin-bottom: 30px;
+  margin-bottom: 15px;
 `;
 
 // const ThumbnailContainer = styled.div`
@@ -50,6 +50,25 @@ const ProductImage = styled.img`
 
 //   &:hover {
 //     opacity: 0.8;
+//   }
+// `;
+
+// const SellerSection = styled.div`
+//   display: flex;
+//   padding-bottom: 10px;
+//   border-bottom: 1px solid var(--color-gray-medium);
+
+//   img {
+//     width: 40px;
+//     height: 40px;
+//     margin-right: 15px;
+//   }
+
+//   p {
+//     font-size: var(--font-size-lg);
+//     font-weight: 500;
+//     display: flex;
+//     align-items: center;
 //   }
 // `;
 
@@ -302,6 +321,8 @@ export default function ProductDetail() {
     <>
       <ContentWrapper>
         <ProductContainer>
+          <h2 className="sr-only">판매상품 상세 페이지</h2>
+
           {/* 메인 이미지 */}
           <ProductImage
             src={product.itemImage}
@@ -324,6 +345,15 @@ export default function ProductDetail() {
               ))}
             </ThumbnailContainer>
           )} */}
+
+          {/* 판매자 부분 */}
+          {/* <SellerSection>
+            <img
+              src={product.author.image}
+              alt={`${product.author}의 프로필 이미지`}
+            />
+            <p>{product.author.accountname}</p>
+          </SellerSection> */}
 
           {/* 판매 완료 태그 */}
           {isSold && <SoldTag>거래완료</SoldTag>}

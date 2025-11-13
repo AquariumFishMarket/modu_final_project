@@ -127,7 +127,6 @@ export const updateProduct = async (
 /**
  * 상품 삭제
  * @param productId 상품 ID
- * @return product
  */
 export const deleteProduct = async (productId: string): Promise<void> => {
   const token = getToken();
@@ -155,9 +154,9 @@ export const deleteProduct = async (productId: string): Promise<void> => {
 
   const data = await response.json();
 
-  console.log("📦상품 삭제: ", data.product);
+  console.log("📦상품 삭제 메세지: ", data);
 
-  return data.product;
+  // 삭제만 하면 되니까 반환 하지 않음
 };
 
 /**
