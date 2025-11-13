@@ -4,7 +4,7 @@ import FloatingChatbot from "../chatbot/FloatingChatbot";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { HeaderProvider, useHeader } from "../../contexts/HeaderContext";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ScrollButton from "../common/buttons/ScrollButton";
 import { useFeedData } from "../../hooks/useFeedData";
@@ -12,6 +12,7 @@ import { useFeedData } from "../../hooks/useFeedData";
 // import { relative } from "path";
 
 const LayoutContainer = styled.div<{ $isProfile?: boolean }>`
+position: relative;
   max-width: 600px;
   width: 100%;
   height: 100vh;
@@ -28,13 +29,17 @@ const MainContent = styled.main<{
   $isChatRoom?: boolean;
   $isPostDetail?: boolean;
 }>`
+
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
   height: 100%;
   /* padding: ${(props) =>
     props.$isPostDetail ? "68px 25px 0" : "68px 15px 0"}; */
   padding: 68px 16px 0;
   overflow-x: hidden;
   overflow-y: auto;
-  position: relative; //스크롤 버튼을 위해
  / * padding-bottom: ${(props) => {
     if (props.$isProfile) return "0";
     return props.$hasFooter ? "110px" : "50px";
@@ -44,10 +49,117 @@ const MainContent = styled.main<{
     props.$isChatRoom ? "var(--color-gray-light)" : "#fff"};
 `;
 
+const RefreshAlert = styled.div<{$letter: boolean, $height: number}>`
+  position: absolute;
+  top: 48px;
+  width: 100%;
+  height: ${(props)=>props.$height}px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 120;
+  text-align: center;
+  padding: 25px 0;
+  margin-bottom: 10px;
+  animation : ${(props)=>props.$height > 0 && 'opacityStype 0.7s ease-in-out'};
+  letter-spacing : ${(props)=>props.$letter ? '2px' : '0'};
+  font-weight: 600;
+  p {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 3px;
+  }
+  span {
+    display: inline-block;
+    width: ${(props)=>props.$letter ? 'auto' : '0'};
+    height: ${(props)=>props.$letter ? 'auto' : '0'};
+    opacity: ${(props)=>props.$letter ? '1' : '0'};
+    overflow: hidden;
+    transition: all 0.7s;
+    color: var(--color-primary-500);
+  }
+
+  @keyframes opacityStype {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+`
+
 function LayoutContent() {
   const location = useLocation();
   const { setHeaderConfig } = useHeader();
   const navigate = useNavigate();
+
+  //drag 이벤트
+  const [pull, setPull] = useState(0);
+  const startYRef = useRef(0);
+  const isDraggingRef = useRef(false);
+
+  const isLetterRef = useRef(false)
+
+  useEffect(() => {
+    const path = location.pathname;
+    if (path !== '/feed') return; // main feed 페이지에서만 작동합니다
+
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const handleMouseDown = (e: MouseEvent) => {
+      // 맨 위에서만 새로고침 동작
+      if (container.scrollTop === 0) {
+        isDraggingRef.current = true;
+        startYRef.current = e.clientY;
+
+        //글자 셋팅
+        isLetterRef.current = false;
+      }
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDraggingRef.current) return;
+
+      const distance = e.clientY - startYRef.current;
+      if (distance > 0) {
+        e.preventDefault();
+        setPull(Math.min(distance, 120)); // 최대 100px까지만
+        container.style.transform = `translateY(${Math.min(distance, 120)}px)`;
+      }
+
+      if( distance > 70) {
+        e.preventDefault();
+        isLetterRef.current = true;
+      }
+    };
+
+    const handleMouseUp = () => {
+      if (isDraggingRef.current) {
+        isDraggingRef.current = false;
+        container.style.transform = `translateY(0px)`;
+        setPull(0);
+
+        isLetterRef.current = false;
+        // 💚 여기에 새로고침 함수 호출 가능
+        // if (pull >= 100) triggerRefresh();
+      }
+    };
+
+    container.addEventListener("mousedown", handleMouseDown);
+    container.addEventListener("mousemove", handleMouseMove);
+    container.addEventListener("mouseup", handleMouseUp);
+
+    return () => {
+      container.removeEventListener("mousedown", handleMouseDown);
+      container.removeEventListener("mousemove", handleMouseMove);
+      container.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, []);
+
+
   const {
     scrollContainerRef
   } = useFeedData();
@@ -216,7 +328,13 @@ function LayoutContent() {
     <>
       <LayoutContainer $isProfile={isProfilePage}>
         <Header />
+        {pull !==0 && (
+        <RefreshAlert $letter={isLetterRef.current} $height={pull}>
+          <p>땡겨서 <span>피쉬마켓</span> 새로고침</p>
+        </RefreshAlert>
+        )}
         <AnimatePresence mode="wait">
+
           <MainContent
             key={location.pathname}
             $hasFooter={shouldShowNav()}
