@@ -65,7 +65,7 @@ function UserCard({
     // 낙관적 업데이트 - 이전 상태 저장
     const previousFollowState = isFollowing;
     setIsFollowing(!previousFollowState);
-
+// 귀신이다 귀신이야!!!!!!
     // 콜백 실행
     if (onFollowToggle) {
       onFollowToggle();
