@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, forwardRef } from "react";
 import {
   PostCardContainer,
   PostContent,
@@ -40,7 +40,9 @@ interface PostCardProps {
   // onPostClick?: (postId: string) => void;
 }
 
-function PostCard({
+const PostCard = forwardRef<HTMLDivElement, PostCardProps>(
+
+({
   postId,
   userName,
   userId,
@@ -55,7 +57,8 @@ function PostCard({
   isLiked,
   onLikeClick,
   onCommentClick,
-}: PostCardProps) {
+}, ref
+) => {
   const navigate = useNavigate();
 
   if (imageSrc) {
@@ -112,7 +115,7 @@ function PostCard({
   // };
 
   return (
-    <PostCardContainer key={postId}>
+    <PostCardContainer key={postId} ref={ref}>
       {/* 게시자 정보 */}
       <PostHeader
         userName={userName}
@@ -187,6 +190,6 @@ function PostCard({
       </PostContent>
     </PostCardContainer>
   );
-}
+})
 
 export default PostCard;
