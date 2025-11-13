@@ -8,6 +8,9 @@ import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ScrollButton from "../common/buttons/ScrollButton";
 import { useFeedData } from "../../hooks/useFeedData";
+//zustand 전역
+import { useFeedStore } from "../../contexts/useFeedStore";
+
 
 // import { relative } from "path";
 
@@ -29,7 +32,6 @@ const MainContent = styled.main<{
   $isChatRoom?: boolean;
   $isPostDetail?: boolean;
 }>`
-
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -63,6 +65,7 @@ const RefreshAlert = styled.div<{$letter: boolean, $height: number}>`
   margin-bottom: 10px;
   animation : ${(props)=>props.$height > 0 && 'opacityStype 0.7s ease-in-out'};
   letter-spacing : ${(props)=>props.$letter ? '2px' : '0'};
+  font-size: 1.8rem;
   font-weight: 600;
   p {
     display: flex;
@@ -101,6 +104,10 @@ function LayoutContent() {
   const isDraggingRef = useRef(false);
 
   const isLetterRef = useRef(false)
+  const {
+    scrollContainerRef
+  } = useFeedData();
+  const fetchFeeds = useFeedStore((state) => state.fetchFeeds);
 
   useEffect(() => {
     const path = location.pathname;
@@ -108,6 +115,7 @@ function LayoutContent() {
 
     const container = scrollContainerRef.current;
     if (!container) return;
+
 
     const handleMouseDown = (e: MouseEvent) => {
       // 맨 위에서만 새로고침 동작
@@ -143,8 +151,8 @@ function LayoutContent() {
         setPull(0);
 
         isLetterRef.current = false;
-        // 💚 여기에 새로고침 함수 호출 가능
-        // if (pull >= 100) triggerRefresh();
+
+        fetchFeeds();
       }
     };
 
@@ -160,9 +168,7 @@ function LayoutContent() {
   }, []);
 
 
-  const {
-    scrollContainerRef
-  } = useFeedData();
+
   // 경로별 헤더 자동 설정
   useEffect(() => {
     const path = location.pathname;
@@ -334,7 +340,6 @@ function LayoutContent() {
         </RefreshAlert>
         )}
         <AnimatePresence mode="wait">
-
           <MainContent
             key={location.pathname}
             $hasFooter={shouldShowNav()}
