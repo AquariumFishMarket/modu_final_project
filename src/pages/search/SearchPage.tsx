@@ -5,11 +5,21 @@ import {
   SearchText,
 } from "./SearchPage.styled";
 import { useSearchContext } from "../../contexts/SearchContext";
+import { toggleFollow } from "../../services/followService";
 
 function SearchPage() {
-  // Context에서 검색 상태 가져오기 (Header와 상태 공유)
+  // Context에서 검색 상태 가져오기
   const { searchResults, isLoading, hasSearched, currentKeyword, error } =
     useSearchContext();
+
+  // 팔로우/언팔로우 처리
+  const handleFollowToggle = async (accountname: string, isFollowing: boolean) => {
+    try {
+      await toggleFollow(accountname, isFollowing);
+    } catch (error) {
+      console.error("팔로우 처리 실패:", error);
+    }
+  };
 
   return (
     <>
@@ -35,16 +45,13 @@ function SearchPage() {
           <>
             {searchResults.map((user) => (
               <UserCard
-                key={user.userId}
-                userName={user.userName}
-                userId={user.userId}
-                userImage={user.userImage}
+                key={user._id}
+                userName={user.username}
+                userId={user.accountname}
+                userImage={user.image}
                 searchKeyword={currentKeyword}
-                isFollowing={user.isFollowing}
-                onFollowToggle={() => {
-                  // API 연동 시 처리
-                  console.log(`${user.userId} 팔로우 토글`);
-                }}
+                isFollowing={user.isfollow}
+                onFollowToggle={() => handleFollowToggle(user.accountname, user.isfollow)}
               />
             ))}
           </>
