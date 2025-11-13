@@ -11,87 +11,9 @@ import { useFeedData } from "../../hooks/useFeedData";
 //zustand 전역
 import { useFeedStore } from "../../contexts/useFeedStore";
 
-
-// import { relative } from "path";
-
-const LayoutContainer = styled.div<{ $isProfile?: boolean }>`
-position: relative;
-  max-width: 600px;
-  width: 100%;
-  height: 100vh;
-  min-height: ${(props) => (props.$isProfile ? "100vh" : "auto")};
-  margin: 0 auto;
-  overflow: hidden;
-  background-color: #fff;
-  border: 1px solid #eeeeee;
-`;
-
-const MainContent = styled.main<{
-  $hasFooter: boolean;
-  $isProfile?: boolean;
-  $isChatRoom?: boolean;
-  $isPostDetail?: boolean;
-}>`
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  height: 100%;
-  /* padding: ${(props) =>
-    props.$isPostDetail ? "68px 25px 0" : "68px 15px 0"}; */
-  padding: 68px 16px 0;
-  overflow-x: hidden;
-  overflow-y: auto;
- / * padding-bottom: ${(props) => {
-   if (props.$isProfile) return "0";
-   return props.$hasFooter ? "110px" : "50px";
- }}; * /
-  padding-bottom: 110px;
-  background-color: ${(props) =>
-    props.$isChatRoom ? "var(--color-gray-light)" : "#fff"};
-`;
-
-const RefreshAlert = styled.div<{$letter: boolean, $height: number}>`
-  position: absolute;
-  top: 48px;
-  width: 100%;
-  height: ${(props)=>props.$height}px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 120;
-  text-align: center;
-  padding: 25px 0;
-  margin-bottom: 10px;
-  animation : ${(props)=>props.$height > 0 && 'opacityStype 0.7s ease-in-out'};
-  letter-spacing : ${(props)=>props.$letter ? '2px' : '0'};
-  font-size: 1.8rem;
-  font-weight: 600;
-  p {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 3px;
-  }
-  span {
-    display: inline-block;
-    width: ${(props)=>props.$letter ? 'auto' : '0'};
-    height: ${(props)=>props.$letter ? 'auto' : '0'};
-    opacity: ${(props)=>props.$letter ? '1' : '0'};
-    overflow: hidden;
-    transition: all 0.7s;
-    color: var(--color-primary-500);
-  }
-
-  @keyframes opacityStype {
-    0% {
-      opacity: 0;
-    }
-    100% {
-      opacity: 1;
-    }
-  }
-`
+import { LayoutContainer, MainContent, RefreshAlert, Fish1, Fish2,
+  Seashall, Coral, Drop, Drop2
+ } from "./globalLayout.styled";
 
 function LayoutContent() {
   const location = useLocation();
@@ -106,9 +28,7 @@ function LayoutContent() {
   const isLetterRef = useRef(false);
   const hasMoveRef = useRef(false);
   const { scrollContainerRef } = useFeedData();
-
-  const fetchFeeds = useFeedStore((state) => state.fetchFeeds);
-const refreshFeed = useFeedStore((state) => state.refreshFeed);
+  const refreshFeed = useFeedStore((state) => state.refreshFeed);
 
   useEffect(() => {
     const path = location.pathname;
@@ -138,7 +58,7 @@ const refreshFeed = useFeedStore((state) => state.refreshFeed);
 
       if (distance > 0) {
         preventDefault();
-        setPull(Math.min(distance, 120)); // 최대 100px까지만
+        setPull(Math.min(distance, 120)); // 최대 드래그
         container.style.transform = `translateY(${Math.min(distance, 120)}px)`;
         currentPullRef.current = Math.min(distance, 120);
       }
@@ -171,8 +91,6 @@ const refreshFeed = useFeedStore((state) => state.refreshFeed);
 
     const handleTouchStart = (e: TouchEvent) => handleDragStart(e.touches[0].clientY);
     const handleTouchMove = (e: TouchEvent) => handleDragMove(e.touches[0].clientY, () => e.preventDefault());
-    const handleTouchEnd = () => handleDragEnd();
-
 
     container.addEventListener("mousedown", handleMouseDown);
     container.addEventListener("mousemove", handleMouseMove);
@@ -361,9 +279,18 @@ const refreshFeed = useFeedStore((state) => state.refreshFeed);
     <>
       <LayoutContainer $isProfile={isProfilePage}>
         <Header />
-        {pull !==0 && (
+
+      {pull !==0 && (
         <RefreshAlert $letter={isLetterRef.current} $height={pull}>
-          <p>땡겨서 <span>피쉬마켓</span> 새로고침</p>
+          <div style={{ position: 'relative' }}>
+            <Fish1 src="/img/fish-character.png" $transform={pull} alt="물고기"/>
+            <Seashall src="/img/seashall-character.png" $transform={pull} alt="조개껍질"></Seashall>
+            <p>땡겨서 <span>피쉬마켓</span> 새로고침</p>
+            <Fish2 src="/img/fish-character.png" $transform={pull} alt="물고기"/>
+            <Coral src="/img/coral-character.png" $transform={pull} alt="산호"/>
+            <Drop src="/img/drop.png" $transform={pull} alt="물방울"/>
+            <Drop2 src="/img/drop.png" $transform={pull} alt="물방울"/>
+          </div>
         </RefreshAlert>
         )}
         <AnimatePresence mode="wait">
