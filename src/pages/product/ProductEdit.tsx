@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import EditForm from "../../components/common/form/EditForm";
-import { FormSubmissionData } from "../../components/common/form/types";
+import { FormData } from "../../components/common/form/types";
 import { useHeader } from "../../contexts/HeaderContext";
 import { useEffect, useRef, useState } from "react";
 import { Product } from "../../types/product";
@@ -67,15 +67,15 @@ export default function ProductEdit() {
   };
 
   // 폼 제출 핸들러
-  const handleSubmit = async (data: FormSubmissionData) => {
+  const handleSubmit = async (data: FormData) => {
     if (!id) return;
 
     try {
       const updatedProductData = {
-        itemName: data.formValues.productname,
-        price: parseInt(data.formValues.price.replace(/,/g, "")),
-        link: data.formValues.link,
-        description: data.formValues.description,
+        itemName: data.productname,
+        price: parseInt(data.price.replace(/,/g, "")),
+        link: data.link,
+        description: data.description,
         // TODO: 이미지 파일 업로드 처리
         // itemImage: data.imageFiles
       };

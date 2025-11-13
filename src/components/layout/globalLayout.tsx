@@ -43,9 +43,9 @@ const MainContent = styled.main<{
   overflow-x: hidden;
   overflow-y: auto;
  / * padding-bottom: ${(props) => {
-    if (props.$isProfile) return "0";
-    return props.$hasFooter ? "110px" : "50px";
-  }}; * /
+   if (props.$isProfile) return "0";
+   return props.$hasFooter ? "110px" : "50px";
+ }}; * /
   padding-bottom: 110px;
   background-color: ${(props) =>
     props.$isChatRoom ? "var(--color-gray-light)" : "#fff"};
@@ -275,10 +275,10 @@ function LayoutContent() {
     }
 
     // 상품 추가
-    if (path === "/product/add") {
+    if (path === "/product") {
       setHeaderConfig({
         show: true,
-        type: "productAdd",
+        type: "product",
         onBackClick: () => navigate(-1),
       });
       return;

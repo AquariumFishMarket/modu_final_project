@@ -255,7 +255,7 @@ function Profile() {
 
   // 상품 등록 버튼 클릭 핸들러
   const handleUploadProduct = (): void => {
-    navigate("/product/upload");
+    navigate("/product");
   };
 
   // ❤️ 좋아요 토글 핸들러 추가
