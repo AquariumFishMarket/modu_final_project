@@ -1,11 +1,12 @@
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { useHeader } from "../../contexts/HeaderContext";
+import { useAuth } from "../../contexts/AuthContext";
 import EditForm from "../../components/common/form/EditForm";
 import {
   CommonFormRef,
   ProfileFormData,
 } from "../../components/common/form/types";
-import { useHeader } from "../../contexts/HeaderContext";
-import { useState, useEffect, useRef } from "react";
 import { getProfileFields } from "../../utils/validation/userValidation";
 import { fetchProfile, updateProfile } from "../../services/profileService";
 import { uploadImage } from "../../services/imageService";
@@ -29,6 +30,7 @@ export default function ProfileEdit() {
   const [loading, setLoading] = useState(true);
   const [profileData, setProfileData] = useState<UserProfile | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const { updateUser } = useAuth();
 
   const profileFields = getProfileFields();
 
@@ -137,13 +139,22 @@ export default function ProfileEdit() {
       );
 
       console.log("✅ 프로필 수정 성공");
+
+      // AuthContext 업데이트로 전역 상태 갱신
+      updateUser({
+        username: data.username,
+        accountname: data.accountname,
+        intro: data.intro || "",
+        image: imageUrl,
+      });
+
       alert("프로필이 수정되었습니다.");
-      navigate("/profile", { replace: true, state: { refresh: true } });
-    } catch (err) {
-      console.error("프로필 수정 실패:", err);
+      navigate("/profile", { replace: true });
+    } catch (error) {
+      console.error("프로필 수정 실패:", error);
       alert(
-        err instanceof Error
-          ? err.message
+        error instanceof Error
+          ? error.message
           : "프로필 수정에 실패했습니다. 다시 시도해주세요."
       );
     }

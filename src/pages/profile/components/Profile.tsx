@@ -20,7 +20,7 @@ import {
   LoadingText,
   MyFeedSection,
   PostListContainer,
-  EmptyPostMessage,
+  // EmptyPostMessage,
 } from "./Profile.styled";
 
 import DefaultButton from "../../../components/common/buttons/Button";
@@ -48,24 +48,19 @@ function Profile() {
   const navigate = useNavigate();
   const { setHeaderConfig } = useHeader();
   const { currentUser, isLoading: isAuthLoading, logout } = useAuth();
-
-  // URL 파라미터에서 userId 가져오기 (동적 라우팅 대비)
+  // URL 파라미터에서 계정ID 가져오기
   const { accountname: paramAccountname } = useParams<{
     accountname?: string;
   }>();
+  const [profileData, setProfileData] = useState<UserProfile | null>(null);
+  const [postsList, setUserPosts] = useState<Post[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [postState, setPostState] = useState<"list" | "gallery">("list");
+  const [isFollowLoading, setIsFollowLoading] = useState(false);
 
   const currentUserAccountname = currentUser?.accountname || "";
   const targetAccountname = paramAccountname || currentUserAccountname;
   const isMyProfile = targetAccountname === currentUserAccountname;
-  const [profileData, setProfileData] = useState<UserProfile | null>(null);
-  const [postsList, setUserPosts] = useState<Post[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-
-  // 포스트 상태 관리 (리스트 / 갤러리)
-  const [postState, setPostState] = useState<"list" | "gallery">("list");
-
-  // 팔로우 처리 중 상태 (중복 클릭 방지)
-  const [isFollowLoading, setIsFollowLoading] = useState(false);
 
   // 🔄 팔로우/언팔로우 처리 (낙관적 업데이트)
   const handleFollowToggle = async (): Promise<void> => {
