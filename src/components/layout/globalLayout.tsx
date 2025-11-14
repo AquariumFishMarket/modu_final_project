@@ -18,6 +18,7 @@ import { LayoutContainer, MainContent, RefreshAlert, Fish1, Fish2,
 
 function LayoutContent() {
   const location = useLocation();
+  const path = location.pathname;
   const { setHeaderConfig } = useHeader();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
@@ -248,16 +249,23 @@ function LayoutContent() {
 
   // Nav 있을 부분
   const shouldShowNav = (): boolean => {
-    const path = location.pathname;
-
     const showNavPaths = ["/", "/feed", "/search", "/chat-list"];
 
     // 프로필 페이지인지 체크 (동적 라우트 포함)
     const isProfilePath =
       path === "/profile" || path.match(/^\/profile\/[^/]+$/);
 
-    return showNavPaths.includes(path) || !!isProfilePath;
+    return (showNavPaths.includes(path) || !!isProfilePath) && isAuthenticated;
   };
+
+  const shouldShowHeader = ():boolean => {
+    if( path === "/login" ||
+      path === "/login/email" ||
+      path === "/signup" ||
+      path === "/profile/setup" ||
+      path === "/404" || !isAuthenticated
+    ) { return false; } else { return true }
+  }
 
   const isProfilePage =
     location.pathname === "/profile" ||
@@ -268,8 +276,7 @@ function LayoutContent() {
     return (
       <>
         <LayoutContainer $isProfile={isProfilePage}>
-          <Header />
-
+          {shouldShowHeader() && <Header />}
         {pull !==0 && (
           <RefreshAlert $letter={isLetterRef.current} $height={pull}>
             <div style={{ position: 'relative' }}>
