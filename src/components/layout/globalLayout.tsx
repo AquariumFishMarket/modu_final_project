@@ -272,7 +272,7 @@ function LayoutContent() {
     !!location.pathname.match(/^\/profile\/[^/]+$/);
 
     const isPostDetailPage = location.pathname.match(/^\/post\/[^/]+$/);
-    console.log(location.pathname)
+
     return (
       <>
         <LayoutContainer $isProfile={isProfilePage}>

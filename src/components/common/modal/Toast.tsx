@@ -5,10 +5,11 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const Toast = () => {
-  const { message } = useToastStore();
+  const { message, show, hideToast } = useToastStore();
 
   useEffect(() => {
-    if (message) {
+    if(!show || message == null) return;
+    if (message && show) {
       toast(message, {
         position: "top-center",
         autoClose: 3000,
@@ -20,7 +21,9 @@ const Toast = () => {
         theme: "light",
       });
     }
-  }, [message]);
+
+  return hideToast()
+  }, [show]);
 
   return null;
 };
