@@ -31,28 +31,6 @@ const ProductImage = styled.img`
   margin-bottom: 15px;
 `;
 
-// const ThumbnailContainer = styled.div`
-//   display: flex;
-//   gap: 8px;
-//   margin-bottom: 20px;
-//   overflow-x: auto;
-// `;
-
-// const Thumbnail = styled.img<{ $isSelected: boolean }>`
-//   width: 60px;
-//   height: 60px;
-//   object-fit: cover;
-//   border-radius: 6px;
-//   cursor: pointer;
-//   border: ${(props) =>
-//     props.$isSelected ? "2px solid var(--color-primary-600)" : "none"};
-//   flex-shrink: 0;
-
-//   &:hover {
-//     opacity: 0.8;
-//   }
-// `;
-
 // const SellerSection = styled.div`
 //   display: flex;
 //   padding-bottom: 10px;
@@ -120,14 +98,6 @@ const StatItem = styled.span`
   align-items: center;
   gap: 4px;
 `;
-
-// const Description = styled.p`
-//   line-height: 1.6;
-//   white-space: pre-wrap;
-//   color: var(--color-gray-dark);
-//   font-size: var(--font-size-md);
-//   font-weight: 500;
-// `;
 
 const BottomActionBar = styled.div`
   position: fixed;
@@ -223,7 +193,6 @@ const ContentWrapper = styled.div`
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
   const [product, setProduct] = useState<Product | null>(null);
-  // const [selectedImageIdx, setSelectedImageIdx] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
 
@@ -236,8 +205,6 @@ export default function ProductDetail() {
 
       try {
         const productData = await fetchProductDetail(id);
-        console.log("📦 상품 데이터:", productData);
-        console.log("이미지 URL:", productData.itemImage);
 
         // ✅ itemImage가 유효한지 확인
         if (
@@ -321,22 +288,6 @@ export default function ProductDetail() {
             onError={handleImageError}
           />
 
-          {/* 썸네일 이미지들 */}
-          {/* {images.length > 1 && (
-            <ThumbnailContainer>
-              {images.map((image, index) => (
-                <Thumbnail
-                  key={index}
-                  src={image}
-                  alt={`${product.itemName} ${index + 1}`}
-                  $isSelected={selectedImageIdx === index}
-                  onClick={() => setSelectedImageIdx(index)}
-                  onError={handleImageError}
-                />
-              ))}
-            </ThumbnailContainer>
-          )} */}
-
           {/* 판매자 부분 */}
           {/* <SellerSection>
             <img
@@ -370,8 +321,6 @@ export default function ProductDetail() {
               </StatItem>
             </StatsGroup>
           </ProductStats>
-
-          {/* <Description>{product.description}</Description> */}
         </ProductContainer>
       </ContentWrapper>
 
@@ -386,9 +335,7 @@ export default function ProductDetail() {
         </LikeButton>
 
         {product.link && (
-          <ActionButton $variant="buy" onClick={handlePurchase}>
-            {/* {isSold ? "거래완료" : "구매하기"} */}
-          </ActionButton>
+          <ActionButton $variant="buy" onClick={handlePurchase}></ActionButton>
         )}
 
         <ActionButton $variant="chat" onClick={handleChatStart}>

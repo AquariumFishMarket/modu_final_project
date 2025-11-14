@@ -1,6 +1,9 @@
 import { useNavigate, useParams } from "react-router-dom";
 import EditForm from "../../components/common/form/EditForm";
-import { CommonFormRef, ProductFormData } from "../../components/common/form/types";
+import {
+  CommonFormRef,
+  ProductFormData,
+} from "../../components/common/form/types";
 import { useHeader } from "../../contexts/HeaderContext";
 import { useEffect, useRef, useState } from "react";
 import { Product } from "../../types/product";
@@ -33,7 +36,6 @@ export default function ProductEdit() {
         setProduct(productData);
       } catch (error) {
         console.error("상품 정보 로드 실패:", error);
-        // 상품을 찾을 수 없으면 상품 상세 페이지로 이동
         navigate(`/product/${id}`);
       }
     };

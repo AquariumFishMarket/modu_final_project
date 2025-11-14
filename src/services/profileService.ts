@@ -1,21 +1,5 @@
 import { getAuthHeaders } from "../utils/auth";
-
-export interface Post {
-  id: string;
-  content: string;
-  image: string;
-  createdAt: string;
-  updatedAt?: string;
-  hearted: boolean;
-  heartCount: number;
-  commentCount: number;
-  author: {
-    accountname: string;
-    username: string;
-    image: string;
-  };
-  // 필요에 따라 추가 필드
-}
+import { Post } from "../types/post";
 
 const BASE_URL = "https://dev.wenivops.co.kr/services/mandarin";
 

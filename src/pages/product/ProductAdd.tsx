@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import CreateForm from "../../components/common/form/CreateForm";
-import { FormData, ProductRequest } from "../../components/common/form/types";
+import { FormData, ProductRequest, CommonFormRef } from "../../components/common/form/types";
 import { useHeader } from "../../contexts/HeaderContext";
 import { useEffect, useRef, useState } from "react";
 import { getProductFields } from "../../utils/validation/productValidation";
@@ -10,7 +10,7 @@ import { uploadImage } from "../../services/imageService";
 export default function ProductAdd() {
   const navigate = useNavigate();
   const { setHeaderConfig } = useHeader();
-  const formRef = useRef<{ submitForm: () => void }>(null);
+  const formRef = useRef<CommonFormRef>(null);
   const [isFormValid, setIsFormValid] = useState(false); // 폼 유효성 상태
 
   const productFields = getProductFields();

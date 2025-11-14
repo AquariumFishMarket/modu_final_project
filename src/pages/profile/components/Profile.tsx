@@ -57,21 +57,11 @@ function Profile() {
     accountname?: string;
   }>();
 
-  // 현재 로그인한 사용자의 accountname
   const currentUserAccountname = currentUser?.accountname || "";
-
-  // URL 파라미터가 있으면 해당 유저, 없으면 내 프로필
   const targetAccountname = paramAccountname || currentUserAccountname;
-
-  // 내 프로필인지 다른 사람 프로필인지 구분
   const isMyProfile = targetAccountname === currentUserAccountname;
-
-  // 프로필 데이터 상태 관리
   const [profileData, setProfileData] = useState<UserProfile | null>(null);
-
   const [postsList, setUserPosts] = useState<Post[]>([]);
-
-  // 로딩 상태
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // 포스트 상태 관리 (리스트 / 갤러리)
@@ -263,30 +253,6 @@ function Profile() {
     );
   };
 
-  //  프로필 공유 버튼 클릭 핸들러
-  // Web Share API 또는 클립보드 복사 기능 구현
-
-  // const handleShareClick = async (): Promise<void> => {
-  //   const profileUrl = `${window.location.origin}/profile/${profileData.accountname}`;
-  //   try {
-  //     if (navigator.share) {
-  //       await navigator.share({
-  //         title: `${profileData.username}의 프로필`,
-  //         text: profileData.intro,
-  //         url: profileUrl,
-  //       });
-  //     } else {
-  //       await navigator.clipboard.writeText(profileUrl);
-  //       alert("프로필 링크가 복사되었습니다!");
-  //     }
-  //   } catch (error) {
-  //     console.error("프로필 공유 실패:", error);
-  //   }
-  // };
-
-  // 컴포넌트 마운트 시 프로필 데이터 및 게시글 로드
-  //  API 연동 시 주석 해제
-
   useEffect(() => {
     // 헤더 설정
     setHeaderConfig({
@@ -296,10 +262,8 @@ function Profile() {
     });
 
     const loadProfileAndPosts = async (): Promise<void> => {
-      // AuthContext 로딩이 완료될 때까지 대기
       if (isAuthLoading) return;
 
-      // 로그인하지 않은 경우
       if (!currentUser) {
         navigate("/login");
         return;
@@ -322,7 +286,7 @@ function Profile() {
             followingCount: 0,
             follower: [],
             following: [],
-            isfollow: false, // 내 프로필은 팔로우 상태 없음
+            isfollow: false,
           };
         } else {
           console.log("👥 다른 사용자 프로필 로드");
@@ -359,7 +323,6 @@ function Profile() {
     navigate,
   ]);
 
-  // AuthContext 로딩 중일 때
   if (isAuthLoading) {
     return (
       <ProfileSection>
@@ -368,7 +331,6 @@ function Profile() {
     );
   }
 
-  // 로딩 중일 때
   if (isLoading || !profileData) {
     return (
       <ProfileSection>
@@ -459,9 +421,7 @@ function Profile() {
               {/* 공유 버튼 - 공유 기능 구현 예정 */}
               <IconButton
                 $iconUrl="/img/icon-share.svg"
-                onClick={() => {
-                  // TODO: 공유 기능 구현
-                }}
+                onClick={() => {}}
                 aria-label="프로필 공유하기"
               />
             </>
