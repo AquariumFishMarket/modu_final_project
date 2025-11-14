@@ -3,12 +3,13 @@ import React, {
   useEffect,
   useImperativeHandle,
   forwardRef,
+  useMemo,
 } from "react";
 import DefaultButton from "../buttons/Button";
 import ImageContainer from "../imageUpload/ImageContainer";
 import ProfileImg from "../ProfileImg";
 import ImageUpButton from "../imageUpload/UploadButton";
-import { CommonFormRef, CreateFormProps, ValidationErrors } from "./types";
+import { CommonFormRef, CreateFormProps, ValidationErrors, FormData } from "./types";
 import {
   InputForm,
   InputGroup,
@@ -20,11 +21,19 @@ import {
   ProfileImageWrapper,
 } from "./Form.styled";
 
-const CreateForm = forwardRef<CommonFormRef, CreateFormProps>(
-  (
-    { formType, fields, showButton = true, onSubmit, onValidationChange },
-    ref
-  ) => {
+function CreateFormInner<T extends FormData>(
+  props: CreateFormProps<T>,
+  ref: React.Ref<CommonFormRef>
+) {
+  const {
+    formType,
+    fields,
+    showButton = true,
+    onSubmit,
+    onValidationChange,
+    buttonText = "등록",
+    disabled = false,
+  } = props;
     // 초기값은 모두 빈 문자열
     const [formValues, setFormValues] = useState(() => {
       const initial: Record<string, string> = {};
@@ -40,9 +49,13 @@ const CreateForm = forwardRef<CommonFormRef, CreateFormProps>(
     }>({}); // 🆕
     const [imgFiles, setImgFiles] = useState<File[]>([]);
     const [deleteIdx, setDeleteIdx] = useState<number | undefined>();
-    const [hasUserInteraction, setHasUserInteraction] = useState(false);
 
     const hasSelectedImage = imgFiles.length > 0;
+    // 이미지 프리뷰 URL 캐싱
+    const previewUrl = useMemo(
+      () => (imgFiles[0] ? URL.createObjectURL(imgFiles[0]) : undefined),
+      [imgFiles]
+    );
 
     // 프로필 이미지 클릭 시 삭제 핸들러
     const handleProfileImageClick = () => {
@@ -61,26 +74,23 @@ const CreateForm = forwardRef<CommonFormRef, CreateFormProps>(
     }, [deleteIdx, imgFiles]);
 
     // 버튼 활성화 조건
-    const isFormValid = () => {
+    const isFormValid = useMemo(() => {
       const requiredFields = fields.filter((field) => field.required);
       const allRequiredFilled = requiredFields.every((field) =>
         formValues[field.name]?.trim()
       );
       const hasNoErrors = Object.values(errors).every((error) => !error);
-
-      // 🆕 검사 중인 필드가 있으면 비활성화
       const isChecking = Object.values(validationStatus).some(
         (status) => status === "checking"
       );
 
       return allRequiredFilled && hasNoErrors && !isChecking;
-    };
+    }, [fields, formValues, errors, validationStatus]); // 실제 의존성
 
-    // 폼 유효성이 변경될 때마다 부모에게 알림
+    // useEffect에서 안전하게 사용
     useEffect(() => {
-      const isValid = isFormValid();
-      onValidationChange?.(isValid);
-    }, [formValues, errors, onValidationChange]);
+      onValidationChange?.(isFormValid);
+    }, [isFormValid, onValidationChange]);
 
     // 입력 변경 핸들러
     const handleInputChange = (fieldName: string, value: string) => {
@@ -92,7 +102,6 @@ const CreateForm = forwardRef<CommonFormRef, CreateFormProps>(
       }
 
       setFormValues((prev) => ({ ...prev, [fieldName]: formattedValue }));
-      setHasUserInteraction(true);
 
       // 기존 에러 제거
       if (errors[fieldName]) {
@@ -118,6 +127,11 @@ const CreateForm = forwardRef<CommonFormRef, CreateFormProps>(
 
       try {
         const errorMessage = await field.validator(value);
+        // 계정ID 검사 로그
+        if (fieldName === "accountname") {
+          console.log("[계정ID 검사] 입력값:", value);
+          console.log("[계정ID 검사] 에러 메시지:", errorMessage);
+        }
 
         if (errorMessage) {
           setErrors((prev) => ({ ...prev, [fieldName]: errorMessage }));
@@ -145,35 +159,27 @@ const CreateForm = forwardRef<CommonFormRef, CreateFormProps>(
           newErrors[field.name] = `${field.label}는 필수입니다.`;
         } else if (field.validator && formValues[field.name]?.trim()) {
           const error = await field.validator(formValues[field.name]);
+          // 계정ID 제출 시 검사 로그
+          if (field.name === "accountname") {
+            console.log("[계정ID 제출] 입력값:", formValues[field.name]);
+            console.log("[계정ID 제출] 에러 메시지:", error);
+          }
           if (error) newErrors[field.name] = error;
         }
       }
 
       setErrors(newErrors);
 
-      // 이미지 파일 추가
-      // if (formType === "profile") {
-      //   if (imgFiles.length > 0) {
-      //     formData.append("profileImage", imgFiles[0]);
-      //   } else {
-      //     formData.append("DefaultImage", "true");
-      //   }
-      // } else if (formType === "product") {
-      //   imgFiles.forEach((file, index) => {
-      //     formData.append(`productImage_${index}`, file);
-      //   });
-      // }
-
-      // 에러가 있으면 제출 중단
+      // 에러가 있으면 제출 중단 및 하단 에러 메시지 갱신
       if (Object.keys(newErrors).length > 0) {
         console.log("유효성 검사 실패:", newErrors);
+        // 하단 에러 메시지 갱신 (필요시 부모에 전달)
         return false;
       }
 
       // onSubmit 호출 - FormData 형식으로 전달
       if (onSubmit) {
-        console.log("📝 폼 값:", formValues);
-        console.log("🖼️ 이미지 파일:", imgFiles);
+        console.log("CreateForm - 📝 폼 값:", formValues);
 
         // FormData 형식으로 변환
         const submissionData: Record<string, string | File | undefined> = {
@@ -189,7 +195,9 @@ const CreateForm = forwardRef<CommonFormRef, CreateFormProps>(
           }
         }
 
-        onSubmit(submissionData);
+        // 성공 시 에러 메시지 초기화
+        setErrors({});
+        onSubmit(submissionData as T);
       }
 
       return true;
@@ -238,7 +246,7 @@ const CreateForm = forwardRef<CommonFormRef, CreateFormProps>(
                     <ProfileImg
                       width={150}
                       thumbimg={true}
-                      imgSrc={URL.createObjectURL(imgFiles[0])}
+                      imgSrc={previewUrl}
                     />
                     <ProfileImageOverlay>클릭하여 삭제</ProfileImageOverlay>
                   </>
@@ -301,7 +309,36 @@ const CreateForm = forwardRef<CommonFormRef, CreateFormProps>(
                   onChange={(e) =>
                     handleInputChange(field.name, e.target.value)
                   }
-                  onBlur={(e) => handleBlur(field.name, e.target.value)}
+                  onBlur={async (e) => {
+                    // 계정ID 중복 검사 validator 연결
+                    if (field.name === "accountname" && field.validator) {
+                      setValidationStatus((prev) => ({
+                        ...prev,
+                        [field.name]: "checking",
+                      }));
+                      setErrors((prev) => ({ ...prev, [field.name]: "" }));
+                      const errorMessage = await field.validator(
+                        e.target.value
+                      );
+                      if (errorMessage) {
+                        setErrors((prev) => ({
+                          ...prev,
+                          [field.name]: errorMessage,
+                        }));
+                        setValidationStatus((prev) => ({
+                          ...prev,
+                          [field.name]: "error",
+                        }));
+                      } else {
+                        setValidationStatus((prev) => ({
+                          ...prev,
+                          [field.name]: "success",
+                        }));
+                      }
+                    } else {
+                      handleBlur(field.name, e.target.value);
+                    }
+                  }}
                   required={field.required}
                 />
               )}
@@ -313,16 +350,20 @@ const CreateForm = forwardRef<CommonFormRef, CreateFormProps>(
 
           {showButton && formType === "profile" && (
             <DefaultButton
-              text="저장"
-              disabled={!isFormValid()}
+              // text="저장"
+              // disabled={!isFormValid}
+              text={buttonText || "저장"}
+              disabled={disabled ?? !isFormValid}
               onClick={handleButtonClick}
             />
           )}
         </InputForm>
       </section>
     );
-  }
-);
+}
 
-CreateForm.displayName = "CreateForm";
+const CreateForm = forwardRef(CreateFormInner) as <T extends FormData = FormData>(
+  props: CreateFormProps<T> & { ref?: React.Ref<CommonFormRef> }
+) => React.ReactElement | null;
+
 export default CreateForm;

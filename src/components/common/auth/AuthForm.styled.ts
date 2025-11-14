@@ -1,10 +1,10 @@
 import styled from "styled-components";
 
-export const Form = styled.form`
+export const Form = styled.form<{ $status?: boolean }>`
   display: flex;
   flex-direction: column;
   padding: 0 34px;
-  gap: 30px;
+  gap: ${(props) => (props.$status ? "15px" : "40px")};
 `;
 
 export const Fieldset = styled.fieldset`
@@ -55,4 +55,11 @@ export const ErrorMessage = styled.span`
   color: var(--color-error);
   font-size: var(--font-size-sm);
   margin-top: 6px;
+`;
+
+export const ResultMessage = styled.div`
+  color: var(--color-error);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  text-align: center;
 `;

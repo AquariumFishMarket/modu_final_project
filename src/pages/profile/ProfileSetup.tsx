@@ -1,14 +1,12 @@
 import CreateForm from "../../components/common/form/CreateForm";
-import { FormData } from "../../components/common/form/types";
+import { ProfileFormData } from "../../components/common/form/types";
 import { getProfileFields } from "../../utils/validation/userValidation";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 import { useState } from "react";
-import {
-  // checkAccountIdDuplicate,
-  updateProfile,
-} from "../../services/authService";
+import { updateProfile } from "../../services/profileService";
+import { uploadImage } from "../../services/imageService";
 import { getToken } from "../../utils/tokenManager";
 
 const ProfileTitle = styled.div`
@@ -41,47 +39,28 @@ export default function ProfileSetup() {
   const [isValid, setIsValid] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // 계정 ID 중복 체크
-  // const handleAccountIdCheck = async (accountId: string): Promise<void> => {
-  //   setIsCheckingAccountId(true);
-  //   setError("");
-
-  //   try {
-  //     const result = await checkAccountIdDuplicate(accountId);
-  //     setIsAccountIdAvailable(result.available);
-
-  //     if (!result.available) {
-  //       setError("이미 사용 중인 계정 ID입니다.");
-  //     }
-  //   } catch (err) {
-  //     console.log(err);
-  //     setError("계정 ID 확인 중 오류가 발생했습니다.");
-  //     setIsAccountIdAvailable(null);
-  //   } finally {
-  //     setIsCheckingAccountId(false);
-  //   }
-  // };
-
   // 유효성 검사 상태 변경 핸들러
   const handleValidationChange = (valid: boolean) => {
     setIsValid(valid);
   };
 
-  // 폼 제출 핸들러 정의
-  const handleSubmit = async (data: FormData): Promise<void> => {
+  // 폼 제출 핸들러
+  const handleSubmit = async (data: ProfileFormData): Promise<void> => {
     setError("");
 
-    const username = data.username as string;
-    const accountname = data.accountname as string;
-    const intro = (data.intro as string) || "";
+    const username = data.username;
+    const accountname = data.accountname;
+    const intro = data.intro || "";
+    const imageFile = data.image as File | undefined;
 
     // 빈 값 검사
     if (!username || !username.trim()) {
-      setError("계정 ID 중복 확인을 먼저 해주세요.");
+      setError("사용자 이름을 입력해주세요.");
       return;
     }
 
     if (!accountname || !accountname.trim()) {
+      console.log(accountname);
       setError("사용할 수 없는 계정 ID입니다.");
       return;
     }
@@ -96,18 +75,21 @@ export default function ProfileSetup() {
     setIsSubmitting(true);
 
     try {
-      await updateProfile(username, accountname, intro, "", token);
+      let imageUrl = "";
+      if (imageFile) {
+        imageUrl = await uploadImage(imageFile);
+      }
+      await updateProfile(username, accountname, intro, imageUrl, token);
+
       alert("회원 정보가 등록되었습니다.");
       navigate("/");
-    } catch (err) {
+    } catch (error) {
       setError(
-        err instanceof Error ? err.message : "정보 등록에 실패했습니다."
+        error instanceof Error ? error.message : "정보 등록에 실패했습니다."
       );
     } finally {
       setIsSubmitting(false);
     }
-
-    navigate("/"); // 성공 시 이동
   };
 
   return (
@@ -116,14 +98,14 @@ export default function ProfileSetup() {
         <h2>프로필 설정</h2>
         <p>나중에 언제든지 변경할 수 있습니다.</p>
       </ProfileTitle>
-      <CreateForm
+      <CreateForm<ProfileFormData>
         formType="profile"
         fields={profileFields}
         showButton={true}
         onSubmit={handleSubmit}
         onValidationChange={handleValidationChange}
-        // buttonText="완료"
-        // disabled={isSubmitting}
+        buttonText={isSubmitting ? "저장 중..." : "저장"}
+        disabled={!isValid || isSubmitting}
       />
 
       {/* 나중에 빼기 */}

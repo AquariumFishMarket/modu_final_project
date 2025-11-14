@@ -1,58 +1,117 @@
 import { getAuthHeaders } from "../utils/auth";
-import type { UserProfile } from "../types/user";
+import { Post } from "../types/post";
 
-// 추가
-export interface Post {
-  _id: string;
-  author: {
+const BASE_URL = "https://dev.wenivops.co.kr/services/mandarin";
+
+// 임시 기본 이미지
+const DEFAULT_PROFILE_IMG = "/img/empty-profile.png";
+
+export interface AuthResponse {
+  message: string;
+  user?: {
     accountname: string;
-    username: string;
+    email: string;
     image: string;
+    intro: string;
+    username: string;
+    _id: string;
   };
-  content: string;
-  image?: string;
-  createdAt: string;
-  updatedAt?: string;
-  likes?: number;
-  comments?: number;
-  // 필요에 따라 추가 필드
 }
 
-// API Base URL
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api";
+export interface MyProfileResponse {
+  user: {
+    _id: string;
+    username: string;
+    email: string;
+    accountname: string;
+    intro: string;
+    image: string;
+    isfollow: boolean;
+    followers: [];
+    followings: [];
+  };
+}
 
-/**
- * 프로필 데이터 가져오기
- */
-export async function fetchProfileData(
-  accountname: string
-): Promise<UserProfile | null> {
+// 내 프로필 정보 조회
+export const getMyProfile = async (
+  token: string
+): Promise<MyProfileResponse> => {
+  const response = await fetch(`${BASE_URL}/user/myinfo`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("프로필 정보를 불러올 수 없습니다.");
+  }
+
+  const data = await response.json();
+  console.log("📥 내 프로필 조회:", data);
+  return data;
+};
+
+// 프로필 업데이트
+export const updateProfile = async (
+  username: string,
+  accountname: string,
+  intro: string,
+  image: string,
+  token: string
+): Promise<AuthResponse> => {
+  console.log("📤 프로필 업데이트 요청:", {
+    username,
+    accountname,
+    intro,
+    image,
+  });
+
+  const profileImage =
+    image && image.trim() !== "" ? image : DEFAULT_PROFILE_IMG;
+
   try {
-    if (!accountname || accountname.trim() === "") {
-      throw new Error("유효하지 않은 사용자 ID입니다");
-    }
-
-    const response = await fetch(`${API_BASE_URL}/profile/${accountname}`, {
-      headers: getAuthHeaders(),
+    const response = await fetch(`${BASE_URL}/user`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        user: {
+          username: username,
+          accountname: accountname,
+          intro: intro || "",
+          image: profileImage,
+        },
+      }),
     });
 
-    if (!response.ok) throw new Error("프로필을 불러올 수 없습니다");
+    console.log("📡 프로필 업데이트 응답 상태:", response.status);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("❌ 프로필 업데이트 실패:", errorText);
+      throw new Error(`프로필 업데이트에 실패했습니다: ${response.status}`);
+    }
 
     const data = await response.json();
-    return data.profile as UserProfile;
+    console.log("✅ 프로필 업데이트 성공:", data);
+
+    return data;
   } catch (error) {
-    console.error("프로필 데이터 가져오기 실패:", error);
-    return null;
+    console.error("❌ 프로필 업데이트 에러:", error);
+    throw error;
   }
-}
+};
 
 /**
  * 사용자 게시글 피드 가져오기
  */
 export async function fetchUserPosts(userId: string): Promise<Post[] | null> {
   try {
-    const response = await fetch(`${API_BASE_URL}/users/${userId}/posts`, {
+    const response = await fetch(`${BASE_URL}/users/${userId}/posts`, {
       headers: getAuthHeaders(),
     });
 
@@ -74,7 +133,7 @@ export async function toggleProfileFollow(
   isFollowing: boolean
 ): Promise<boolean> {
   try {
-    const response = await fetch(`${API_BASE_URL}/users/${userId}/follow`, {
+    const response = await fetch(`${BASE_URL}/users/${userId}/follow`, {
       method: isFollowing ? "DELETE" : "POST",
       headers: getAuthHeaders(),
     });
@@ -93,7 +152,7 @@ export async function toggleProfileFollow(
  */
 export async function togglePostLike(postId: string): Promise<boolean> {
   try {
-    const response = await fetch(`${API_BASE_URL}/posts/${postId}/like`, {
+    const response = await fetch(`${BASE_URL}/posts/${postId}/like`, {
       method: "POST",
       headers: getAuthHeaders(),
     });
