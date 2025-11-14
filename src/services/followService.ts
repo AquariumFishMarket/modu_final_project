@@ -1,3 +1,4 @@
+import { FollowUser } from "../types/follow";
 import { getAuthHeaders } from "../utils/auth";
 
 // API Base URL (환경변수로 관리)

@@ -1,6 +1,23 @@
 import { getAuthHeaders } from "../utils/auth";
 import type { UserProfile } from "../types/user";
 
+// 추가
+export interface Post {
+  _id: string;
+  author: {
+    accountname: string;
+    username: string;
+    image: string;
+  };
+  content: string;
+  image?: string;
+  createdAt: string;
+  updatedAt?: string;
+  likes?: number;
+  comments?: number;
+  // 필요에 따라 추가 필드
+}
+
 // API Base URL
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api";
