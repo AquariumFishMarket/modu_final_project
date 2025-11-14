@@ -227,10 +227,6 @@ export default function ProductDetail() {
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
 
-  const isSold = product?.status === "sold";
-
-  const canPurchase = !isSold && product?.link;
-
   useEffect(() => {
     const loadProduct = async () => {
       if (!id) {
@@ -253,9 +249,6 @@ export default function ProductDetail() {
         }
 
         setProduct(productData);
-        setLikeCount(productData.interactions?.likes || 0);
-        // TODO: 사용자의 찜 상태 가져오기 (API 추가 필요)
-        // setIsLiked(productData.isLiked);
       } catch (error) {
         console.error("상품 정보 로드 실패:", error);
 
@@ -303,15 +296,13 @@ export default function ProductDetail() {
 
   // 채팅하기
   const handleChatStart = () => {
-    if (isSold) return;
-
     console.log("채팅 시작:", product.id);
     // navigate(`/chat-room/${product.seller.id}`);
   };
 
   // 구매하기
   const handlePurchase = () => {
-    if (!canPurchase || !product.link) return;
+    if (!product.link) return;
 
     window.open(product.link, "_blank");
     console.log("구매 링크로 이동:", product.link);
@@ -356,7 +347,7 @@ export default function ProductDetail() {
           </SellerSection> */}
 
           {/* 판매 완료 태그 */}
-          {isSold && <SoldTag>거래완료</SoldTag>}
+          <SoldTag>거래완료</SoldTag>
 
           {/* 상품 정보 */}
           <ProductTitle>{product.itemName}</ProductTitle>
@@ -370,14 +361,12 @@ export default function ProductDetail() {
             <StatsGroup>
               <StatItem>
                 <img src="/img/icon-eye.svg" alt="" />{" "}
-                {product.interactions?.views || 0}
               </StatItem>
               <StatItem>
                 <img src="/img/icon-heart-filled.svg" alt="" /> {likeCount}
               </StatItem>
               <StatItem>
                 <img src="/img/icon-chat.svg" alt="" />{" "}
-                {product.interactions?.chatCount || 0}
               </StatItem>
             </StatsGroup>
           </ProductStats>
@@ -397,20 +386,12 @@ export default function ProductDetail() {
         </LikeButton>
 
         {product.link && (
-          <ActionButton
-            $variant="buy"
-            disabled={isSold}
-            onClick={handlePurchase}
-          >
-            {isSold ? "거래완료" : "구매하기"}
+          <ActionButton $variant="buy" onClick={handlePurchase}>
+            {/* {isSold ? "거래완료" : "구매하기"} */}
           </ActionButton>
         )}
 
-        <ActionButton
-          $variant="chat"
-          disabled={isSold}
-          onClick={handleChatStart}
-        >
+        <ActionButton $variant="chat" onClick={handleChatStart}>
           채팅하기
         </ActionButton>
       </BottomActionBar>

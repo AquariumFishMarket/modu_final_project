@@ -9,7 +9,7 @@ import DefaultButton from "../buttons/Button";
 import ImageContainer from "../imageUpload/ImageContainer";
 import ProfileImg from "../ProfileImg";
 import ImageUpButton from "../imageUpload/UploadButton";
-import { CommonFormRef, CreateFormProps, ValidationErrors } from "./types";
+import { CommonFormRef, CreateFormProps, ValidationErrors, FormData } from "./types";
 import {
   InputForm,
   InputGroup,
@@ -21,11 +21,19 @@ import {
   ProfileImageWrapper,
 } from "./Form.styled";
 
-const CreateForm = forwardRef<CommonFormRef, CreateFormProps>(
-  (
-    { formType, fields, showButton = true, onSubmit, onValidationChange },
-    ref
-  ) => {
+function CreateFormInner<T extends FormData>(
+  props: CreateFormProps<T>,
+  ref: React.Ref<CommonFormRef>
+) {
+  const {
+    formType,
+    fields,
+    showButton = true,
+    onSubmit,
+    onValidationChange,
+    buttonText = "등록",
+    disabled = false,
+  } = props;
     // 초기값은 모두 빈 문자열
     const [formValues, setFormValues] = useState(() => {
       const initial: Record<string, string> = {};
@@ -41,7 +49,6 @@ const CreateForm = forwardRef<CommonFormRef, CreateFormProps>(
     }>({}); // 🆕
     const [imgFiles, setImgFiles] = useState<File[]>([]);
     const [deleteIdx, setDeleteIdx] = useState<number | undefined>();
-    const [hasUserInteraction, setHasUserInteraction] = useState(false);
 
     const hasSelectedImage = imgFiles.length > 0;
     // 이미지 프리뷰 URL 캐싱
@@ -95,7 +102,6 @@ const CreateForm = forwardRef<CommonFormRef, CreateFormProps>(
       }
 
       setFormValues((prev) => ({ ...prev, [fieldName]: formattedValue }));
-      setHasUserInteraction(true);
 
       // 기존 에러 제거
       if (errors[fieldName]) {
@@ -191,7 +197,7 @@ const CreateForm = forwardRef<CommonFormRef, CreateFormProps>(
 
         // 성공 시 에러 메시지 초기화
         setErrors({});
-        onSubmit(submissionData);
+        onSubmit(submissionData as T);
       }
 
       return true;
@@ -344,18 +350,20 @@ const CreateForm = forwardRef<CommonFormRef, CreateFormProps>(
 
           {showButton && formType === "profile" && (
             <DefaultButton
-              text="저장"
-              disabled={!isFormValid}
-              // text={buttonText || "저장"}
-              // disabled={disabled ?? !isFormValid}
+              // text="저장"
+              // disabled={!isFormValid}
+              text={buttonText || "저장"}
+              disabled={disabled ?? !isFormValid}
               onClick={handleButtonClick}
             />
           )}
         </InputForm>
       </section>
     );
-  }
-);
+}
 
-CreateForm.displayName = "CreateForm";
+const CreateForm = forwardRef(CreateFormInner) as <T extends FormData = FormData>(
+  props: CreateFormProps<T> & { ref?: React.Ref<CommonFormRef> }
+) => React.ReactElement | null;
+
 export default CreateForm;

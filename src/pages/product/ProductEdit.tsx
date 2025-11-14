@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import EditForm from "../../components/common/form/EditForm";
-import { FormData } from "../../components/common/form/types";
+import { CommonFormRef, ProductFormData } from "../../components/common/form/types";
 import { useHeader } from "../../contexts/HeaderContext";
 import { useEffect, useRef, useState } from "react";
 import { Product } from "../../types/product";
@@ -17,7 +17,7 @@ export default function ProductEdit() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>(); // URL에서 상품 ID 가져오기
   const { setHeaderConfig } = useHeader();
-  const formRef = useRef<{ submitForm: () => void }>(null);
+  const formRef = useRef<CommonFormRef>(null);
   const [isFormValid, setIsFormValid] = useState(false);
   const [product, setProduct] = useState<Product | null>(null); // 기존 상품 데이터
 
@@ -67,17 +67,15 @@ export default function ProductEdit() {
   };
 
   // 폼 제출 핸들러
-  const handleSubmit = async (data: FormData) => {
+  const handleSubmit = async (data: ProductFormData) => {
     if (!id) return;
 
     try {
       const updatedProductData = {
-        itemName: data.productname,
+        itemName: data.itemName,
         price: parseInt(data.price.replace(/,/g, "")),
-        link: data.link,
-        description: data.description,
-        // TODO: 이미지 파일 업로드 처리
-        // itemImage: data.imageFiles
+        link: data.link || "",
+        // itemImage: 이미지 업로드 후 string URL로 할당 필요
       };
 
       await updateProduct(id, updatedProductData);
@@ -96,45 +94,17 @@ export default function ProductEdit() {
       productname: product.itemName,
       price: formatPrice(product.price.toString()),
       link: product.link || "",
-      description: product.description,
     };
   };
 
-  const getInitialImages = (): File[] => {
-    // 실제로는 URL을 File로 변환하는 로직이 필요하지만,
-    // 여기서는 간단히 빈 배열 반환
-    return [];
-  };
-
-  // 🆕 기존 이미지 URL 배열 반환
-  const getExistingImageUrls = (): string[] => {
-    if (!product) return [];
-
-    if (typeof product.itemImage === "string") {
-      return [product.itemImage];
-    }
-
-    if (Array.isArray(product.itemImage)) {
-      return product.itemImage;
-    }
-
-    return [];
-  };
-
-  if (!product) {
-    return <div>상품을 찾을 수 없습니다.</div>;
-  }
-
   return (
-    <EditForm
+    <EditForm<ProductFormData>
       ref={formRef}
       formType="product"
       fields={productFields}
       onSubmit={handleSubmit}
       onValidationChange={handleValidationChange}
       initialValues={getInitialValues()} // 🆕 기존 데이터로 초기화
-      initialImages={getInitialImages()} // 🆕 기존 이미지로 초기화
-      existingImageUrls={getExistingImageUrls()} // 🆕 기존 이미지 URL
     />
   );
 }
