@@ -36,7 +36,6 @@ export default function LoginEmail() {
     e: React.FormEvent<HTMLFormElement>
   ): Promise<void> => {
     e.preventDefault();
-    console.log("폼 제출:", e);
     setFormError("");
 
     const formData = new FormData(e.currentTarget);
@@ -47,7 +46,6 @@ export default function LoginEmail() {
 
     try {
       const result = await login(email, password);
-      console.log("로그인 결과:", result);
 
       if (result.token) {
         // ✅ AuthContext에 로그인 정보 저장
@@ -60,7 +58,6 @@ export default function LoginEmail() {
           intro: result.intro,
         });
 
-        console.log("네비게이션 시작");
         navigate("/");
       }
     } catch (error) {

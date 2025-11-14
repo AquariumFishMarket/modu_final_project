@@ -139,7 +139,6 @@ export const fetchUserPosts = async (
     if (!response.ok) throw new Error("내 게시글 데이터 가져오기 실패");
 
     const data: UserPostsResponse = await response.json();
-    console.log(`${accountname}의 게시글 목록:`, data.post);
 
     // 최신순
     const posts = Array.isArray(data.post) ? data.post : [];

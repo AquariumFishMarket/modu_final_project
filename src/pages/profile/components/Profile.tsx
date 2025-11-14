@@ -181,7 +181,6 @@ function Profile() {
 
         // 내 프로필인 경우 currentUser 사용
         if (isMyProfile) {
-          console.log("👤 내 프로필 데이터 설정");
           profileToLoad = {
             _id: currentUser._id,
             username: currentUser.username,
@@ -209,7 +208,6 @@ function Profile() {
         setProfileData(profileToLoad);
 
         // 게시글 로드 (공통)
-        console.log("📝 게시글 로드 시작");
         const posts = await fetchUserPosts(profileToLoad.accountname);
         if (posts) {
           setUserPosts(posts);

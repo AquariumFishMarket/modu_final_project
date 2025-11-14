@@ -164,7 +164,7 @@ export const fetchProductList = async (
 
   const data = await response.json();
 
-  console.log("📦 상품 리스트: ", data); // { data, product: [] }
+  // console.log("📦 상품 리스트: ", data); // { data, product: [] }
 
   return data;
 };

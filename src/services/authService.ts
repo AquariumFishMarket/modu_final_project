@@ -114,8 +114,6 @@ export const login = async (
   password: string
 ): Promise<LoginResponse> => {
   try {
-    console.log("🔐 로그인 API 호출 시작");
-
     const response = await fetch(`${BASE_URL}/user/login`, {
       method: "POST",
       headers: {
@@ -129,10 +127,8 @@ export const login = async (
       }),
     });
 
-    console.log("📡 응답 상태:", response.status);
-
     const data = await response.json();
-    console.log("📦 로그인 응답:", data);
+    console.log("✅ 로그인 성공:", data);
 
     if (!response.ok) {
       throw new Error("로그인에 실패했습니다.");
