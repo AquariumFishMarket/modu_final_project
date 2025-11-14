@@ -116,7 +116,7 @@ const FeedPage = () => {
       {feedList.map((feed, idx) => {
         const isLast = idx === feedList.length - 1;
         const isMyPost = currentUser?.accountname === feed.author.accountname;
-
+        console.log('💢FeedPage : ' + feed.profileImg)
         return (
           <PostCard
             key={`${feed.id}-${idx}`}

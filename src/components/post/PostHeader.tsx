@@ -22,9 +22,9 @@ interface PostHeaderProps {
   variant?: "post" | "comment";
   dateTime?: string;
   dateText?: string;
-  authorAccountname: string; 
-  isMyComment?: boolean; 
-  isMyPost?: boolean; 
+  authorAccountname: string;
+  isMyComment?: boolean;
+  isMyPost?: boolean;
   onEdit?: () => void; // 댓글 수정 핸들러
   onDelete?: () => void; // 댓글 삭제 핸들러
   onReport?: () => void; // 댓글/게시글 신고 핸들러
@@ -47,6 +47,7 @@ function PostHeader({
 }: PostHeaderProps) {
   const navigate = useNavigate();
   const [imgSrc, setImgSrc] = useState(avatarSrc);
+  console.log('PostHeader.tsx :' + avatarSrc)
 
   const handleImageError = () => {
     setImgSrc("/img/fish-logo-GB.png");
