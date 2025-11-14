@@ -53,30 +53,30 @@ export default function ExceptionPage ({text,type}:Exception) {
 
     return (
         <ErrPageSection>
-        <h2 className="sr-only">로그인 확인 페이지</h2>
-        <div style={{ position: 'relative' }}>
-            <Drop src="/img/drop.png" />
-            <Drop2 src="/img/drop.png" />
-            <Drop3 src="/img/drop.png" />
-            <img src="/img/fish-logo.svg" alt="물고기 로고" />
-        </div>
-        <ErrorContent>
-            <ErrorMessage>{text}</ErrorMessage>
-            {type === 'member' && (
-                <DefaultButton
-                text={"피드 보러가기"}
-                width={120}
-                onClick={handleGoFeed}
-                />
-            )}
-            {type === 'guest' && (
-                <DefaultButton
-                text={"로그인 하러가기"}
-                width={120}
-                onClick={handleGoLogin}
-                />
-            )}
-        </ErrorContent>
+            <h2 className="sr-only">로그인 확인 페이지</h2>
+            <div style={{ position: 'relative' }}>
+                <Drop src="/img/drop.png" />
+                <Drop2 src="/img/drop.png" />
+                <Drop3 src="/img/drop.png" />
+                <img src="/img/fish-logo.svg" alt="물고기 로고" />
+            </div>
+            <ErrorContent>
+                <ErrorMessage>{text}</ErrorMessage>
+                {type === 'member' && (
+                    <DefaultButton
+                    text={"피드 보러가기"}
+                    width={10}
+                    onClick={handleGoFeed}
+                    />
+                )}
+                {type === 'guest' && (
+                    <DefaultButton
+                    text={"로그인 하러가기"}
+                    width={150}
+                    onClick={handleGoLogin}
+                    />
+                )}
+            </ErrorContent>
         </ErrPageSection>
     )
 }
