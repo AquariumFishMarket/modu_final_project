@@ -1,11 +1,10 @@
 // API 호출 관리 서비스
 
 const BASE_URL = "https://dev.wenivops.co.kr/services/mandarin";
+const DEFAULT_PROFILE_IMG = "/img/empty-profile.png";
 
 export interface AuthResponse {
-  //   success: boolean;
   message: string;
-  //   token?: string;
   user?: {
     accountname: string;
     email: string;
@@ -13,7 +12,6 @@ export interface AuthResponse {
     intro: string;
     username: string;
     _id: string;
-    // isFirstLogin?: boolean;
   };
 }
 
@@ -73,9 +71,6 @@ export const checkAccountIdDuplicate = async (
 
   return data;
 };
-
-// 임시 기본 이미지
-const DEFAULT_PROFILE_IMG = "public/img/empty-profile.png";
 
 // 회원가입
 export const signup = async (
@@ -151,42 +146,7 @@ export const login = async (
   }
 };
 
-// 프로필 업데이트 (username, accountname 설정)
-export const updateProfile = async (
-  username: string,
-  accountname: string,
-  intro: string,
-  image: string,
-  token: string
-): Promise<AuthResponse> => {
-  const profileImage =
-    image && image.trim() !== "" ? image : DEFAULT_PROFILE_IMG;
-
-  const response = await fetch(`${BASE_URL}/user`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({
-      user: {
-        username: username,
-        accountname: accountname,
-        intro: intro || "",
-        image: profileImage,
-      },
-    }),
-  });
-
-  const data = await response.json();
-  console.log("프로필 업데이트 응답:", data);
-
-  if (!response.ok) {
-    throw new Error("프로필 업데이트에 실패했습니다.");
-  }
-
-  return data;
-};
+// 프로필 조회/수정 API는 profileService로 이동
 
 // 회원 정보 등록 (첫 로그인 시)
 // export const updateUserProfile = async (

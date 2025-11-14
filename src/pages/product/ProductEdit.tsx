@@ -1,6 +1,9 @@
 import { useNavigate, useParams } from "react-router-dom";
 import EditForm from "../../components/common/form/EditForm";
-import { FormData } from "../../components/common/form/types";
+import {
+  CommonFormRef,
+  ProductFormData,
+} from "../../components/common/form/types";
 import { useHeader } from "../../contexts/HeaderContext";
 import { useEffect, useRef, useState } from "react";
 import { Product } from "../../types/product";
@@ -17,7 +20,7 @@ export default function ProductEdit() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>(); // URL에서 상품 ID 가져오기
   const { setHeaderConfig } = useHeader();
-  const formRef = useRef<{ submitForm: () => void }>(null);
+  const formRef = useRef<CommonFormRef>(null);
   const [isFormValid, setIsFormValid] = useState(false);
   const [product, setProduct] = useState<Product | null>(null); // 기존 상품 데이터
 
@@ -33,7 +36,6 @@ export default function ProductEdit() {
         setProduct(productData);
       } catch (error) {
         console.error("상품 정보 로드 실패:", error);
-        // 상품을 찾을 수 없으면 상품 상세 페이지로 이동
         navigate(`/product/${id}`);
       }
     };
@@ -67,18 +69,15 @@ export default function ProductEdit() {
   };
 
   // 폼 제출 핸들러
-  const handleSubmit = async (data: FormData) => {
+  const handleSubmit = async (data: ProductFormData) => {
     if (!id) return;
 
     try {
       const updatedProductData = {
         itemName: data.itemName,
-        price:
-          typeof data.price === "string" && data.price
-            ? parseInt(data.price.replace(/,/g, ""))
-            : 0,
-        link: data.link,
-        // itemImage: data.imageFiles
+        price: parseInt(data.price.replace(/,/g, "")),
+        link: data.link || "",
+        // itemImage: 이미지 업로드 후 string URL로 할당 필요
       };
 
       await updateProduct(id, updatedProductData);
@@ -101,7 +100,7 @@ export default function ProductEdit() {
   };
 
   return (
-    <EditForm
+    <EditForm<ProductFormData>
       ref={formRef}
       formType="product"
       fields={productFields}

@@ -2,8 +2,13 @@ import React, { useState } from "react";
 import AuthForm from "../../components/common/auth/AuthForm";
 import styled from "styled-components";
 import { Link, useNavigate } from "react-router-dom";
-import { checkEmailDuplicate, signup, login } from "../../services/authService";
+import { signup, login } from "../../services/authService";
 import { saveToken } from "../../utils/tokenManager";
+import {
+  validateEmail,
+  validatePassword,
+  validateEmailDuplicate,
+} from "../../utils/validation/AuthValidation";
 
 const Signuptitle = styled.h2`
   text-align: center;
@@ -20,58 +25,18 @@ const LoginLink = styled(Link)`
   display: inline-block;
   text-align: center;
   margin: 20px auto;
+
+  span {
+    font-weight: 700;
+  }
 `;
 
 export default function Signup() {
   const navigate = useNavigate();
-  const [error, setError] = useState<string | null>(null);
-  const [emailStatus, setEmailStatus] = useState<{
-    checking: boolean;
-    checked: boolean;
-    available: boolean;
-    message: string;
-  }>({ checking: false, checked: false, available: false, message: "" });
+  const [formError, setFormError] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // 이메일 중복 체크 함수 분리
-  const handleEmailCheck = async (email: string) => {
-    if (!email) return;
-
-    console.log("이메일 중복 체크 시작:", email);
-    setEmailStatus((prev) => ({ ...prev, checking: true }));
-    setError(null);
-
-    try {
-      const res = await checkEmailDuplicate(email);
-      console.log("중복 체크 응답:", res);
-
-      const isAvailable = res.message === "사용 가능한 이메일 입니다.";
-
-      setEmailStatus({
-        checking: false,
-        checked: true,
-        available: isAvailable,
-        message: res.message,
-      });
-
-      if (!isAvailable) {
-        setError(res.message);
-      }
-    } catch (err) {
-      console.error("이메일 중복 체크 에러:", err);
-      setEmailStatus({
-        checking: false,
-        checked: false,
-        available: false,
-        message: "이메일 중복 확인에 실패했습니다.",
-      });
-      setError(
-        err instanceof Error ? err.message : "이메일 중복 확인에 실패했습니다."
-      );
-    }
-  };
-
-  // 회원가입 폼 필드 설정
+  // 회원가입 폼 필드 설정 (validator 연결)
   const signupFields = [
     {
       type: "email" as const,
@@ -79,8 +44,13 @@ export default function Signup() {
       label: "이메일",
       placeholder: "이메일 주소를 입력해 주세요.",
       required: true,
-      onBlur: async (e: React.FocusEvent<HTMLInputElement>) => {
-        await handleEmailCheck(e.target.value);
+      validator: async (value: string) => {
+        // 형식 검사
+        const formatError = validateEmail(value);
+        if (formatError) return formatError;
+        // 중복 검사
+        const duplicateError = await validateEmailDuplicate(value);
+        return duplicateError || "";
       },
     },
     {
@@ -89,65 +59,35 @@ export default function Signup() {
       label: "비밀번호",
       placeholder: "비밀번호를 입력해 주세요.",
       required: true,
+      validator: validatePassword,
     },
   ];
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError(null);
+    setIsSubmitting(true);
+    setFormError("");
 
     const formData = new FormData(e.currentTarget);
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
-    // const username = (formData.get("username") as string) || "";
-    // const accountname = (formData.get("accountname") as string) || "";
-    // const intro = (formData.get("intro") as string) || "";
-    // const image = (formData.get("image") as string) || "";
-
-    // 이메일 중복 체크가 진행 중인 경우
-    if (emailStatus.checking) {
-      setError("이메일 중복 확인 중입니다. 잠시만 기다려주세요.");
-      return;
-    }
-
-    if (!emailStatus.checked) {
-      console.log("이메일 중복 체크 미완료, 자동으로 체크 시작");
-      setError("이메일 중복 확인 중입니다...");
-
-      // 자동으로 중복 체크 실행
-      try {
-        await handleEmailCheck(email);
-        // 체크 완료 후 다시 제출 시도하지 않고 사용자가 다시 클릭하도록 함
-        setError("이메일 중복 확인이 완료되었습니다. 다시 시도해주세요.");
-        return;
-      } catch {
-        setError("이메일 중복 확인에 실패했습니다. 다시 시도해주세요.");
-        return;
-      }
-    }
-
-    setIsSubmitting(true);
 
     try {
-      console.log("1. 회원가입 시작");
       await signup(email, password);
-      console.log("회원가입 성공");
 
-      console.log("2. 자동 로그인 시작");
       const loginResult = await login(email, password);
-      console.log("로그인 성공:", loginResult);
 
-      console.log("3. 토큰 저장");
       saveToken(loginResult.token);
 
-      setError(null);
       alert("회원가입이 완료되었습니다. 프로필을 설정해주세요.");
-
-      console.log("4. 프로필 설정 페이지로 이동");
       navigate("/profile/setup");
-      // navigate("/login/email");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "회원가입에 실패했습니다.");
+    } catch (error) {
+      // 실패 시 alert 대신 하단 메시지로만 표시
+      setFormError(
+        error instanceof Error
+          ? error.message
+          : "이메일과 비밀번호를 다시 확인해주세요."
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -165,14 +105,11 @@ export default function Signup() {
         buttonText={isSubmitting ? "처리 중..." : "회원가입"}
         onSubmit={handleSubmit}
         onButtonClick={handleButtonClick}
+        formError={formError}
       />
-      {/* 나중에 빼기  */}
-      {error && (
-        <div style={{ color: "red", textAlign: "center", marginTop: "10px" }}>
-          {error}
-        </div>
-      )}
-      <LoginLink to={"/login/email"}>이메일로 로그인</LoginLink>
+      <LoginLink to={"/login/email"}>
+        이미 계정이 있으신가요? <span>이메일로 로그인</span>
+      </LoginLink>
     </>
   );
 }

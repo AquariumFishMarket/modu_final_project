@@ -20,12 +20,16 @@ const SignupLink = styled(Link)`
   display: inline-block;
   text-align: center;
   margin: 20px auto;
+
+  span {
+    font-weight: 700;
+  }
 `;
 
 export default function LoginEmail() {
   const navigate = useNavigate();
   const { login: authLogin } = useAuth(); // AuthContext의 login 함수
-  const [error, setError] = useState<string>("");
+  const [formError, setFormError] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (
@@ -33,7 +37,7 @@ export default function LoginEmail() {
   ): Promise<void> => {
     e.preventDefault();
     console.log("폼 제출:", e);
-    setError("");
+    setFormError("");
 
     const formData = new FormData(e.currentTarget);
     const email = formData.get("email") as string;
@@ -59,8 +63,12 @@ export default function LoginEmail() {
         console.log("네비게이션 시작");
         navigate("/");
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "로그인에 실패합니다.");
+    } catch (error) {
+      setFormError(
+        error instanceof Error
+          ? error.message
+          : "이메일과 비밀번호를 다시 확인해주세요."
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -89,22 +97,18 @@ export default function LoginEmail() {
   return (
     <>
       <LoginTitle>로그인</LoginTitle>
-
-      {error && (
-        <div style={{ color: "red", textAlign: "center", marginTop: "10px" }}>
-          {error}
-        </div>
-      )}
-
       <AuthForm
         fields={loginFields}
         buttonText={isSubmitting ? "로그인 중..." : "로그인"}
         onSubmit={handleSubmit}
         onButtonClick={handleButtonClick}
         disabled={isSubmitting}
+        formError={formError}
       />
 
-      <SignupLink to="/signup">이메일로 회원가입</SignupLink>
+      <SignupLink to="/signup">
+        처음이신가요? <span>이메일로 회원가입</span>
+      </SignupLink>
     </>
   );
 }

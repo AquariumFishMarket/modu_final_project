@@ -64,14 +64,14 @@ export const getProfileFields = (): FormFieldConfig[] => [
     validator: validateUsername,
   },
   {
-    name: "accountId",
+    name: "accountname",
     label: "계정 ID",
     placeholder: "영문, 숫자, 특수문자(.),(...)만 사용 가능합니다.",
     required: true,
     validator: validateAccountId,
   },
   {
-    name: "introduction",
+    name: "intro",
     label: "소개",
     placeholder: "자신과 판매할 상품에 대해 소개해 주세요!",
   },

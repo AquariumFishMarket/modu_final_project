@@ -37,6 +37,5 @@ export const validateEmailDuplicate = async (
 export const validatePassword = (password: string): string => {
   if (!password) return "비밀번호를 입력해 주세요.";
   if (password.length < 8) return "비밀번호는 8자 이상이어야 합니다.";
-  // 필요 시 추가 규칙(특수문자, 숫자 등)도 여기에 추가
   return "";
 };

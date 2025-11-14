@@ -1,76 +1,78 @@
 import { useNavigate } from "react-router-dom";
 import EditForm from "../../components/common/form/EditForm";
-import { FormData } from "../../components/common/form/types";
+import { CommonFormRef, ProfileFormData } from "../../components/common/form/types";
 import { useHeader } from "../../contexts/HeaderContext";
 import { useState, useEffect, useRef } from "react";
+import { getProfileFields } from "../../utils/validation/userValidation";
+import { getMyProfile, updateProfile } from "../../services/profileService";
+import { uploadImage } from "../../services/imageService";
+import { getToken } from "../../utils/tokenManager";
 
-// 유효성 검사 함수 -> profile 유효성만 따로 분리
-const validateUsername = (username: string): string | null => {
-  if (username.length < 2 || username.length > 10) {
-    return "사용자 이름은 2-10자 이내여야 합니다.";
-  }
-  return null;
-};
-
-const validateAccountId = async (accountId: string): Promise<string | null> => {
-  const accountIdRegex = /^[a-zA-Z0-9._]+$/;
-  if (!accountIdRegex.test(accountId)) {
-    return "영문, 숫자, 특수문자(.), (_)만 사용 가능합니다.";
-  }
-
-  if (accountId.length < 3) {
-    return "계정 ID는 3자 이상이어야 합니다.";
-  }
-
-  try {
-    const isDuplicate = await checkAccountIdDuplicate(accountId);
-    if (isDuplicate) {
-      return "이미 사용 중인 계정 ID입니다.";
-    }
-  } catch {
-    return "계정 ID 중복 확인 중 오류가 발생했습니다.";
-  }
-
-  return null;
-};
-
-// ID 중복 검사
-const checkAccountIdDuplicate = async (accountId: string): Promise<boolean> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const duplicateIds = ["admin", "test", "user123"];
-      resolve(duplicateIds.includes(accountId.toLowerCase()));
-    }, 500);
-  });
-};
-
-const profileFields = [
-  {
-    name: "username",
-    label: "사용자 이름",
-    placeholder: "2-10자 이내여야 합니다.",
-    required: true,
-    validator: validateUsername,
-  },
-  {
-    name: "accountId",
-    label: "계정 ID",
-    placeholder: "영문, 숫자, 특수문자(.),(...)만 사용 가능합니다.",
-    required: true,
-    validator: validateAccountId,
-  },
-  {
-    name: "introduction",
-    label: "소개",
-    placeholder: "자신과 판매할 상품에 대해 소개해 주세요!",
-  },
-];
+// 사용자 프로필 타입 정의
+interface UserProfile {
+  username: string;
+  accountname: string;
+  intro: string;
+  image: string;
+}
 
 export default function ProfileEdit() {
   const navigate = useNavigate();
   const { setHeaderConfig } = useHeader();
-  const formRef = useRef<{ submitForm: () => void }>(null);
+  const formRef = useRef<CommonFormRef>(null);
   const [isFormValid, setIsFormValid] = useState(false);
+
+  // 상태
+  const [loading, setLoading] = useState(true);
+  const [profileData, setProfileData] = useState<UserProfile | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const profileFields = getProfileFields();
+
+  // 기존 프로필 데이터 불러오기
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const token = getToken();
+
+        if (!token) {
+          throw new Error("로그인이 필요합니다.");
+        }
+
+        const start = Date.now();
+        const data = await getMyProfile(token);
+
+        setProfileData({
+          username: data.user.username,
+          accountname: data.user.accountname,
+          intro: data.user.intro || "",
+          image: data.user.image,
+        });
+
+        // 최소 0.8초 로딩 화면 유지
+        const elapsed = Date.now() - start;
+        const minDelay = 800;
+        if (elapsed < minDelay) {
+          setTimeout(() => setLoading(false), minDelay - elapsed);
+        } else {
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error("프로필 로딩 실패:", error);
+        setError(
+          error instanceof Error ? error.message : "오류가 발생했습니다."
+        );
+
+        setTimeout(() => navigate("/profile"), 2000);
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, [navigate]);
 
   useEffect(() => {
     setHeaderConfig({
@@ -91,7 +93,7 @@ export default function ProfileEdit() {
     return () => {
       setHeaderConfig({ show: false });
     };
-  }, [isFormValid]);
+  }, [isFormValid, setHeaderConfig, navigate]);
 
   // 폼 유효성 변경 핸들러
   const handleValidationChange = (isValid: boolean) => {
@@ -99,16 +101,69 @@ export default function ProfileEdit() {
   };
 
   // 폼 제출 핸들러
-  const handleSubmit = (data: FormData) => {
-    console.log("프로필 수정 완료:", data);
-    console.log("사용자 이름:", data.username);
-    console.log("계정 ID:", data.accountId);
-    console.log("소개:", data.intro);
-    console.log("프로필 이미지:", data.image);
+  const handleSubmit = async (data: ProfileFormData) => {
+    try {
+      console.log("📤 제출 데이터:", data);
 
-    // 수정 완료 후 프로필 페이지로 이동
-    navigate("/profile");
+      const token = getToken();
+      if (!token) {
+        throw new Error("로그인이 필요합니다."); // ☑️ 예외처리 필요
+      }
+
+      let imageUrl = "";
+
+      if (data.image instanceof File) {
+        console.log("🖼️ 새 이미지 업로드");
+        imageUrl = await uploadImage(data.image);
+      } else if (typeof data.image === "string" && data.image) {
+        console.log("🖼️ 기존 이미지 유지:", data.image);
+        imageUrl = data.image;
+      } else {
+        console.log("🖼️ 기본 이미지 사용");
+        imageUrl = "/img/empty-profile.png";
+      }
+
+      await updateProfile(
+        data.username,
+        data.accountname,
+        data.intro || "",
+        imageUrl,
+        token
+      );
+
+      console.log("✅ 프로필 수정 성공");
+      alert("프로필이 수정되었습니다.");
+      navigate("/profile", { replace: true, state: { refresh: true } });
+    } catch (err) {
+      console.error("프로필 수정 실패:", err);
+      alert(
+        err instanceof Error
+          ? err.message
+          : "프로필 수정에 실패했습니다. 다시 시도해주세요."
+      );
+    }
   };
+
+  // 🆕 로딩 상태 -> 처리 어떻게 할지
+  if (loading) {
+    return <div>프로필 정보를 불러오는 중...</div>;
+  }
+
+  // 🆕 에러 상태 -> 처리 어떻게 할지
+  if (error) {
+    return (
+      <div>
+        {error}
+        <br />
+        <small>잠시 후 프로필 페이지로 이동합니다...</small>
+      </div>
+    );
+  }
+
+  // 🆕 데이터 없음 -> 처리 어떻게 할지
+  if (!profileData) {
+    return <div>프로필 정보를 불러올 수 없습니다.</div>;
+  }
 
   return (
     <EditForm
@@ -117,6 +172,12 @@ export default function ProfileEdit() {
       fields={profileFields}
       onSubmit={handleSubmit}
       onValidationChange={handleValidationChange}
+      initialValues={{
+        username: profileData.username,
+        accountname: profileData.accountname,
+        intro: profileData.intro,
+      }}
+      initialImageUrl={profileData.image}
     />
   );
 }
