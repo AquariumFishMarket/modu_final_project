@@ -14,8 +14,11 @@ import {
   updateComment,
   reportComment,
   reportPost,
+  deletePost,
 } from "../../services/postService";
 import { useAuth } from "../../contexts/AuthContext";
+import { useHeader } from "../../contexts/HeaderContext";
+import MoreMenu from "../../components/common/modal/MoreMenu";
 
 interface Author {
   _id: string;
@@ -69,11 +72,26 @@ function PostDetail() {
   const { postId } = useParams<{ postId: string }>();
   const navigate = useNavigate();
   const { currentUser } = useAuth();
+  const { setHeaderConfig } = useHeader();
   const [commentText, setCommentText] = useState("");
   const [post, setPost] = useState<Post | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const lastCommentRef = useRef<HTMLDivElement>(null);
+
+  // 게시글 삭제 핸들러
+  const handleDeletePost = async () => {
+    if (!postId) return;
+
+    try {
+      await deletePost(postId);
+      console.log("게시글 삭제 성공");
+      navigate(-1);
+    } catch (error) {
+      console.error("게시글 삭제 실패:", error);
+      alert("게시글 삭제에 실패했습니다.");
+    }
+  };
 
   // 디버깅: 현재 사용자 정보 확인
   useEffect(() => {
@@ -105,6 +123,26 @@ function PostDetail() {
 
     loadPostData();
   }, [postId]);
+
+  // 헤더 설정 (post 로드 후)
+  useEffect(() => {
+    if (!post) return;
+
+    setHeaderConfig({
+      show: true,
+      type: "postDetail",
+      onBackClick: () => navigate(-1),
+      rightElement: (
+        <MoreMenu
+          type="post"
+          authorAccountname={post.author.accountname}
+          onEdit={() => navigate(`/post/${postId}/edit`)}
+          onDelete={handleDeletePost}
+          onReport={handlePostReport}
+        />
+      ),
+    });
+  }, [post, postId, setHeaderConfig, navigate]);
 
   const handleCommentSubmit = async (
     text: string,
