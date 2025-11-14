@@ -1,4 +1,3 @@
-import { color } from "framer-motion";
 import styled from "styled-components";
 
 export const PostCardContainer = styled.article`
@@ -36,8 +35,7 @@ export const PostMain = styled.figure`
   gap: 1.6rem;
   margin: 0;
   border: none;
-  /* padding: 0 1.6rem 0 0; */
-  cursor: pointer; // 상세 보기
+  cursor: pointer;
 
   figcaption {
     line-height: 1.8rem;
@@ -45,8 +43,6 @@ export const PostMain = styled.figure`
   }
 
   img {
-    /* width: 30.4rem;
-    height: 22.8rem; */
     width: 100%;
     height: auto;
     min-height: 180px;
@@ -59,16 +55,7 @@ export const PostMain = styled.figure`
   @media (min-width: 390px) {
     padding: 0;
 
-    /* figcaption {
-      font-size: 1.6rem;
-      line-height: 2.4rem;
-    } */
-
     img {
-      /* width: 100%;
-      max-width: 100%;
-      height: auto;
-      aspect-ratio: 16 / 9; */
       min-height: 220px;
     }
   }
@@ -78,12 +65,7 @@ export const PostFooter = styled.footer`
   display: flex;
   flex-direction: column;
   gap: 1.6rem;
-  /* padding: 1.2rem 1.6rem 0 0; */
   padding-top: 12px;
-
-  /* @media (min-width: 768px) {
-    padding: 1.2rem 0 0 0;
-  } */
 `;
 
 export const PostActions = styled.div`
@@ -104,14 +86,6 @@ export const ActionButton = styled.button`
   font-size: var(--font-size-sm);
   transition: color 0.2s;
 
-  /* &:hover {
-    color: var(--color-primary-600);
-  }
-
-  &:first-child:hover {
-    color: var(--color-error);
-  } */
-
   img {
     width: 2rem;
     height: 2rem;
@@ -121,6 +95,131 @@ export const ActionButton = styled.button`
 export const PostTime = styled.time`
   font-size: var(--font-size-xs);
   color: var(--color-gray-dark);
+`;
+
+// Embla Carousel Styles
+export const ImageCarousel = styled.div`
+  position: relative;
+  overflow: hidden;
+  border-radius: 1rem;
+  border: 1px solid var(--color-gray-medium);
+`;
+
+export const ImageCarouselViewport = styled.div`
+  overflow: hidden;
+`;
+
+export const ImageCarouselContainer = styled.div`
+  display: flex;
+`;
+
+export const ImageCarouselSlide = styled.div`
+  flex: 0 0 100%;
+  min-width: 0;
+
+  img {
+    width: 100%;
+    height: auto;
+    min-height: 180px;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border: none;
+    border-radius: 0;
+    display: block;
+
+    @media (min-width: 390px) {
+      min-height: 220px;
+    }
+  }
+`;
+
+export const CarouselDots = styled.div`
+  position: absolute;
+  bottom: 1.2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: center;
+  gap: 0.4rem;
+  z-index: 10;
+`;
+
+export const CarouselDot = styled.button<{ $isActive: boolean }>`
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  border: none;
+  background: ${(props) =>
+    props.$isActive ? "#ffffff" : "rgba(255, 255, 255, 0.5)"};
+  cursor: pointer;
+  transition: all 0.2s;
+  padding: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+
+  &:hover {
+    background: ${(props) =>
+      props.$isActive ? "#ffffff" : "rgba(255, 255, 255, 0.7)"};
+  }
+`;
+
+export const CarouselButton = styled.button`
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+
+  &:hover {
+    background: rgba(255, 255, 255, 1);
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  &:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  svg {
+    width: 1.8rem;
+    height: 1.8rem;
+    color: #333;
+  }
+
+  &.prev {
+    left: 1rem;
+  }
+
+  &.next {
+    right: 1rem;
+  }
+
+  @media (max-width: 480px) {
+    width: 2.4rem;
+    height: 2.4rem;
+
+    svg {
+      width: 1.4rem;
+      height: 1.4rem;
+    }
+
+    &.prev {
+      left: 0.6rem;
+    }
+
+    &.next {
+      right: 0.6rem;
+    }
+  }
 `;
 
 export const HeartLabel = styled.div<{ $liked: boolean }>`
