@@ -13,41 +13,21 @@ export const useFeedData = () => {
   const observerRef = useRef<IntersectionObserver | null>(null);
   const loadMoreTriggerRef = useRef<HTMLDivElement>(null);
 
-
   //  좋아요 토글 (낙관적 업데이트)
 
-  const handleLikeToggle = useCallback(
-    async (feedId: string): Promise<void> => {
-      const previousFeedList = feedList;
-      const targetFeed = feedList.find((feed) => feed.id === feedId);
-      if (!targetFeed) return;
-
-      // 낙관적 업데이트
-      setFeedList((prev) =>
-        prev.map((feed) =>
-          feed.id === feedId
-            ? {
-                ...feed,
-                isLiked: !feed.isLiked,
-                likeCount: feed.isLiked
-                  ? feed.likeCount - 1
-                  : feed.likeCount + 1,
-              }
-            : feed
-        )
-      );
-
-      try {
-        await toggleLike(feedId, targetFeed.isLiked);
-      } catch (error) {
-        console.error("좋아요 토글 실패:", error);
-        // 실패 시 롤백
-        setFeedList(previousFeedList);
-      }
-    },
-    [feedList]
-  );
-
+  const handleLikeToggle = useCallback((feedId: string): void => {
+    setFeedList((prev) =>
+      prev.map((feed) =>
+        feed.id === feedId
+          ? {
+              ...feed,
+              isLiked: !feed.isLiked,
+              likeCount: feed.isLiked ? feed.likeCount - 1 : feed.likeCount + 1,
+            }
+          : feed
+      )
+    );
+  }, []);
 
   //  다음 페이지 로드
   const loadNextPage = useCallback(() => {
@@ -89,7 +69,6 @@ export const useFeedData = () => {
       observer.disconnect();
     };
   }, [feedList.length, hasMore, isLoading, loadNextPage]);
-
 
   return {
     hasMore,
