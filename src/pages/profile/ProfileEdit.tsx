@@ -1,10 +1,13 @@
 import { useNavigate } from "react-router-dom";
 import EditForm from "../../components/common/form/EditForm";
-import { CommonFormRef, ProfileFormData } from "../../components/common/form/types";
+import {
+  CommonFormRef,
+  ProfileFormData,
+} from "../../components/common/form/types";
 import { useHeader } from "../../contexts/HeaderContext";
 import { useState, useEffect, useRef } from "react";
 import { getProfileFields } from "../../utils/validation/userValidation";
-import { getMyProfile, updateProfile } from "../../services/profileService";
+import { fetchProfile, updateProfile } from "../../services/profileService";
 import { uploadImage } from "../../services/imageService";
 import { getToken } from "../../utils/tokenManager";
 
@@ -31,7 +34,7 @@ export default function ProfileEdit() {
 
   // 기존 프로필 데이터 불러오기
   useEffect(() => {
-    const fetchProfile = async () => {
+    const loadProfile = async () => {
       try {
         setLoading(true);
         setError(null);
@@ -43,13 +46,15 @@ export default function ProfileEdit() {
         }
 
         const start = Date.now();
-        const data = await getMyProfile(token);
+        const data = await fetchProfile();
+
+        if (!data) throw new Error("프로필 정보를 불러올 수 없습니다.");
 
         setProfileData({
-          username: data.user.username,
-          accountname: data.user.accountname,
-          intro: data.user.intro || "",
-          image: data.user.image,
+          username: data.username,
+          accountname: data.accountname,
+          intro: data.intro || "",
+          image: data.image,
         });
 
         // 최소 0.8초 로딩 화면 유지
@@ -71,7 +76,7 @@ export default function ProfileEdit() {
       }
     };
 
-    fetchProfile();
+    loadProfile();
   }, [navigate]);
 
   useEffect(() => {

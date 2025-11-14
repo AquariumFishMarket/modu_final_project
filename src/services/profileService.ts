@@ -1,5 +1,7 @@
 import { getAuthHeaders } from "../utils/auth";
-import { Post } from "../types/post";
+import { Post, UserPostsResponse } from "../types/post";
+import { UserProfile } from "../types/user";
+import { getToken } from "../utils/tokenManager";
 
 const BASE_URL = "https://dev.wenivops.co.kr/services/mandarin";
 
@@ -32,28 +34,49 @@ export interface MyProfileResponse {
   };
 }
 
-// 내 프로필 정보 조회
-export const getMyProfile = async (
-  token: string
-): Promise<MyProfileResponse> => {
-  const response = await fetch(`${BASE_URL}/user/myinfo`, {
-    method: "GET",
-    headers: {
+/**
+ * 👤 통합 프로필 조회 함수
+ * 내 프로필: accountname 미지정 또는 내 계정명과 동일
+ * 타인 프로필: accountname 지정 & 내 계정명과 다름
+ * 반환: UserProfile | null
+ */
+export const fetchProfile = async (
+  accountname?: string,
+  currentUserAccountname?: string
+): Promise<UserProfile | null> => {
+  try {
+    const token = getToken();
+    let url = `${BASE_URL}/user/myinfo`;
+    const headers: Record<string, string> = {
       Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-  });
+    };
 
-  if (!response.ok) {
-    throw new Error("프로필 정보를 불러올 수 없습니다.");
+    if (accountname && accountname !== currentUserAccountname) {
+      url = `${BASE_URL}/profile/${accountname}`;
+      headers["Content-type"] = "application/json";
+    }
+
+    const response = await fetch(url, {
+      method: "GET",
+      headers,
+    });
+
+    if (!response.ok) throw new Error("프로필을 불러올 수 없습니다");
+
+    const data = await response.json();
+    // 내 프로필: data.user, 타인 프로필: data.profile
+    return accountname && accountname !== currentUserAccountname
+      ? data.profile
+      : data.user;
+  } catch (error) {
+    console.error("프로필 데이터 가져오기 실패:", error);
+    return null;
   }
-
-  const data = await response.json();
-  console.log("📥 내 프로필 조회:", data);
-  return data;
 };
 
-// 프로필 업데이트
+/**
+ * 👤🆕 프로필 업데이트
+ */
 export const updateProfile = async (
   username: string,
   accountname: string,
@@ -107,35 +130,58 @@ export const updateProfile = async (
 };
 
 /**
- * 사용자 게시글 피드 가져오기
+ * 📜 사용자 게시글 피드 가져오기
  */
-export async function fetchUserPosts(userId: string): Promise<Post[] | null> {
+export const fetchUserPosts = async (
+  accountname: string
+): Promise<Post[] | null> => {
   try {
-    const response = await fetch(`${BASE_URL}/users/${userId}/posts`, {
-      headers: getAuthHeaders(),
-    });
+    const token = getToken();
+    const limit = 1000; // ☑️ 무한 스크롤 되면 개수 20개로 줄이기
 
-    if (!response.ok) throw new Error("게시글 데이터 가져오기 실패");
+    const response = await fetch(
+      `${BASE_URL}/post/${accountname}/userpost?limit=${limit}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-type": "application/json",
+        },
+      }
+    );
 
-    const data = await response.json();
-    return data.posts as Post[];
+    if (!response.ok) throw new Error("내 게시글 데이터 가져오기 실패");
+
+    const data: UserPostsResponse = await response.json();
+    console.log(`${accountname}의 게시글 목록:`, data.post);
+
+    // 최신순
+    const posts = Array.isArray(data.post) ? data.post : [];
+    return posts.sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
   } catch (error) {
     console.error("게시글 데이터 가져오기 실패:", error);
     return null;
   }
-}
+};
 
 /**
- * 팔로우/언팔로우 처리
+ * 🔄 팔로우/언팔로우 처리
  */
 export async function toggleProfileFollow(
-  userId: string,
+  accountname: string,
   isFollowing: boolean
 ): Promise<boolean> {
   try {
-    const response = await fetch(`${BASE_URL}/users/${userId}/follow`, {
+    const token = getToken();
+    const response = await fetch(`${BASE_URL}/profile/${accountname}/follow`, {
       method: isFollowing ? "DELETE" : "POST",
-      headers: getAuthHeaders(),
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-type": "application/json",
+      },
     });
 
     if (!response.ok) throw new Error("팔로우 처리 실패");

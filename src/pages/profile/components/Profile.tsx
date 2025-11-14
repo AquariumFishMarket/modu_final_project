@@ -29,11 +29,13 @@ import type { UserProfile } from "../../../types/user";
 import PostCard from "../../../components/post/postCard/PostCard";
 import PostStateBar from "../../../components/post/PostStateBar";
 import PostGallery from "./PostGallery";
-import { Post, UserPostsResponse } from "../../../types/post";
-import { getToken } from "../../../utils/tokenManager";
+import { Post } from "../../../types/post";
 import { useAuth } from "../../../contexts/AuthContext";
-// import { useUserPostsData } from "../../hooks/useUserPostsData";
-// import type { Feed } from "../../types/feed";
+import {
+  fetchProfile,
+  fetchUserPosts,
+  toggleProfileFollow,
+} from "../../../services/profileService";
 
 const BASE_URL = `https://dev.wenivops.co.kr/services/mandarin`;
 
@@ -41,8 +43,8 @@ const BASE_URL = `https://dev.wenivops.co.kr/services/mandarin`;
 //  - 내 프로필과 다른 유저의 프로필을 조건부 렌더링
 //  - isMyProfile = targetAccountname === currentUserAccountname로 구분
 
-//  API 연동 예정:
-//  - fetchProfileData: 프로필 정보 가져오기 👤
+//  API -> profileService로 옮김
+//  - fetchProfile: 프로필 정보 가져오기 👤
 //  - fetchUserPosts: 사용자 게시글 목록 가져오기 📜
 //  - handleFollowToggle: 팔로우/언팔로우 처리 🔄
 //  - handleLikeToggle: 게시글 좋아요 처리 ❤️
@@ -67,98 +69,10 @@ function Profile() {
   // 포스트 상태 관리 (리스트 / 갤러리)
   const [postState, setPostState] = useState<"list" | "gallery">("list");
 
-  // // 무한 스크롤 훅 사용
-  // const {
-  //   postsList,
-  //   isLoading: isPostsLoading,
-  //   isInitialLoading: isPostsInitialLoading,
-  //   hasMore,
-  //   scrollContainerRef,
-  //   loadMoreTriggerRef,
-  //   handleLikeToggle: handlePostLikeToggle,
-  // } = useUserPostsData(profileData.userId);
-
-  // 프로필 데이터 상태 관리
-  // const [profileData, setProfileData] = useState<UserProfile | null>(null);
-
   // 팔로우 처리 중 상태 (중복 클릭 방지)
   const [isFollowLoading, setIsFollowLoading] = useState(false);
 
-  // 👤 프로필 데이터 가져오기
-  const fetchProfileData = async (
-    accountname?: string
-  ): Promise<UserProfile | null> => {
-    try {
-      const token = getToken(); // 토큰 가져오기
-      let url = `${BASE_URL}/user/myinfo`;
-      const headers: Record<string, string> = {
-        Authorization: `Bearer ${token}`,
-      };
-
-      if (accountname && accountname !== currentUserAccountname) {
-        url = `${BASE_URL}/profile/${accountname}`;
-        headers["Content-type"] = "application/json";
-      }
-
-      const response = await fetch(url, {
-        method: "GET",
-        headers,
-      });
-
-      if (!response.ok) throw new Error("프로필을 불러올 수 없습니다");
-
-      const data = await response.json();
-
-      // 다른 유저 프로필은 data.profile로 반환됨
-      // 내 프로필은 data.user
-      return accountname && accountname !== currentUserAccountname
-        ? data.profile
-        : data.user;
-    } catch (error) {
-      console.error("프로필 데이터 가져오기 실패:", error);
-      return null;
-    }
-  };
-
-  // 📜 사용자 게시글 피드 가져오기
-  const fetchUserPosts = async (
-    accountname: string
-  ): Promise<Post[] | null> => {
-    try {
-      const token = getToken();
-      const limit = 1000; // ☑️ 무한 스크롤 되면 개수 20개로 줄이기
-
-      const response = await fetch(
-        `${BASE_URL}/post/${accountname}/userpost?limit=${limit}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-type": "application/json",
-          },
-        }
-      );
-
-      if (!response.ok) throw new Error("내 게시글 데이터 가져오기 실패");
-
-      const data: UserPostsResponse = await response.json();
-      console.log(`${accountname}의 게시글 목록:`, data.post);
-
-      // 최신순
-      const posts = Array.isArray(data.post) ? data.post : [];
-      return posts.sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
-    } catch (error) {
-      console.error("게시글 데이터 가져오기 실패:", error);
-      return null;
-    }
-  };
-
-  // API: 팔로우/언팔로우 처리 (낙관적 업데이트)
-  //  API 연동 시 주석 해제된 부분 활성화
-
+  // 🔄 팔로우/언팔로우 처리 (낙관적 업데이트)
   const handleFollowToggle = async (): Promise<void> => {
     if (isFollowLoading || !profileData) return;
 
@@ -181,11 +95,7 @@ function Profile() {
 
     setIsFollowLoading(true);
     try {
-      // API 연동 시 주석 해제
-      // const response = await fetch(`/api/users/${profileData.accountname}/follow`, {
-      //   method: newFollowState ? 'POST' : 'DELETE',
-      // });
-      // if (!response.ok) throw new Error('팔로우 처리 실패');
+      await toggleProfileFollow(profileData.accountname, profileData.isfollow);
     } catch (error) {
       console.error("팔로우 처리 실패:", error);
       setProfileData(previousData);
@@ -290,7 +200,10 @@ function Profile() {
           };
         } else {
           console.log("👥 다른 사용자 프로필 로드");
-          const fetchedProfile = await fetchProfileData(targetAccountname);
+          const fetchedProfile = await fetchProfile(
+            targetAccountname,
+            currentUserAccountname
+          );
           if (!fetchedProfile) {
             throw new Error("프로필을 불러올 수 없습니다");
           }
