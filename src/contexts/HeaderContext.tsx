@@ -1,4 +1,4 @@
-import {
+import React, {
   createContext,
   useContext,
   useState,
@@ -28,6 +28,7 @@ export interface HeaderConfig {
   title?: string;
   userName?: string; // chat type에서 사용
   inputState?: boolean; // edit, post type에서 사용
+  rightElement?: React.ReactNode; 
   onBackClick?: () => void;
   onSearchClick?: () => void;
   onMoreClick?: () => void;

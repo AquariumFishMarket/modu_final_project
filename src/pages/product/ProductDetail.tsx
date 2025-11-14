@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Product } from "../../types/product";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import {
   fetchProductDetail,
   toggleProductLike,
 } from "../../services/productService";
+import { useHeader } from "../../contexts/HeaderContext";
+import MoreMenu from "../../components/common/modal/MoreMenu";
 
 // 시간 표시 유틸리티 함수 추가
 const getRelativeTime = (createdAt: string): string => {
@@ -222,6 +224,8 @@ const ContentWrapper = styled.div`
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const { setHeaderConfig } = useHeader();
   const [product, setProduct] = useState<Product | null>(null);
   // const [selectedImageIdx, setSelectedImageIdx] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
@@ -230,6 +234,29 @@ export default function ProductDetail() {
   const isSold = product?.status === "sold";
 
   const canPurchase = !isSold && product?.link;
+
+  // 상품 삭제 핸들러
+  const handleDelete = async () => {
+    console.log("상품 삭제:", id);
+    // 상품 삭제 API 호출
+    navigate(-1);
+  };
+
+  // 판매완료 처리 핸들러
+  const handleMarkAsSold = async () => {
+    console.log("판매완료 처리:", id);
+    // 상품 상태 업데이트 API 호출
+    if (product) {
+      setProduct({ ...product, status: "sold" });
+    }
+  };
+
+  // 상품 신고 핸들러
+  const handleReport = () => {
+    console.log("상품 신고:", id);
+    // 상품 신고 API 호출
+    alert("상품이 신고되었습니다.");
+  };
 
   useEffect(() => {
     const loadProduct = async () => {
@@ -270,6 +297,27 @@ export default function ProductDetail() {
 
     loadProduct();
   }, [id]);
+
+  // 헤더 설정 (product 로드 후)
+  useEffect(() => {
+    if (!product) return;
+
+    setHeaderConfig({
+      show: true,
+      type: "productDetail",
+      onBackClick: () => navigate(-1),
+      rightElement: (
+        <MoreMenu
+          type="product"
+          authorAccountname={product.author.accountname}
+          onEdit={() => navigate(`/product/${id}/edit`)}
+          onDelete={handleDelete}
+          onMarkAsSold={handleMarkAsSold}
+          onReport={handleReport}
+        />
+      ),
+    });
+  }, [product, id, setHeaderConfig, navigate]);
 
   if (!product) {
     return <div>상품을 찾을 수 없습니다.</div>;

@@ -12,7 +12,6 @@ import {
   AllyHiddenTitle,
 } from "./Header.styled";
 import DefaultButton from "../common/buttons/Button";
-import MoreMenu from "../common/modal/MoreMenu";
 
 import { useHeader } from "../../contexts/HeaderContext";
 import { useSearchContext } from "../../contexts/SearchContext";
@@ -104,12 +103,7 @@ function Header() {
           <IconButton onClick={config.onBackClick}>
             <img src="/img/icon-arrow-left.svg" alt="이전 페이지로 이동" />
           </IconButton>
-          {/* 기존 더보기 버튼을 MoreMenu로 교체 */}
-          <MoreMenu
-            type="profile"
-            onSettings={() => console.log("설정")}
-            onLogout={() => console.log("로그아웃")}
-          />
+          {config.rightElement}
         </Section>
       )}
 
@@ -151,11 +145,7 @@ function Header() {
           <IconButton onClick={config.onBackClick}>
             <img src="/img/icon-arrow-left.svg" alt="이전 페이지로 이동" />
           </IconButton>
-          <MoreMenu
-            type="product"
-            onSettings={() => console.log("설정")}
-            onLogout={() => console.log("로그아웃")}
-          />
+          {config.rightElement}
         </Section>
       )}
 
@@ -182,11 +172,7 @@ function Header() {
           <IconButton onClick={config.onBackClick}>
             <img src="/img/icon-arrow-left.svg" alt="이전 페이지로 이동" />
           </IconButton>
-          <MoreMenu
-            type="post"
-            onSettings={() => console.log("설정")}
-            onLogout={() => console.log("로그아웃")}
-          />
+          {config.rightElement}
         </Section>
       )}
 
@@ -196,7 +182,7 @@ function Header() {
           <IconButton onClick={config.onBackClick}>
             <img src="/img/icon-arrow-left.svg" alt="이전 페이지로 이동" />
           </IconButton>
-          <MoreMenu type="chat" onLeave={() => console.log("채팅방 나가기")} />
+          {config.rightElement}
         </Section>
       )}
 
@@ -211,10 +197,7 @@ function Header() {
               {config.userName}
             </h2>
           </ChatUserContainer>
-          <MoreMenu
-            type="chatList"
-            onLeave={() => console.log("채팅방 나가기")}
-          />
+          {config.rightElement}
         </Section>
       )}
     </HeaderContainer>

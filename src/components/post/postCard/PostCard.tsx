@@ -127,6 +127,7 @@ const PostCard = forwardRef<HTMLDivElement, PostCardProps>(
         avatarSrc={avatarSrc}
         avatarAlt={avatarAlt}
         postId={postId}
+        authorAccountname={userId}
         isMyPost={isMyPost}
         onReport={onReportClick}
       />
