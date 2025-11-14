@@ -1,6 +1,5 @@
 import { getAuthHeaders } from "../utils/auth";
 import type { UserProfile } from "../types/user";
-import type { Post } from "../data/dummyPosts";
 
 // API Base URL
 const API_BASE_URL =
