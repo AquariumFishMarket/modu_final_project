@@ -60,9 +60,9 @@ export default function RootRoute() {
             } />
           {/* 프로필 */}
           <Route path="/profile/setup" element={
-            <GuestRoute>
+
               <ProfileSetup />
-            </GuestRoute>
+
           } />
           <Route path="/profile/edit" element={
             <GuestRoute>

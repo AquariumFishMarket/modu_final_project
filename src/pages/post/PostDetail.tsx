@@ -19,6 +19,8 @@ import {
 import { useAuth } from "../../contexts/AuthContext";
 import { useHeader } from "../../contexts/HeaderContext";
 import MoreMenu from "../../components/common/modal/MoreMenu";
+import { ToastContainer } from "react-toastify";
+import Toast from "../../components/common/modal/Toast";
 
 interface Author {
   _id: string;
@@ -337,6 +339,8 @@ function PostDetail() {
 
   return (
     <PostDetailContainer>
+            <ToastContainer />
+      <Toast />
       {/* 게시글 카드 */}
       <PostCard
         postId={post.id}

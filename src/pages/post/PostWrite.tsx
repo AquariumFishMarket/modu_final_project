@@ -6,7 +6,7 @@ import styled from "styled-components";
 import { motion } from "motion/react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useHeader } from "../../contexts/HeaderContext";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { useToastStore } from "../../contexts/useToastStore";
 import { fetchPostDetail, EditPost } from "../../services/postService";
 import { useFeedStore } from "../../contexts/useFeedStore";

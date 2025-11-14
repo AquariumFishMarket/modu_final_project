@@ -65,7 +65,7 @@ export default function ExceptionPage ({text,type}:Exception) {
                 {type === 'member' && (
                     <DefaultButton
                     text={"피드 보러가기"}
-                    width={10}
+                    width={120}
                     onClick={handleGoFeed}
                     />
                 )}
