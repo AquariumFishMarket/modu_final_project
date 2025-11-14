@@ -5,8 +5,7 @@ interface ImageButtonProps {
     colortype: 'color' | 'gray';
     size: 'large' | 'small';
     imgArr: File[];
-    setImgArr: Dispatch<SetStateAction<File[]>>;
-    existingCount?: number;
+    setImgArr: Dispatch<SetStateAction<File[]>>
 }
 
 interface MultipleBtn extends ImageButtonProps {
@@ -41,7 +40,7 @@ const DefaultBtn = styled.button<{size:string,$colortype:string}>`
     }
 `
 
-export default function ImageUpButton({multiple, colortype, size, imgArr, setImgArr, existingCount = 0}:ButtonType) {
+export default function ImageUpButton({multiple, colortype, size, imgArr, setImgArr}:ButtonType) {
 
     const fileInputRef = useRef<HTMLInputElement | null>(null);
     const [realtimeArr,setRealtimeArr] = useState<File[]>([])
@@ -65,21 +64,18 @@ export default function ImageUpButton({multiple, colortype, size, imgArr, setImg
             }
             return true;
         });
-
         setRealtimeArr(filtered)
+
+        // input 초기화
         e.target.value = '';
     }
 
+    //post에서만 실행되도록..
     useEffect(()=>{
-        if (realtimeArr.length === 0) return;
-
         const total = [...imgArr, ...realtimeArr];
-        const totalWithExisting = total.length + existingCount;
-
         if(multiple == true) {
-            if(totalWithExisting > 10) {
-                alert(`이미지는 10장까지 업로드 가능합니다.\n(현재: 기존 ${existingCount}장 + 선택 ${total.length}장 = ${totalWithExisting}장)`);
-                setRealtimeArr([]);
+            if(total.length > 10) {
+                alert('이미지는 10장까지 업로드 가능합니다.');
             } else {
                 setImgArr(total);
             }

@@ -82,11 +82,6 @@ export async function fetchPostDetail(
     }
 
     const data: PostDetailApiResponse = await response.json();
-    console.log("📸 fetchPostDetail 응답:", {
-      id: data.post.id,
-      content: data.post.content?.substring(0, 50),
-      image: data.post.image,
-    });
     return data.post;
   } catch (error) {
     console.error("게시글 상세 조회 실패:", error);
@@ -103,12 +98,6 @@ export async function EditPost(
 ): Promise<PostDetail | null> {
   try {
     const token = getToken();
-
-    console.log("🔧 EditPost 요청:", {
-      postId,
-      content: content?.substring(0, 50),
-      image,
-    });
 
     const response = await fetch(`${BASE_URL}/post/${postId}`, {
       method: "PUT",
@@ -138,11 +127,7 @@ export async function EditPost(
     }
 
     const data: PostDetailApiResponse = await response.json();
-    console.log("✅ EditPost 응답:", {
-      id: data.post.id,
-      content: data.post.content?.substring(0, 50),
-      image: data.post.image,
-    });
+    console.log("수정된 게시글: ", data.post);
     return data.post;
   } catch (error) {
     console.error("게시글 수정 실패:", error);

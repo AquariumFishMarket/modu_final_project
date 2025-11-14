@@ -8,27 +8,18 @@ import { InitialLoadingSection } from "./FeedPage.styled";
 import PostCard from "../../components/post/postCard/PostCard";
 import { ToastContainer } from "react-toastify";
 
+//zustand 전역
 import { useFeedStore } from "../../contexts/useFeedStore";
-import { useAuth } from "../../contexts/AuthContext";
-import { reportPost } from "../../services/postService";
 
 const FeedPage = () => {
   const navigate = useNavigate();
-  const { currentUser } = useAuth();
+
 
   const toggleLike = useFeedStore((state) => state.toggleLike);
 
   const observer = useRef<IntersectionObserver | null>(null);
 
-  const handlePostReport = async (postId: string) => {
-    try {
-      await reportPost(postId);
-      alert("게시글이 신고되었습니다.");
-    } catch (error) {
-      alert("게시글 신고에 실패했습니다.");
-    }
-  };
-
+  // 페이지 애니메이션
   const pageVariants = {
     initial: { opacity: 0, y: 10 },
     animate: { opacity: 1, y: 0, transition: { duration: 0.5 } },
@@ -42,6 +33,7 @@ const FeedPage = () => {
   const isRefreshing = useFeedStore((state) => state.isRefreshing);
   const isInitialLized = useFeedStore((state) => state.isInitialLized);
 
+  // ref로 최신 상태 유지 (콜백 재생성 방지)
   const hasMoreRef = useRef(hasMore);
   const isRefreshingRef = useRef(isRefreshing);
   const loadInProgressRef = useRef(false);
@@ -59,6 +51,7 @@ const FeedPage = () => {
     fetchFeeds(false);
   }, [isInitialLized, fetchFeeds]);
 
+  // 무한스크롤 intersection observer
   const lastCardRef = useCallback(
     (node: HTMLElement | null) => {
       if (!node) return;
@@ -68,12 +61,14 @@ const FeedPage = () => {
         ([entry]) => {
           if (!entry.isIntersecting) return;
 
+          // 현재 상태 확인 (ref 사용해 최신 값 참조)
           if (!hasMoreRef.current) return;
           if (isRefreshingRef.current) return;
           if (loadInProgressRef.current) return;
 
           loadInProgressRef.current = true;
 
+          // 중복 호출 방지: fetch 완료/오류 시 플래그 해제
           fetchFeeds(true).finally(() => {
             loadInProgressRef.current = false;
           });
@@ -86,6 +81,7 @@ const FeedPage = () => {
     [fetchFeeds]
   );
 
+  // 초기 로딩
   if (isLoading) {
     return (
       <motion.div
@@ -103,6 +99,7 @@ const FeedPage = () => {
     );
   }
 
+  //  피드 있음
   return (
     <motion.div
       initial="initial"
@@ -115,7 +112,6 @@ const FeedPage = () => {
 
       {feedList.map((feed, idx) => {
         const isLast = idx === feedList.length - 1;
-        const isMyPost = currentUser?.accountname === feed.author.accountname;
 
         return (
           <PostCard
@@ -128,14 +124,13 @@ const FeedPage = () => {
             content={feed.content}
             imageSrc={feed.image}
             imageAlt="게시글 이미지"
-            dateTime={feed.updatedAt}
-            likeCount={feed.likeCount}
+            dateTime={feed.updatedAt} //api 명세 없는부분
+            //dateText={feed.updatedAt} //api 명세 없는부분
+            likeCount={feed.likeCount} 
             commentCount={feed.comments.length}
             isLiked={feed.isLiked}
-            isMyPost={isMyPost}
-            onLikeClick={() => toggleLike(feed.id)}
+            onLikeClick={() => toggleLike(feed.id)} 
             onCommentClick={() => navigate(`/post/${feed.id}`)}
-            onReportClick={() => handlePostReport(feed.id)}
             ref={isLast ? lastCardRef : null}
           />
         );

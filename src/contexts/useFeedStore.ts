@@ -18,7 +18,6 @@ interface FeedStore {
   refreshFeed: () => void;
   fetchFeeds: (isLoadMore?: boolean) => Promise<void>;
   toggleLike: (postId: string) => void;
-  updatePost: (updatedPost: any) => void;
 }
 
 export const useFeedStore = create<FeedStore>((set, get) => ({
@@ -104,7 +103,6 @@ export const useFeedStore = create<FeedStore>((set, get) => ({
           ...ele,
           isLiked: ele.hearted ?? false,
           likeCount: ele.heartCount ?? ele.author?.hearts?.length ?? 0,
-          profileImg: ele.author?.image ?? "/img/empty-profile.png",
         }));
 
       const shuffled = normalized.sort(() => 0.5 - Math.random());
@@ -144,23 +142,6 @@ export const useFeedStore = create<FeedStore>((set, get) => ({
             ...feed,
             isLiked: !feed.isLiked,
             likeCount: feed.isLiked ? feed.likeCount - 1 : feed.likeCount + 1,
-          }
-        : feed
-    );
-
-    set({ feedList: updated });
-  },
-
-  updatePost: (updatedPost: any) => {
-    const { feedList } = get();
-
-    const updated = feedList.map((feed) =>
-      feed.id === updatedPost.id
-        ? {
-            ...feed,
-            ...updatedPost,
-            isLiked: updatedPost.hearted ?? feed.isLiked,
-            likeCount: updatedPost.heartCount ?? feed.likeCount,
           }
         : feed
     );
