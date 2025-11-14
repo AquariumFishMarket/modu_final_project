@@ -2,34 +2,15 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Variants } from "framer-motion";
 import { SplashContainer, LogoWrapper, LogoImage } from "./Splash.styled";
+import { useAuth } from "../../contexts/AuthContext";
 
 function Splash() {
   const navigate = useNavigate();
-
+  const { isAuthenticated } = useAuth();
   useEffect(() => {
     const checkAuthAndRedirect = async () => {
-      // API 연동 - 로그인 상태 체크
-      // const token = localStorage.getItem('token');
-      // if (token) {
-      //   try {
-      //     const response = await fetch('API_ENDPOINT/user/checktoken', {
-      //       headers: { Authorization: `Bearer ${token}` }
-      //     });
-      //     if (response.ok) {
-      //       navigate('/feed');
-      //       return;
-      //     }
-      //   } catch (error) {
-      //     console.error('Token validation failed:', error);
-      //   }
-      // }
-      // navigate('/login');
-
-      // 임시: true면 로그인됨, false면 로그인 안됨
-      const IS_LOGGED_IN = true; // true/false로 변경해서 테스트
-
       const timer = setTimeout(() => {
-        if (IS_LOGGED_IN) {
+        if (isAuthenticated) {
           navigate("/feed");
         } else {
           navigate("/login");

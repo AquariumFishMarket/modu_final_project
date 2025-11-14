@@ -17,7 +17,6 @@ function ErrPage() {
   return (
     <ErrPageSection>
       <h2 className="sr-only">404페이지</h2>
-      <img src="/img/gif/gif.gif" alt="" />
       <ErrorImage src="/img/fish_logo-404.png" alt="" />
       <ErrorContent>
         <ErrorMessage>페이지를 찾을 수 없습니다 :(</ErrorMessage>

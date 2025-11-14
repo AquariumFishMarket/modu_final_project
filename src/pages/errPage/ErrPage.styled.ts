@@ -101,7 +101,7 @@ export const ErrPageSection = styled.section`
   justify-content: center;
   align-items: center;
   gap: 3rem;
-  overflow: hidden;
+  //overflow: hidden;
   position: relative;
 `;
 

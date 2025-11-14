@@ -9,10 +9,8 @@ import {
   ErrorMessage,
   ResultMessage,
 } from "./AuthForm.styled";
-import {
-  validateEmail,
-  validatePassword,
-} from "../../../utils/validation/AuthValidation";
+
+import { validateEmail, validatePassword } from "../../../utils/validation/AuthValidation";
 
 interface FormField {
   type: "email" | "password";

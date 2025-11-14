@@ -1,72 +1,170 @@
-
-import { create } from 'zustand';
-import { getToken } from '../utils/tokenManager';
+import { create } from "zustand";
+import { getToken } from "../utils/tokenManager";
 
 interface FeedStore {
-    feedList: any[];
-    isRefreshing: boolean;
-    isInitialLoading: boolean;
-    setFeedList: (list: any[]) => void;
-    setIsRefreshing: (value: boolean) => void;
-    setIsInitialLoading: (value: boolean) => void;
-    refreshFeed: () => void;
-    fetchFeeds: () => Promise<void>;
+  feedList: any[];
+  skip: number;
+  isRefreshing: boolean;
+  isInitialLoading: boolean;
+  hasMore: boolean;
+  isInitialLized: boolean;
+  isFetching: boolean;
+
+  setFeedList: (list: any[]) => void;
+  setSkip: (value: number) => void;
+  setIsRefreshing: (value: boolean) => void;
+  setIsInitialLoading: (value: boolean) => void;
+
+  refreshFeed: () => void;
+  fetchFeeds: (isLoadMore?: boolean) => Promise<void>;
+  toggleLike: (postId: string) => void;
+  updatePost: (updatedPost: any) => void;
 }
 
-export const useFeedStore = create<FeedStore>((set, get)=>({
-    feedList: [],
-    isRefreshing: false,
-    isInitialLoading: true,
-    setFeedList: (list) => set({ feedList: list}),
-    setIsRefreshing: (value) => set({ isRefreshing: value }),
-    setIsInitialLoading: (value) => set({ isInitialLoading: value }),
-    refreshFeed: () => {
-        set({ isRefreshing: true });
-        get().fetchFeeds();
-    },
-    fetchFeeds: async() => {
+export const useFeedStore = create<FeedStore>((set, get) => ({
+  feedList: [],
+  skip: 0,
+  isRefreshing: false,
+  isInitialLoading: true,
+  hasMore: true,
+  isInitialLized: false,
+  isFetching: false,
 
-        const token = getToken();
-        if (!token) return;
+  setFeedList: (list) => set({ feedList: list }),
+  setSkip: (val) => set({ skip: val }),
+  setIsRefreshing: (value) => set({ isRefreshing: value }),
+  setIsInitialLoading: (value) => set({ isInitialLoading: value }),
 
-        try {
-            const query = new URLSearchParams();
-            query.append("limit", "10");
-            query.append("skip", "0");
+  refreshFeed: async () => {
+    set({
+      isRefreshing: true,
+      skip: 0,
+      feedList: [],
+      hasMore: true,
+      isInitialLoading: true,
+      isInitialLized: false,
+    });
 
-            const url = `https://dev.wenivops.co.kr/services/mandarin/post${
-            query.toString() ? `?${query}` : ""
-            }`;
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    await get().fetchFeeds(false);
+  },
 
-            const res = await fetch(url, {
-                method: "GET",
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-type": "application/json",
-                },
-            });
+  fetchFeeds: async (isLoadMore = false) => {
+    const token = getToken();
+    if (!token) return;
 
-            if (!res.ok) {
-                const err = await res.json();
-                throw new Error(err.message || "게시글 불러오기 실패");
-            }
+    if (get().isFetching) return;
 
-            const data = await res.json();
+    const { skip, isRefreshing, hasMore } = get();
 
-            const datalist = data.posts;
-            const filtered = datalist.filter((ele: any) =>
-                ele.author.email.includes("pirate")
-            );
-            const shuffled = filtered.sort(()=> 0.5 - Math.random() )
+    if (isLoadMore && (isRefreshing || !hasMore)) return;
 
-            set({ feedList: shuffled })
+    set({
+      isFetching: true,
+      ...(isLoadMore ? { isRefreshing: true } : {}),
+    });
 
-        } catch(err) {
-            console.log(err)
-        } finally {
-            setTimeout(()=>{
-                set({ isRefreshing : false, isInitialLoading: false  })
-            },1000)
-        }
+    try {
+      const query = new URLSearchParams();
+      const limit = 5;
+      const querySkip = isLoadMore ? skip : 0;
+
+      query.append("limit", String(limit));
+      query.append("skip", querySkip.toString());
+
+      const url = `https://dev.wenivops.co.kr/services/mandarin/post?${query}`;
+
+      const res = await fetch(url, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-type": "application/json",
+        },
+      });
+
+      if (!res.ok) throw new Error("게시글 불러오기 실패");
+
+      const data = await res.json();
+      const datalist = data.posts || [];
+      const serverCount = datalist.length;
+
+      if (serverCount === 0) {
+        set({
+          hasMore: false,
+          isRefreshing: false,
+          isInitialLoading: false,
+          isFetching: false,
+        });
+        return;
+      }
+
+      const normalized = datalist
+        .filter((ele: any) => ele.author.email.includes("pirate"))
+        .map((ele: any) => ({
+          ...ele,
+          isLiked: ele.hearted ?? false,
+          likeCount: ele.heartCount ?? ele.author?.hearts?.length ?? 0,
+          profileImg: ele.author?.image ?? "/img/empty-profile.png",
+        }));
+
+      const shuffled = normalized.sort(() => 0.5 - Math.random());
+
+      set((state) => {
+        const newFeedList = isLoadMore
+          ? [...state.feedList, ...shuffled]
+          : shuffled;
+
+        const newSkip = isLoadMore ? state.skip + serverCount : serverCount;
+
+        return {
+          feedList: newFeedList,
+          skip: newSkip,
+          isInitialLoading: false,
+          isRefreshing: false,
+          hasMore: serverCount === limit,
+          isInitialLized: true,
+          isFetching: false,
+        };
+      });
+    } catch (err) {
+      set({
+        isRefreshing: false,
+        isInitialLoading: false,
+        isFetching: false,
+      });
     }
-}))
+  },
+
+  toggleLike: (postId: string) => {
+    const { feedList } = get();
+
+    const updated = feedList.map((feed) =>
+      feed.id === postId
+        ? {
+            ...feed,
+            isLiked: !feed.isLiked,
+            likeCount: feed.isLiked ? feed.likeCount - 1 : feed.likeCount + 1,
+          }
+        : feed
+    );
+
+    set({ feedList: updated });
+  },
+
+  updatePost: (updatedPost: any) => {
+    const { feedList } = get();
+
+    const updated = feedList.map((feed) =>
+      feed.id === updatedPost.id
+        ? {
+            ...feed,
+            ...updatedPost,
+            isLiked: updatedPost.hearted ?? feed.isLiked,
+            likeCount: updatedPost.heartCount ?? feed.likeCount,
+          }
+        : feed
+    );
+
+    set({ feedList: updated });
+  },
+}));

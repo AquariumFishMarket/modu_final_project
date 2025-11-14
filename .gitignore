@@ -24,3 +24,5 @@ dist-ssr
 *.sw?
 *.tsbuildinfosrc/pages/Home/components/
 .env
+.vercel
+*.tsbuildinfo

@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import PostCard from "../../components/post/postCard/PostCard";
 import CommentField from "../../components/post/comment/CommentField";
@@ -14,8 +14,11 @@ import {
   updateComment,
   reportComment,
   reportPost,
+  deletePost,
 } from "../../services/postService";
 import { useAuth } from "../../contexts/AuthContext";
+import { useHeader } from "../../contexts/HeaderContext";
+import MoreMenu from "../../components/common/modal/MoreMenu";
 
 interface Author {
   _id: string;
@@ -68,17 +71,31 @@ interface Comment {
 function PostDetail() {
   const { postId } = useParams<{ postId: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const { currentUser } = useAuth();
+  const { setHeaderConfig } = useHeader();
   const [commentText, setCommentText] = useState("");
   const [post, setPost] = useState<Post | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const lastCommentRef = useRef<HTMLDivElement>(null);
 
+  // 게시글 삭제 핸들러
+  const handleDeletePost = async () => {
+    if (!postId) return;
+
+    try {
+      await deletePost(postId);
+      console.log("게시글 삭제 성공");
+      navigate(-1);
+    } catch (error) {
+      console.error("게시글 삭제 실패:", error);
+      alert("게시글 삭제에 실패했습니다.");
+    }
+  };
+
   // 디버깅: 현재 사용자 정보 확인
-  useEffect(() => {
- 
-  }, [currentUser]);
+  useEffect(() => {}, [currentUser]);
 
   // 게시글 및 댓글 데이터 불러오기
   useEffect(() => {
@@ -92,10 +109,14 @@ function PostDetail() {
           fetchPostComments(postId),
         ]);
 
+        console.log("🔄 PostDetail 데이터 로드:", {
+          id: postData?.id,
+          content: postData?.content?.substring(0, 50),
+          image: postData?.image,
+        });
         setPost(postData);
         // 댓글을 역순으로 정렬 (오래된 댓글이 위로)
         setComments([...commentsData].reverse());
-
       } catch (error) {
         console.error("게시글 데이터 로드 실패:", error);
       } finally {
@@ -104,18 +125,36 @@ function PostDetail() {
     };
 
     loadPostData();
-  }, [postId]);
+  }, [postId, location.search]);
+
+  // 헤더 설정 (post 로드 후)
+  useEffect(() => {
+    if (!post) return;
+
+    setHeaderConfig({
+      show: true,
+      type: "postDetail",
+      onBackClick: () => navigate(-1),
+      rightElement: (
+        <MoreMenu
+          type="post"
+          authorAccountname={post.author.accountname}
+          onEdit={() => navigate(`/post/${postId}/edit`)}
+          onDelete={handleDeletePost}
+          onReport={handlePostReport}
+        />
+      ),
+    });
+  }, [post, postId, setHeaderConfig, navigate]);
 
   const handleCommentSubmit = async (
     text: string,
     refObj: React.RefObject<HTMLTextAreaElement | null>
   ) => {
-
     if (!text.trim() || !postId) return;
 
     try {
       const newComment = await createComment(postId, text);
-
 
       // 성공 시 textarea 초기화
       if (refObj.current) {
@@ -124,7 +163,6 @@ function PostDetail() {
       }
 
       if (newComment) {
-
         setComments((prev) => {
           const updated = [...prev, newComment]; // 최신 댓글이 아래로
 
@@ -145,7 +183,6 @@ function PostDetail() {
           });
         }, 100);
       } else {
-
         // fallback: 목록 새로고침
         const updatedComments = await fetchPostComments(postId);
 
@@ -189,8 +226,6 @@ function PostDetail() {
   // 댓글 삭제 핸들러
   const handleCommentDelete = async (commentId: string) => {
     if (!postId) return;
-
-
 
     const prevComments = [...comments];
 
@@ -259,7 +294,6 @@ function PostDetail() {
   const handleCommentReport = async (commentId: string) => {
     if (!postId) return;
 
-
     try {
       await reportComment(postId, commentId);
       alert("댓글이 신고되었습니다.");
@@ -272,7 +306,6 @@ function PostDetail() {
   // 게시글 신고 핸들러
   const handlePostReport = async () => {
     if (!postId) return;
-
 
     try {
       await reportPost(postId);

@@ -22,8 +22,9 @@ interface PostHeaderProps {
   variant?: "post" | "comment";
   dateTime?: string;
   dateText?: string;
-  isMyComment?: boolean; // 댓글일 때 내 댓글인지 여부
-  isMyPost?: boolean; // 게시글일 때 내 게시글인지 여부
+  authorAccountname: string; 
+  isMyComment?: boolean; 
+  isMyPost?: boolean; 
   onEdit?: () => void; // 댓글 수정 핸들러
   onDelete?: () => void; // 댓글 삭제 핸들러
   onReport?: () => void; // 댓글/게시글 신고 핸들러
@@ -37,6 +38,7 @@ function PostHeader({
   postId,
   variant = "post",
   dateTime,
+  authorAccountname,
   isMyComment,
   isMyPost,
   onEdit,
@@ -108,6 +110,7 @@ function PostHeader({
         <MoreMenu
           type="comment"
           size="md"
+          authorAccountname={authorAccountname}
           isMyComment={isMyComment}
           onEdit={onEdit}
           onDelete={onDelete}
@@ -117,6 +120,7 @@ function PostHeader({
         <MoreMenu
           type="post"
           size="sm"
+          authorAccountname={authorAccountname}
           isMyPost={isMyPost}
           onEdit={handleEditPost}
           onDelete={handleDeletePost}

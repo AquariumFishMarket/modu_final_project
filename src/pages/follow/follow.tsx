@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useHeader } from "../../contexts/HeaderContext";
 import FollowUserCard from "../../components/common/follow/FollowUserCard";
-import type { FollowUser } from "../../data/dummyFollowData";
+import type { FollowUser } from "../../types/follow";
 import {
   fetchFollowers,
   fetchFollowing,
@@ -10,8 +10,6 @@ import {
 } from "../../services/followService";
 import { FollowListContainer, EmptyState } from "./follow.styled";
 
-// 팔로우 목록 페이지
-// URL: /profile/:userId/followers 또는 /profile/:userId/following
 function Follow() {
   const navigate = useNavigate();
   const { userId, type } = useParams<{
@@ -24,13 +22,10 @@ function Follow() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // 헤더 설정
+  // ✔ 헤더 설정
   useEffect(() => {
-    console.log("Follow 컴포넌트 마운트/업데이트:", { userId, type });
-
     if (!type || !userId) return;
 
-    // 잘못된 type 값 가드
     if (type !== "followers" && type !== "following") {
       navigate("/404", { replace: true });
       return;
@@ -42,14 +37,11 @@ function Follow() {
       show: true,
       type,
       title: isFollowers ? "팔로워" : "팔로잉",
-      onBackClick: () => {
-        // userId는 이미 디코딩된 상태이므로 그대로 사용
-        navigate(`/profile/${userId}`, { replace: false });
-      },
+      onBackClick: () => navigate(`/profile/${userId}`),
     });
   }, [type, userId, navigate]);
 
-  // 데이터 로드
+  // ✔ 데이터 로드
   useEffect(() => {
     if (!type || !userId) return;
 
@@ -58,10 +50,12 @@ function Follow() {
     const loadFollowList = async () => {
       setIsLoading(true);
       setError(null);
+
       try {
         const data = isFollowers
           ? await fetchFollowers(userId)
           : await fetchFollowing(userId);
+
         setUsers(data);
       } catch (err) {
         console.error("팔로우 목록 로드 실패:", err);
@@ -75,15 +69,15 @@ function Follow() {
     loadFollowList();
   }, [type, userId]);
 
+  // ✔ 팔로우 토글 (낙관적 업데이트)
   const handleFollowToggle = useCallback(
     async (targetUserId: string) => {
       const target = users.find((u) => u.userId === targetUserId);
       if (!target) return;
 
-      // 롤백용 복사본
-      const prevUsers = [...users];
+      const prevUsers = [...users]; // 롤백용 복사본
 
-      // 낙관적 업데이트
+      // 즉시 UI 반영
       setUsers((prev) =>
         prev.map((u) =>
           u.userId === targetUserId ? { ...u, isFollowing: !u.isFollowing } : u
@@ -94,8 +88,7 @@ function Follow() {
         await toggleFollow(targetUserId, target.isFollowing);
       } catch (err) {
         console.error("팔로우 처리 실패:", err);
-        // 실패 시 롤백
-        setUsers(prevUsers);
+        setUsers(prevUsers); // 실패 시 롤백
       }
     },
     [users]
@@ -103,13 +96,17 @@ function Follow() {
 
   return (
     <FollowListContainer>
-      {users.length === 0 ? (
+      {isLoading && <EmptyState>불러오는 중...</EmptyState>}
+
+      {!isLoading && users.length === 0 && (
         <EmptyState>
           {type === "followers"
             ? "팔로워가 없습니다."
             : "팔로잉한 사용자가 없습니다."}
         </EmptyState>
-      ) : (
+      )}
+
+      {!isLoading &&
         users.map((user) => (
           <li key={user.userId}>
             <FollowUserCard
@@ -121,8 +118,7 @@ function Follow() {
               onFollowToggle={handleFollowToggle}
             />
           </li>
-        ))
-      )}
+        ))}
     </FollowListContainer>
   );
 }
