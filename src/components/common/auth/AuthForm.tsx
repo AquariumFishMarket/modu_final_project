@@ -19,6 +19,7 @@ interface FormField {
   label: string;
   placeholder?: string;
   required?: boolean;
+  onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
 }
 
 interface AuthFormProps {
@@ -134,9 +135,11 @@ export default function AuthForm({
                 placeholder={field.placeholder}
                 value={values[field.name] || ""}
                 onChange={handleInputChange}
+                onBlur={field.onBlur}
                 $hasError={!!errors[field.name]}
                 required={field.required}
               />
+              {/* 필드별 에러 메시지 */}
               {errors[field.name] && (
                 <ErrorMessage>{errors[field.name]}</ErrorMessage>
               )}

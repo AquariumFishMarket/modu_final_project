@@ -3,9 +3,7 @@
 const BASE_URL = "https://dev.wenivops.co.kr/services/mandarin";
 
 export interface AuthResponse {
-  //   success: boolean;
   message: string;
-  //   token?: string;
   user?: {
     accountname: string;
     email: string;
@@ -13,7 +11,6 @@ export interface AuthResponse {
     intro: string;
     username: string;
     _id: string;
-    // isFirstLogin?: boolean;
   };
 }
 
@@ -179,7 +176,7 @@ export const updateProfile = async (
   });
 
   const data = await response.json();
-  console.log("프로필 업데이트 응답:", data);
+  console.log("authService - 프로필 업데이트 ✅:", data);
 
   if (!response.ok) {
     throw new Error("프로필 업데이트에 실패했습니다.");

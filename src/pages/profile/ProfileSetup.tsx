@@ -9,6 +9,7 @@ import {
   // checkAccountIdDuplicate,
   updateProfile,
 } from "../../services/authService";
+import { uploadImage } from "../../services/imageService";
 import { getToken } from "../../utils/tokenManager";
 
 const ProfileTitle = styled.div`
@@ -67,13 +68,14 @@ export default function ProfileSetup() {
     setIsValid(valid);
   };
 
-  // 폼 제출 핸들러 정의
+  // 폼 제출 핸들러
   const handleSubmit = async (data: FormData): Promise<void> => {
     setError("");
 
     const username = data.username as string;
     const accountname = data.accountname as string;
     const intro = (data.intro as string) || "";
+    const imageFile = data.image as File | undefined;
 
     // 빈 값 검사
     if (!username || !username.trim()) {
@@ -82,6 +84,7 @@ export default function ProfileSetup() {
     }
 
     if (!accountname || !accountname.trim()) {
+      console.log(accountname);
       setError("사용할 수 없는 계정 ID입니다.");
       return;
     }
@@ -96,18 +99,21 @@ export default function ProfileSetup() {
     setIsSubmitting(true);
 
     try {
-      await updateProfile(username, accountname, intro, "", token);
+      let imageUrl = "";
+      if (imageFile) {
+        imageUrl = await uploadImage(imageFile);
+      }
+      await updateProfile(username, accountname, intro, imageUrl, token);
+
       alert("회원 정보가 등록되었습니다.");
       navigate("/");
-    } catch (err) {
+    } catch (error) {
       setError(
-        err instanceof Error ? err.message : "정보 등록에 실패했습니다."
+        error instanceof Error ? error.message : "정보 등록에 실패했습니다."
       );
     } finally {
       setIsSubmitting(false);
     }
-
-    navigate("/"); // 성공 시 이동
   };
 
   return (
@@ -122,8 +128,8 @@ export default function ProfileSetup() {
         showButton={true}
         onSubmit={handleSubmit}
         onValidationChange={handleValidationChange}
-        // buttonText="완료"
-        // disabled={isSubmitting}
+        // buttonText={isSubmitting ? "저장 중..." : "저장"}
+        // disabled={!isValid || isSubmitting}
       />
 
       {/* 나중에 빼기 */}
