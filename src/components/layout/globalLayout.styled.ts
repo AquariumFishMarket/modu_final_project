@@ -17,21 +17,16 @@ export const MainContent = styled.main<{
   $isProfile?: boolean;
   $isChatRoom?: boolean;
   $isPostDetail?: boolean;
+  isPadding: string;
 }>`
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
   height: 100%;
-  /* padding: ${(props) =>
-    props.$isPostDetail ? "68px 25px 0" : "68px 15px 0"}; */
-  padding: 68px 16px 0;
+  padding: ${(props)=>props.isPadding === '/login' ? '0' : '68px 16px 0'};
   overflow-x: hidden;
   overflow-y: auto;
- / * padding-bottom: ${(props) => {
-   if (props.$isProfile) return "0";
-   return props.$hasFooter ? "110px" : "50px";
- }}; * /
   padding-bottom: 110px;
   background-color: ${(props) =>
     props.$isChatRoom ? "var(--color-gray-light)" : "#fff"};

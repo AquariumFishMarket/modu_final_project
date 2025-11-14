@@ -2,7 +2,6 @@ import Header from "./Header";
 import FooterNav from "./FooterNav";
 import FloatingChatbot from "../chatbot/FloatingChatbot";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import styled from "styled-components";
 import { HeaderProvider, useHeader } from "../../contexts/HeaderContext";
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -10,6 +9,8 @@ import ScrollButton from "../common/buttons/ScrollButton";
 import { useFeedData } from "../../hooks/useFeedData";
 //zustand 전역
 import { useFeedStore } from "../../contexts/useFeedStore";
+//인증관련 전역
+import { useAuth } from "../../contexts/AuthContext";
 
 import { LayoutContainer, MainContent, RefreshAlert, Fish1, Fish2,
   Seashall, Coral, Drop, Drop2
@@ -19,6 +20,7 @@ function LayoutContent() {
   const location = useLocation();
   const { setHeaderConfig } = useHeader();
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
 
   //drag 이벤트
   const [pull, setPull] = useState(0);
@@ -33,6 +35,7 @@ function LayoutContent() {
   useEffect(() => {
     const path = location.pathname;
     if (path !== '/feed') return; // main feed 페이지에서만 작동합니다
+    if (!isAuthenticated) return; // 로그인상태가 아니면 작동하지 않습니다
 
     const container = scrollContainerRef.current;
     if (!container) return;
@@ -112,8 +115,6 @@ function LayoutContent() {
     };
   }, []);
 
-
-
   // 경로별 헤더 자동 설정
   useEffect(() => {
     const path = location.pathname;
@@ -124,7 +125,8 @@ function LayoutContent() {
       path === "/login/email" ||
       path === "/signup" ||
       path === "/profile/setup" ||
-      path === "/404"
+      path === "/404" ||
+      !isAuthenticated
     ) {
       setHeaderConfig({ show: false });
       return;
@@ -134,18 +136,6 @@ function LayoutContent() {
     if (path.match(/^\/profile\/[^/]+\/(followers|following)$/)) {
       return;
     }
-
-    // 프로필 셋업 (정확한 경로 체크)
-    // if (path === "/profile/setup") {
-    //   setHeaderConfig({
-    //     show: true,
-    //     type: "edit",
-    //     inputState: true,
-    //     onBackClick: () => navigate("/login"),
-    //     onButtonClick: () => console.log("프로필 설정 완료"),
-    //   });
-    //   return;
-    // }
 
     // 프로필 수정 -> 경로 체크
     if (path === "/profile/edit") {
@@ -273,48 +263,49 @@ function LayoutContent() {
     location.pathname === "/profile" ||
     !!location.pathname.match(/^\/profile\/[^/]+$/);
 
-  const isPostDetailPage = location.pathname.match(/^\/post\/[^/]+$/);
+    const isPostDetailPage = location.pathname.match(/^\/post\/[^/]+$/);
+    console.log(location.pathname)
+    return (
+      <>
+        <LayoutContainer $isProfile={isProfilePage}>
+          <Header />
 
-  return (
-    <>
-      <LayoutContainer $isProfile={isProfilePage}>
-        <Header />
-
-      {pull !==0 && (
-        <RefreshAlert $letter={isLetterRef.current} $height={pull}>
-          <div style={{ position: 'relative' }}>
-            <Fish1 src="/img/fish-character.png" $transform={pull} alt="물고기"/>
-            <Seashall src="/img/seashall-character.png" $transform={pull} alt="조개껍질"></Seashall>
-            <p>땡겨서 <span>피쉬마켓</span> 새로고침</p>
-            <Fish2 src="/img/fish-character.png" $transform={pull} alt="물고기"/>
-            <Coral src="/img/coral-character.png" $transform={pull} alt="산호"/>
-            <Drop src="/img/drop.png" $transform={pull} alt="물방울"/>
-            <Drop2 src="/img/drop.png" $transform={pull} alt="물방울"/>
-          </div>
-        </RefreshAlert>
-        )}
-        <AnimatePresence mode="wait">
-          <MainContent
-            key={location.pathname}
-            $hasFooter={shouldShowNav()}
-            $isProfile={isProfilePage}
-            $isPostDetail={!!isPostDetailPage}
-            as={motion.main}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.26, ease: "easeOut" }}
-            ref={scrollContainerRef}
-          >
-            <Outlet />
-          </MainContent>
-        </AnimatePresence>
-        {shouldShowNav() && <FooterNav />}
-      </LayoutContainer>
-      {/* 플로팅 챗봇 - position: fixed로 전역에 표시 */}
-      <FloatingChatbot />
-      <ScrollButton scrollContainerRef={scrollContainerRef}></ScrollButton>
-    </>
-  );
+        {pull !==0 && (
+          <RefreshAlert $letter={isLetterRef.current} $height={pull}>
+            <div style={{ position: 'relative' }}>
+              <Fish1 src="/img/fish-character.png" $transform={pull} alt="물고기"/>
+              <Seashall src="/img/seashall-character.png" $transform={pull} alt="조개껍질"></Seashall>
+              <p>땡겨서 <span>피쉬마켓</span> 새로고침</p>
+              <Fish2 src="/img/fish-character.png" $transform={pull} alt="물고기"/>
+              <Coral src="/img/coral-character.png" $transform={pull} alt="산호"/>
+              <Drop src="/img/drop.png" $transform={pull} alt="물방울"/>
+              <Drop2 src="/img/drop.png" $transform={pull} alt="물방울"/>
+            </div>
+          </RefreshAlert>
+          )}
+          <AnimatePresence mode="wait">
+            <MainContent
+              key={location.pathname}
+              $hasFooter={shouldShowNav()}
+              $isProfile={isProfilePage}
+              $isPostDetail={!!isPostDetailPage}
+              as={motion.main}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.26, ease: "easeOut" }}
+              ref={scrollContainerRef}
+              isPadding={location.pathname}
+            >
+              <Outlet />
+            </MainContent>
+          </AnimatePresence>
+          {shouldShowNav() && <FooterNav />}
+        </LayoutContainer>
+        {/* 플로팅 챗봇 - position: fixed로 전역에 표시 */}
+        <FloatingChatbot />
+        <ScrollButton scrollContainerRef={scrollContainerRef}></ScrollButton>
+      </>
+    );
 }
 
 export default function GlobalLayout() {
