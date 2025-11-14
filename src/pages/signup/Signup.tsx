@@ -8,7 +8,7 @@ import {
   validateEmail,
   validatePassword,
   validateEmailDuplicate,
-} from "../../utils/validation/authValidation";
+} from "../../utils/validation/AuthValidation";
 
 const Signuptitle = styled.h2`
   text-align: center;

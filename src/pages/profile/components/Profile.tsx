@@ -29,7 +29,7 @@ import type { UserProfile } from "../../../types/user";
 import PostCard from "../../../components/post/postCard/PostCard";
 import PostStateBar from "../../../components/post/PostStateBar";
 import PostGallery from "./PostGallery";
-import { type Post } from "../../data/dummyPosts";
+import { Post, UserPostsResponse } from "../../../types/post";
 import { getToken } from "../../../utils/tokenManager";
 import { useAuth } from "../../../contexts/AuthContext";
 // import { useUserPostsData } from "../../hooks/useUserPostsData";
@@ -65,23 +65,6 @@ function Profile() {
 
   // 내 프로필인지 다른 사람 프로필인지 구분
   const isMyProfile = targetAccountname === currentUserAccountname;
-
-  // 프로필 데이터 상태 관리
-  // const [profileData, setProfileData] = useState<UserProfile>({
-  //   _id: "my_user_id", // 임시: 내 프로필로 표시되도록 currentUserId와 동일하게 설정
-  //   username: "물고기마켓",
-  //   accountname: "@fishmarket",
-  //   image: "/img/fish_profile.svg",
-  //   intro: "안녕하세요! 물고기마켓입니다.",
-  //   followerCount: 128,
-  //   followingCount: 52,
-  //   isFollowing: false,
-  // });
-
-  // const [isPostsInitialLoading, setIsPostsInitialLoading] =
-  //   useState<boolean>(true);
-  // const [isPostsLoading, setIsPostsLoading] = useState<boolean>(false);
-  // const [hasMore, setHasMore] = useState<boolean>(false);
 
   // 프로필 데이터 상태 관리
   const [profileData, setProfileData] = useState<UserProfile | null>(null);
@@ -167,7 +150,8 @@ function Profile() {
       );
 
       if (!response.ok) throw new Error("내 게시글 데이터 가져오기 실패");
-      const data = await response.json();
+
+      const data: UserPostsResponse = await response.json();
       console.log(`${accountname}의 게시글 목록:`, data.post);
 
       // 최신순
@@ -259,23 +243,25 @@ function Profile() {
   };
 
   // ❤️ 좋아요 토글 핸들러 추가
-  // const handlePostLikeToggle = (postId: string): void => {
-  //   // TODO: 좋아요 API 연동
-  //   console.log("좋아요 토글:", postId);
+  const handlePostLikeToggle = (postId: string): void => {
+    // TODO: 좋아요 API 연동
+    console.log("좋아요 토글:", postId);
 
-  //   // 임시 낙관적 업데이트
-  //   setUserPosts((prev) =>
-  //     prev.map((post) =>
-  //       post.id === postId
-  //         ? {
-  //             ...post,
-  //             hearted: !post.hearted,
-  //             likeCount: post.hearted ? post.likeCount - 1 : post.likeCount + 1,
-  //           }
-  //         : post
-  //     )
-  //   );
-  // };
+    // 임시 낙관적 업데이트
+    setUserPosts((prev) =>
+      prev.map((post) =>
+        post.id === postId
+          ? {
+              ...post,
+              hearted: !post.hearted,
+              likeCount: post.hearted
+                ? post.heartCount - 1
+                : post.heartCount + 1,
+            }
+          : post
+      )
+    );
+  };
 
   //  프로필 공유 버튼 클릭 핸들러
   // Web Share API 또는 클립보드 복사 기능 구현
@@ -507,16 +493,15 @@ function Profile() {
                   <PostCard
                     key={post.id}
                     postId={post.id}
-                    userName={profileData.username}
-                    userId={profileData.accountname}
-                    avatarSrc={profileData.image}
-                    avatarAlt={`${profileData.username}의 프로필 이미지`}
+                    userName={post.author.username}
+                    userId={post.author.accountname}
+                    avatarSrc={post.author.image}
+                    avatarAlt={`${post.author.username}의 프로필 이미지`}
                     content={post.content}
                     imageSrc={post.image}
                     imageAlt="게시글 이미지"
                     dateTime={post.createdAt}
-                    dateText={post.createdAt}
-                    likeCount={post.likeCount}
+                    likeCount={post.heartCount}
                     commentCount={post.commentCount}
                     isLiked={post.hearted}
                     onLikeClick={() => handlePostLikeToggle(post.id)}
@@ -536,18 +521,18 @@ function Profile() {
               <PostGallery
                 posts={postsList.map((post) => ({
                   postId: post.id,
-                  userName: post.userName,
-                  userId: post.userId,
-                  avatarSrc: post.profileImg,
-                  avatarAlt: `${post.userName}의 프로필 이미지`,
+                  userName: post.author.username,
+                  userId: post.author.accountname,
+                  avatarSrc: post.author.image,
+                  avatarAlt: `${post.author.username}의 프로필 이미지`,
                   content: post.content,
                   imageSrc: post.image,
                   imageAlt: "게시글 이미지",
                   dateTime: post.createdAt,
                   dateText: post.createdAt,
-                  likeCount: post.likeCount,
+                  likeCount: post.heartCount,
                   commentCount: post.commentCount,
-                  isLiked: post.isLiked,
+                  isLiked: post.hearted,
                 }))}
                 onPostClick={(postId) => {
                   navigate(`/post/${postId}`);

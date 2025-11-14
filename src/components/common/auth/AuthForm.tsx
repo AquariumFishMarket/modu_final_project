@@ -11,7 +11,7 @@ import {
 import {
   validateEmail,
   validatePassword,
-} from "../../../utils/validation/authValidation";
+} from "../../../utils/validation/AuthValidation";
 
 interface FormField {
   type: "email" | "password";
