@@ -72,11 +72,12 @@ export default function ProductEdit() {
 
     try {
       const updatedProductData = {
-        itemName: data.productname,
-        price: parseInt(data.price.replace(/,/g, "")),
+        itemName: data.itemName,
+        price:
+          typeof data.price === "string" && data.price
+            ? parseInt(data.price.replace(/,/g, ""))
+            : 0,
         link: data.link,
-        description: data.description,
-        // TODO: 이미지 파일 업로드 처리
         // itemImage: data.imageFiles
       };
 
@@ -96,34 +97,8 @@ export default function ProductEdit() {
       productname: product.itemName,
       price: formatPrice(product.price.toString()),
       link: product.link || "",
-      description: product.description,
     };
   };
-
-  const getInitialImages = (): File[] => {
-    // 실제로는 URL을 File로 변환하는 로직이 필요하지만,
-    // 여기서는 간단히 빈 배열 반환
-    return [];
-  };
-
-  // 🆕 기존 이미지 URL 배열 반환
-  const getExistingImageUrls = (): string[] => {
-    if (!product) return [];
-
-    if (typeof product.itemImage === "string") {
-      return [product.itemImage];
-    }
-
-    if (Array.isArray(product.itemImage)) {
-      return product.itemImage;
-    }
-
-    return [];
-  };
-
-  if (!product) {
-    return <div>상품을 찾을 수 없습니다.</div>;
-  }
 
   return (
     <EditForm
@@ -133,8 +108,6 @@ export default function ProductEdit() {
       onSubmit={handleSubmit}
       onValidationChange={handleValidationChange}
       initialValues={getInitialValues()} // 🆕 기존 데이터로 초기화
-      initialImages={getInitialImages()} // 🆕 기존 이미지로 초기화
-      existingImageUrls={getExistingImageUrls()} // 🆕 기존 이미지 URL
     />
   );
 }

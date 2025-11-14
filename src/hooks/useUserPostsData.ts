@@ -48,11 +48,18 @@ export const useUserPostsData = (userId: string) => {
 
   const handleLikeToggle = useCallback(
     async (postId: string): Promise<void> => {
-      const previousPostsList = postsList;
+      let previousPostsList: Feed[] = [];
+      let originalIsLiked = false;
 
       // 낙관적 업데이트
-      setPostsList((prev) =>
-        prev.map((post) =>
+      setPostsList((prev) => {
+        previousPostsList = prev;
+        const targetPost = prev.find((post) => post.id === postId);
+        if (targetPost) {
+          originalIsLiked = targetPost.isLiked;
+        }
+
+        return prev.map((post) =>
           post.id === postId
             ? {
                 ...post,
@@ -62,18 +69,18 @@ export const useUserPostsData = (userId: string) => {
                   : post.likeCount + 1,
               }
             : post
-        )
-      );
+        );
+      });
 
       try {
-        await toggleLike(postId);
+        await toggleLike(postId, originalIsLiked);
       } catch (error) {
         console.error("좋아요 토글 실패:", error);
         // 실패 시 롤백
         setPostsList(previousPostsList);
       }
     },
-    [postsList]
+    []
   );
 
   //  다음 페이지 로드

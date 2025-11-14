@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useHeader } from "../../contexts/HeaderContext";
 import FollowUserCard from "../../components/common/follow/FollowUserCard";
-import type { FollowUser } from "../../data/dummyFollowData";
+
 import {
   fetchFollowers,
   fetchFollowing,
