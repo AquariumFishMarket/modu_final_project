@@ -47,7 +47,6 @@ function PostHeader({
 }: PostHeaderProps) {
   const navigate = useNavigate();
   const [imgSrc, setImgSrc] = useState(avatarSrc);
-  console.log('PostHeader.tsx :' + avatarSrc)
 
   const handleImageError = () => {
     setImgSrc("/img/fish-logo-GB.png");
@@ -55,7 +54,6 @@ function PostHeader({
 
   // 게시글 액션 핸들러들
   const handleEditPost = () => {
-    console.log("게시글 수정:", postId);
     navigate(`/post/${postId}/edit`);
   };
 
