@@ -2,7 +2,7 @@ import type { Product } from "../types/product";
 import { getAuthHeaders } from "../utils/tokenManager";
 import { ProductRequest } from "../components/common/form/types";
 
-const API_BASE_URL = "https://dev.wenivops.co.kr/services/mandarin";
+const BASE_URL = "https://dev.wenivops.co.kr/services/mandarin";
 
 /**
  * 상품 등록
@@ -12,7 +12,7 @@ const API_BASE_URL = "https://dev.wenivops.co.kr/services/mandarin";
 export const fetchProductUpload = async (
   productData: ProductRequest
 ): Promise<Product> => {
-  const response = await fetch(`${API_BASE_URL}/product`, {
+  const response = await fetch(`${BASE_URL}/product`, {
     method: "POST",
     headers: getAuthHeaders(),
     body: JSON.stringify({
@@ -50,7 +50,7 @@ export const fetchProductUpload = async (
 export const fetchProductDetail = async (
   productId: string
 ): Promise<Product> => {
-  const response = await fetch(`${API_BASE_URL}/product/detail/${productId}`, {
+  const response = await fetch(`${BASE_URL}/product/detail/${productId}`, {
     method: "GET",
     headers: getAuthHeaders(),
   });
@@ -68,8 +68,6 @@ export const fetchProductDetail = async (
 
   const data = await response.json();
 
-  console.log("📦상품 조회: ", data.product);
-
   return data.product;
 };
 
@@ -83,10 +81,12 @@ export const updateProduct = async (
   productId: string,
   productData: Partial<Product>
 ): Promise<void> => {
-  const response = await fetch(`${API_BASE_URL}/product/${productId}`, {
+  const response = await fetch(`${BASE_URL}/product/${productId}`, {
     method: "PUT",
     headers: getAuthHeaders(),
-    body: JSON.stringify(productData),
+    body: JSON.stringify({
+      product: productData,
+    }),
   });
 
   if (!response.ok) {
@@ -104,7 +104,7 @@ export const updateProduct = async (
 
   const data = await response.json();
 
-  console.log("📦상품 수정: ", data.product);
+  console.log("✅ 상품 수정 완료: ", data.product);
 
   return data.product;
 };
@@ -114,7 +114,7 @@ export const updateProduct = async (
  * @param productId 상품 ID
  */
 export const deleteProduct = async (productId: string): Promise<void> => {
-  const response = await fetch(`${API_BASE_URL}/product/${productId}`, {
+  const response = await fetch(`${BASE_URL}/product/${productId}`, {
     method: "DELETE",
     headers: getAuthHeaders(),
   });
@@ -147,7 +147,7 @@ export const deleteProduct = async (productId: string): Promise<void> => {
 export const fetchProductList = async (
   accountname: string
 ): Promise<{ data: number; product: Product[] }> => {
-  const response = await fetch(`${API_BASE_URL}/product/${accountname}`, {
+  const response = await fetch(`${BASE_URL}/product/${accountname}`, {
     method: "GET",
     headers: getAuthHeaders(),
   });
@@ -174,7 +174,7 @@ export const fetchProductList = async (
  * @param productId 상품 ID
  */
 export const toggleProductLike = async (productId: string): Promise<void> => {
-  const response = await fetch(`${API_BASE_URL}/products/${productId}/like`, {
+  const response = await fetch(`${BASE_URL}/products/${productId}/like`, {
     method: "POST",
     headers: getAuthHeaders(),
   });
