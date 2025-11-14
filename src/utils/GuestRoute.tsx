@@ -1,15 +1,17 @@
 import { ReactNode } from "react";
-import { isAuthenticated } from "./auth";
 import ExceptionPage from "../pages/errPage/ExceptionPage";
-
+import { useAuth } from "../contexts/AuthContext";
 interface Props {
   children: ReactNode;
 }
-const isLogined = isAuthenticated()
 
-//login 안되어있을때
+
+//login z
 
 export default function GuestRoute({children}:Props) {
-    if(!isLogined) return <ExceptionPage text="로그인이 필요합니다 :)" type="guest" />
+    const { isAuthenticated, isLoading } = useAuth();
+
+    if(isLoading) return null;
+    if(!isAuthenticated) return <ExceptionPage text="로그인이 필요한 서비스입니다! :)" type="guest" />
     return <>{children}</>
 }
