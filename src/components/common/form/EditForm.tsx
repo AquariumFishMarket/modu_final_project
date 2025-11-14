@@ -115,10 +115,10 @@ const EditForm = forwardRef<CommonFormRef, EditFormProps>(
       }
 
       // price 필드 숫자로 변환
-      if (fieldName === "price" && value) {
-        const numValue = Number(value.replace(/,/g, ""));
-        formattedValue = isNaN(numValue) ? 0 : numValue;
-      }
+      // if (fieldName === "price" && value) {
+      //   const numValue = Number(value.replace(/,/g, ""));
+      //   formattedValue = isNaN(numValue) ? 0 : numValue;
+      // }
 
       setFormValues((prev) => ({ ...prev, [fieldName]: formattedValue }));
       setHasUserInteraction(true);

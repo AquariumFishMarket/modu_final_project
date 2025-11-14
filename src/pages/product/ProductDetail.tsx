@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Product } from "../../types/product";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import {
   fetchProductDetail,
   toggleProductLike,
 } from "../../services/productService";
-import { useHeader } from "../../contexts/HeaderContext";
-import MoreMenu from "../../components/common/modal/MoreMenu";
 
 // 시간 표시 유틸리티 함수 추가
 const getRelativeTime = (createdAt: string): string => {
@@ -224,39 +222,10 @@ const ContentWrapper = styled.div`
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
-  const { setHeaderConfig } = useHeader();
   const [product, setProduct] = useState<Product | null>(null);
   // const [selectedImageIdx, setSelectedImageIdx] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
-
-  const isSold = product?.status === "sold";
-
-  const canPurchase = !isSold && product?.link;
-
-  // 상품 삭제 핸들러
-  const handleDelete = async () => {
-    console.log("상품 삭제:", id);
-    // 상품 삭제 API 호출
-    navigate(-1);
-  };
-
-  // 판매완료 처리 핸들러
-  const handleMarkAsSold = async () => {
-    console.log("판매완료 처리:", id);
-    // 상품 상태 업데이트 API 호출
-    if (product) {
-      setProduct({ ...product, status: "sold" });
-    }
-  };
-
-  // 상품 신고 핸들러
-  const handleReport = () => {
-    console.log("상품 신고:", id);
-    // 상품 신고 API 호출
-    alert("상품이 신고되었습니다.");
-  };
 
   useEffect(() => {
     const loadProduct = async () => {
@@ -280,9 +249,6 @@ export default function ProductDetail() {
         }
 
         setProduct(productData);
-        setLikeCount(productData.interactions?.likes || 0);
-        // TODO: 사용자의 찜 상태 가져오기 (API 추가 필요)
-        // setIsLiked(productData.isLiked);
       } catch (error) {
         console.error("상품 정보 로드 실패:", error);
 
@@ -297,27 +263,6 @@ export default function ProductDetail() {
 
     loadProduct();
   }, [id]);
-
-  // 헤더 설정 (product 로드 후)
-  useEffect(() => {
-    if (!product) return;
-
-    setHeaderConfig({
-      show: true,
-      type: "productDetail",
-      onBackClick: () => navigate(-1),
-      rightElement: (
-        <MoreMenu
-          type="product"
-          authorAccountname={product.author.accountname}
-          onEdit={() => navigate(`/product/${id}/edit`)}
-          onDelete={handleDelete}
-          onMarkAsSold={handleMarkAsSold}
-          onReport={handleReport}
-        />
-      ),
-    });
-  }, [product, id, setHeaderConfig, navigate]);
 
   if (!product) {
     return <div>상품을 찾을 수 없습니다.</div>;
@@ -351,15 +296,13 @@ export default function ProductDetail() {
 
   // 채팅하기
   const handleChatStart = () => {
-    if (isSold) return;
-
     console.log("채팅 시작:", product.id);
     // navigate(`/chat-room/${product.seller.id}`);
   };
 
   // 구매하기
   const handlePurchase = () => {
-    if (!canPurchase || !product.link) return;
+    if (!product.link) return;
 
     window.open(product.link, "_blank");
     console.log("구매 링크로 이동:", product.link);
@@ -404,7 +347,7 @@ export default function ProductDetail() {
           </SellerSection> */}
 
           {/* 판매 완료 태그 */}
-          {isSold && <SoldTag>거래완료</SoldTag>}
+          <SoldTag>거래완료</SoldTag>
 
           {/* 상품 정보 */}
           <ProductTitle>{product.itemName}</ProductTitle>
@@ -418,14 +361,12 @@ export default function ProductDetail() {
             <StatsGroup>
               <StatItem>
                 <img src="/img/icon-eye.svg" alt="" />{" "}
-                {product.interactions?.views || 0}
               </StatItem>
               <StatItem>
                 <img src="/img/icon-heart-filled.svg" alt="" /> {likeCount}
               </StatItem>
               <StatItem>
                 <img src="/img/icon-chat.svg" alt="" />{" "}
-                {product.interactions?.chatCount || 0}
               </StatItem>
             </StatsGroup>
           </ProductStats>
@@ -445,20 +386,12 @@ export default function ProductDetail() {
         </LikeButton>
 
         {product.link && (
-          <ActionButton
-            $variant="buy"
-            disabled={isSold}
-            onClick={handlePurchase}
-          >
-            {isSold ? "거래완료" : "구매하기"}
+          <ActionButton $variant="buy" onClick={handlePurchase}>
+            {/* {isSold ? "거래완료" : "구매하기"} */}
           </ActionButton>
         )}
 
-        <ActionButton
-          $variant="chat"
-          disabled={isSold}
-          onClick={handleChatStart}
-        >
+        <ActionButton $variant="chat" onClick={handleChatStart}>
           채팅하기
         </ActionButton>
       </BottomActionBar>
