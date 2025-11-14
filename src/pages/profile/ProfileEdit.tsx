@@ -30,7 +30,7 @@ export default function ProfileEdit() {
   const [loading, setLoading] = useState(true);
   const [profileData, setProfileData] = useState<UserProfile | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const { updateUser } = useAuth();
+  const { refreshUserInfo } = useAuth();
 
   const profileFields = getProfileFields();
 
@@ -134,19 +134,13 @@ export default function ProfileEdit() {
         data.username,
         data.accountname,
         data.intro || "",
-        imageUrl,
-        token
+        imageUrl
       );
 
       console.log("✅ 프로필 수정 성공");
 
-      // AuthContext 업데이트로 전역 상태 갱신
-      updateUser({
-        username: data.username,
-        accountname: data.accountname,
-        intro: data.intro || "",
-        image: imageUrl,
-      });
+      // AuthContext 업데이트 - 서버에서 최신 정보 가져오기
+      await refreshUserInfo();
 
       alert("프로필이 수정되었습니다.");
       navigate("/profile", { replace: true });

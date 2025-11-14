@@ -1,5 +1,5 @@
 import { FollowUser } from "../types/follow";
-import { getAuthHeaders } from "../utils/auth";
+import { getAuthHeaders } from "../utils/tokenManager";
 
 // API Base URL (환경변수로 관리)
 const API_BASE_URL =

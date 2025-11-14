@@ -1,4 +1,4 @@
-import { getAuthHeaders } from "../utils/auth";
+import { getAuthHeaders } from "../utils/tokenManager";
 import type { Feed } from "../types/feed";
 
 const API_BASE_URL =

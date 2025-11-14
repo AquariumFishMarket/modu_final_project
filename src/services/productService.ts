@@ -1,5 +1,5 @@
 import type { Product } from "../types/product";
-import { getToken } from "../utils/tokenManager";
+import { getAuthHeaders } from "../utils/tokenManager";
 import { ProductRequest } from "../components/common/form/types";
 
 const API_BASE_URL = "https://dev.wenivops.co.kr/services/mandarin";
@@ -12,14 +12,9 @@ const API_BASE_URL = "https://dev.wenivops.co.kr/services/mandarin";
 export const fetchProductUpload = async (
   productData: ProductRequest
 ): Promise<Product> => {
-  const token = getToken();
-
   const response = await fetch(`${API_BASE_URL}/product`, {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-type": "application/json",
-    },
+    headers: getAuthHeaders(),
     body: JSON.stringify({
       product: {
         itemName: productData.itemName,
@@ -55,14 +50,9 @@ export const fetchProductUpload = async (
 export const fetchProductDetail = async (
   productId: string
 ): Promise<Product> => {
-  const token = getToken();
-
   const response = await fetch(`${API_BASE_URL}/product/detail/${productId}`, {
     method: "GET",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-type": "application/json",
-    },
+    headers: getAuthHeaders(),
   });
 
   if (!response.ok) {
@@ -93,14 +83,9 @@ export const updateProduct = async (
   productId: string,
   productData: Partial<Product>
 ): Promise<void> => {
-  const token = getToken();
-
   const response = await fetch(`${API_BASE_URL}/product/${productId}`, {
     method: "PUT",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-type": "application/json",
-    },
+    headers: getAuthHeaders(),
     body: JSON.stringify(productData),
   });
 
@@ -129,14 +114,9 @@ export const updateProduct = async (
  * @param productId 상품 ID
  */
 export const deleteProduct = async (productId: string): Promise<void> => {
-  const token = getToken();
-
   const response = await fetch(`${API_BASE_URL}/product/${productId}`, {
     method: "DELETE",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-type": "application/json",
-    },
+    headers: getAuthHeaders(),
   });
 
   if (!response.ok) {
@@ -167,14 +147,9 @@ export const deleteProduct = async (productId: string): Promise<void> => {
 export const fetchProductList = async (
   accountname: string
 ): Promise<{ data: number; product: Product[] }> => {
-  const token = getToken();
-
   const response = await fetch(`${API_BASE_URL}/product/${accountname}`, {
     method: "GET",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-type": "application/json",
-    },
+    headers: getAuthHeaders(),
   });
 
   if (!response.ok) {
@@ -199,13 +174,9 @@ export const fetchProductList = async (
  * @param productId 상품 ID
  */
 export const toggleProductLike = async (productId: string): Promise<void> => {
-  const token = getToken();
-
   const response = await fetch(`${API_BASE_URL}/products/${productId}/like`, {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+    headers: getAuthHeaders(),
   });
 
   if (!response.ok) {

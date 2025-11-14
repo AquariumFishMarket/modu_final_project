@@ -1,7 +1,6 @@
-import { getAuthHeaders } from "../utils/auth";
+import { getAuthHeaders } from "../utils/tokenManager";
 import { Post, UserPostsResponse } from "../types/post";
 import { UserProfile } from "../types/user";
-import { getToken } from "../utils/tokenManager";
 
 const BASE_URL = "https://dev.wenivops.co.kr/services/mandarin";
 
@@ -45,20 +44,15 @@ export const fetchProfile = async (
   currentUserAccountname?: string
 ): Promise<UserProfile | null> => {
   try {
-    const token = getToken();
     let url = `${BASE_URL}/user/myinfo`;
-    const headers: Record<string, string> = {
-      Authorization: `Bearer ${token}`,
-    };
 
     if (accountname && accountname !== currentUserAccountname) {
       url = `${BASE_URL}/profile/${accountname}`;
-      headers["Content-type"] = "application/json";
     }
 
     const response = await fetch(url, {
       method: "GET",
-      headers,
+      headers: getAuthHeaders(),
     });
 
     if (!response.ok) throw new Error("프로필을 불러올 수 없습니다");
@@ -81,8 +75,7 @@ export const updateProfile = async (
   username: string,
   accountname: string,
   intro: string,
-  image: string,
-  token: string
+  image: string
 ): Promise<AuthResponse> => {
   console.log("📤 프로필 업데이트 요청:", {
     username,
@@ -97,10 +90,7 @@ export const updateProfile = async (
   try {
     const response = await fetch(`${BASE_URL}/user`, {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
+      headers: getAuthHeaders(),
       body: JSON.stringify({
         user: {
           username: username,
@@ -136,17 +126,13 @@ export const fetchUserPosts = async (
   accountname: string
 ): Promise<Post[] | null> => {
   try {
-    const token = getToken();
     const limit = 1000; // ☑️ 무한 스크롤 되면 개수 20개로 줄이기
 
     const response = await fetch(
       `${BASE_URL}/post/${accountname}/userpost?limit=${limit}`,
       {
         method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-type": "application/json",
-        },
+        headers: getAuthHeaders(),
       }
     );
 
@@ -175,13 +161,9 @@ export async function toggleProfileFollow(
   isFollowing: boolean
 ): Promise<boolean> {
   try {
-    const token = getToken();
     const response = await fetch(`${BASE_URL}/profile/${accountname}/follow`, {
       method: isFollowing ? "DELETE" : "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-type": "application/json",
-      },
+      headers: getAuthHeaders(),
     });
 
     if (!response.ok) throw new Error("팔로우 처리 실패");
