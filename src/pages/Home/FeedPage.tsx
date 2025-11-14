@@ -14,6 +14,7 @@ import { useFeedStore } from "../../contexts/useFeedStore";
 const FeedPage = () => {
   const navigate = useNavigate();
 
+
   const toggleLike = useFeedStore((state) => state.toggleLike);
 
   const observer = useRef<IntersectionObserver | null>(null);
