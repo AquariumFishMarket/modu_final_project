@@ -36,6 +36,7 @@ import {
   fetchUserPosts,
   toggleProfileFollow,
 } from "../../../services/profileService";
+import MoreMenu from "../../../components/common/modal/MoreMenu";
 
 const BASE_URL = `https://dev.wenivops.co.kr/services/mandarin`;
 
@@ -43,16 +44,10 @@ const BASE_URL = `https://dev.wenivops.co.kr/services/mandarin`;
 //  - 내 프로필과 다른 유저의 프로필을 조건부 렌더링
 //  - isMyProfile = targetAccountname === currentUserAccountname로 구분
 
-//  API -> profileService로 옮김
-//  - fetchProfile: 프로필 정보 가져오기 👤
-//  - fetchUserPosts: 사용자 게시글 목록 가져오기 📜
-//  - handleFollowToggle: 팔로우/언팔로우 처리 🔄
-//  - handleLikeToggle: 게시글 좋아요 처리 ❤️
-
 function Profile() {
   const navigate = useNavigate();
   const { setHeaderConfig } = useHeader();
-  const { currentUser, isLoading: isAuthLoading } = useAuth();
+  const { currentUser, isLoading: isAuthLoading, logout } = useAuth();
 
   // URL 파라미터에서 userId 가져오기 (동적 라우팅 대비)
   const { accountname: paramAccountname } = useParams<{
@@ -105,7 +100,6 @@ function Profile() {
   };
 
   // 채팅 버튼 클릭 핸들러 🗯️
-  // 채팅 페이지 라우팅 구현
   const handleChatClick = (): void => {
     // navigate(`/chat/${profileData.id}`);
   };
@@ -169,6 +163,13 @@ function Profile() {
       show: true,
       type: "profile",
       onBackClick: () => navigate(-1),
+      rightElement: (
+        <MoreMenu
+          type="profile"
+          onSettings={() => navigate("/settings")}
+          onLogout={() => logout()}
+        />
+      ),
     });
 
     const loadProfileAndPosts = async (): Promise<void> => {
@@ -385,8 +386,8 @@ function Profile() {
                 {/* IntersectionObserver 트리거 */}
                 {/* <div ref={loadMoreTriggerRef} style={{ height: "1px" }} />
 
-                {isPostsLoading && <LoadingText>불러오는 중...</LoadingText>}
-                {!hasMore && postsList.length > 0 && (
+                {isPostsLoading && <LoadingText>불러오는 중...</LoadingText>} */}
+                {/* {!hasMore && postsList.length > 0 && (
                   <LoadingText>더 이상 게시글이 없습니다.</LoadingText>
                 )} */}
               </PostListContainer>
@@ -418,9 +419,9 @@ function Profile() {
 
       {/* 게시글이 없을 때 빈 상태 메시지 표시 */}
       {/* {!isPostsInitialLoading && postsList.length === 0 && ( */}
-      <MyFeedSection>
+      {/* <MyFeedSection>
         <EmptyPostMessage>게시글이 없습니다.</EmptyPostMessage>
-      </MyFeedSection>
+      </MyFeedSection> */}
       {/* )} */}
     </>
   );
