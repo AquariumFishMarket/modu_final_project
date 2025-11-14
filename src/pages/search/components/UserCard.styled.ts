@@ -1,6 +1,8 @@
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 
+// 귀신아 잘가라 이제 오지마 제발 귀찮아죽겠어
+
 export const UserCard = styled.div`
   width: 100%;
   display: flex;

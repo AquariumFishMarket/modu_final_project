@@ -50,7 +50,7 @@ const EditForm = forwardRef<CommonFormRef, EditFormProps>(
     const [imgFiles, setImgFiles] = useState<File[]>(initialImages);
     const [deleteIdx, setDeleteIdx] = useState<number | undefined>();
 
-    // 🆕 수정 모드 특화 로직들 - 누락된 상태 추가
+    // 수정 모드 특화 로직들 - 누락된 상태 추가
     const [deletedExistingImages, setDeletedExistingImages] = useState<
       number[]
     >([]);
@@ -112,6 +112,12 @@ const EditForm = forwardRef<CommonFormRef, EditFormProps>(
       let formattedValue = value;
       if (field?.formatter) {
         formattedValue = field.formatter(value);
+      }
+
+      // price 필드 숫자로 변환
+      if (fieldName === "price" && value) {
+        const numValue = Number(value.replace(/,/g, ""));
+        formattedValue = isNaN(numValue) ? 0 : numValue;
       }
 
       setFormValues((prev) => ({ ...prev, [fieldName]: formattedValue }));
@@ -188,11 +194,7 @@ const EditForm = forwardRef<CommonFormRef, EditFormProps>(
           }
         }
 
-        onSubmit?.({
-          formData,
-          imageFiles: imgFiles,
-          formValues,
-        });
+        onSubmit?.({});
 
         return true;
       }

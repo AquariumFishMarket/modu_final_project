@@ -1,5 +1,5 @@
 import CreateForm from "../../components/common/form/CreateForm";
-import { FormSubmissionData } from "../../components/common/form/types";
+import { FormData } from "../../components/common/form/types";
 import { getProfileFields } from "../../utils/validation/userValidation";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
@@ -68,12 +68,12 @@ export default function ProfileSetup() {
   };
 
   // 폼 제출 핸들러 정의
-  const handleSubmit = async (data: FormSubmissionData): Promise<void> => {
+  const handleSubmit = async (data: FormData): Promise<void> => {
     setError("");
 
     const username = data.username as string;
-    const accountname = data.accountId as string;
-    const intro = (data.introduction as string) || "";
+    const accountname = data.accountname as string;
+    const intro = (data.intro as string) || "";
 
     // 빈 값 검사
     if (!username || !username.trim()) {

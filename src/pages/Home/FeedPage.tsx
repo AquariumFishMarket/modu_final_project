@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
@@ -7,21 +7,16 @@ import Toast from "../../components/common/modal/Toast";
 import { InitialLoadingSection } from "./FeedPage.styled";
 import PostCard from "../../components/post/postCard/PostCard";
 import { ToastContainer } from "react-toastify";
-import { useFeedData } from "../../hooks/useFeedData";
+
 //zustand 전역
 import { useFeedStore } from "../../contexts/useFeedStore";
 
 const FeedPage = () => {
   const navigate = useNavigate();
-<<<<<<< Updated upstream
-  const {
-    handleLikeToggle,
-  } = useFeedData();
 
-=======
   const toggleLike = useFeedStore((state) => state.toggleLike);
+
   const observer = useRef<IntersectionObserver | null>(null);
->>>>>>> Stashed changes
 
   // 페이지 애니메이션
   const pageVariants = {
@@ -33,12 +28,6 @@ const FeedPage = () => {
   const feedList = useFeedStore((state) => state.feedList);
   const isLoading = useFeedStore((state) => state.isInitialLoading);
   const fetchFeeds = useFeedStore((state) => state.fetchFeeds);
-<<<<<<< Updated upstream
-
-  useEffect(()=>{
-    fetchFeeds();
-  },[])
-=======
   const hasMore = useFeedStore((state) => state.hasMore);
   const isRefreshing = useFeedStore((state) => state.isRefreshing);
   const isInitialLized = useFeedStore((state) => state.isInitialLized);
@@ -46,19 +35,22 @@ const FeedPage = () => {
   // ref로 최신 상태 유지 (콜백 재생성 방지)
   const hasMoreRef = useRef(hasMore);
   const isRefreshingRef = useRef(isRefreshing);
+  const loadInProgressRef = useRef(false);
+
   useEffect(() => {
     hasMoreRef.current = hasMore;
   }, [hasMore]);
+
   useEffect(() => {
     isRefreshingRef.current = isRefreshing;
   }, [isRefreshing]);
-  const loadInProgressRef = useRef(false);
 
   useEffect(() => {
     if (isInitialLized) return;
     fetchFeeds(false);
-  }, [isInitialLized]);
+  }, [isInitialLized, fetchFeeds]);
 
+  // 무한스크롤 intersection observer
   const lastCardRef = useCallback(
     (node: HTMLElement | null) => {
       if (!node) return;
@@ -74,6 +66,7 @@ const FeedPage = () => {
           if (loadInProgressRef.current) return;
 
           loadInProgressRef.current = true;
+
           // 중복 호출 방지: fetch 완료/오류 시 플래그 해제
           fetchFeeds(true).finally(() => {
             loadInProgressRef.current = false;
@@ -86,7 +79,6 @@ const FeedPage = () => {
     },
     [fetchFeeds]
   );
->>>>>>> Stashed changes
 
   // 초기 로딩
   if (isLoading) {
@@ -114,31 +106,9 @@ const FeedPage = () => {
       exit="exit"
       variants={pageVariants}
     >
-      <ToastContainer></ToastContainer>
-      <Toast></Toast>
-<<<<<<< Updated upstream
+      <ToastContainer />
+      <Toast />
 
-      {feedList.map((feed) => (
-        <PostCard
-          key={feed.id}
-          postId={feed.id}
-          userName={feed.author.username}
-          userId={feed.author.accountname}
-          avatarSrc={feed.profileImg}
-          avatarAlt={`${feed.author.username} 프로필`}
-          content={feed.content}
-          imageSrc={feed.image}
-          imageAlt="게시글 이미지"
-          dateTime={feed.updatedAt} //api 명세 없는부분
-          dateText={feed.updatedAt} //api 명세 없는부분
-          likeCount={feed.author.hearts.length}
-          commentCount={feed.comments.length}
-          isLiked={feed.isLiked}
-          onLikeClick={() => handleLikeToggle(feed.id)}
-          onCommentClick={() => navigate(`/post/${feed.id}`)}
-        />
-      ))}
-=======
       {feedList.map((feed, idx) => {
         const isLast = idx === feedList.length - 1;
 
@@ -153,16 +123,18 @@ const FeedPage = () => {
             content={feed.content}
             imageSrc={feed.image}
             imageAlt="게시글 이미지"
-            dateTime={feed.updatedAt}
-            likeCount={feed.likeCount}
+            dateTime={feed.updatedAt} //api 명세 없는부분
+            //dateText={feed.updatedAt} //api 명세 없는부분
+            likeCount={feed.likeCount} 
             commentCount={feed.comments.length}
             isLiked={feed.isLiked}
-            onLikeClick={() => toggleLike(feed.id)}
+            onLikeClick={() => toggleLike(feed.id)} 
             onCommentClick={() => navigate(`/post/${feed.id}`)}
             ref={isLast ? lastCardRef : null}
           />
         );
       })}
+
       {isRefreshing && hasMore && (
         <div style={{ textAlign: "center", padding: "20px", color: "#999" }}>
           로딩중..
@@ -174,7 +146,6 @@ const FeedPage = () => {
           마지막 페이지입니다.
         </div>
       )}
->>>>>>> Stashed changes
     </motion.div>
   );
 };

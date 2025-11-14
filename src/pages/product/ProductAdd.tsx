@@ -1,9 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import CreateForm from "../../components/common/form/CreateForm";
-import { FormSubmissionData } from "../../components/common/form/types";
+import { FormData, ProductRequest } from "../../components/common/form/types";
 import { useHeader } from "../../contexts/HeaderContext";
 import { useEffect, useRef, useState } from "react";
 import { getProductFields } from "../../utils/validation/productValidation";
+import { fetchProductUpload } from "../../services/productService";
+import { uploadImage } from "../../services/imageService";
 
 export default function ProductAdd() {
   const navigate = useNavigate();
@@ -16,10 +18,10 @@ export default function ProductAdd() {
   useEffect(() => {
     setHeaderConfig({
       show: true,
-      type: "productAdd",
+      type: "product",
       title: "상품 등록",
       inputState: isFormValid,
-      onBackClick: () => navigate("/profile"),
+      onBackClick: () => navigate(-1),
       onButtonClick: () => {
         // 실제 폼 제출 로직
         if (formRef.current) {
@@ -28,26 +30,43 @@ export default function ProductAdd() {
       },
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isFormValid]);
+  }, [isFormValid, navigate, setHeaderConfig]);
 
   // 폼 유효성 변경 핸들러
   const handleValidationChange = (isValid: boolean) => {
     setIsFormValid(isValid);
   };
 
-  // 폼 제출 핸들러 정의
-  const handleSubmit = (data: FormSubmissionData) => {
-    console.log("상품 등록 완료:", data);
-    console.log("상품명:", data.formValues.productname);
-    console.log("가격:", data.formValues.price);
-    console.log("설명:", data.formValues.description);
-    console.log("링크:", data.formValues.link);
-    console.log("이미지 파일들:", data.imageFiles);
+  // 폼 제출 핸들러
+  const handleSubmit = async (data: FormData) => {
+    try {
+      let imageUrl = "";
 
-    // 🆕 등록 완료 후 상품 상세 페이지나 홈으로 이동
-    // navigate(`/product/${newProductId}`);
-    navigate("/");
+      if (data.itemImage) {
+        imageUrl = await uploadImage(data.itemImage as File);
+      }
+
+      const productData: ProductRequest = {
+        itemName: data.itemName as string,
+        price: Number((data.price as string)?.replace(/,/g, "") || 0),
+        link: data.link as string,
+        itemImage: imageUrl,
+      };
+
+      const newProduct = await fetchProductUpload(productData);
+
+      console.log("상품 등록 완료 :", newProduct);
+
+      // 등록된 상품 상세 페이지로 이동
+      navigate(`/product/${newProduct.id}`);
+
+      //
+    } catch (error) {
+      console.error("상품 등록 실패: ", error);
+      alert("상품 등록에 실패했습니다.");
+    }
   };
+
   return (
     <CreateForm
       ref={formRef}

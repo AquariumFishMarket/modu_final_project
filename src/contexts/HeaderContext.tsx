@@ -1,4 +1,10 @@
-import { createContext, useContext, useState, useCallback, ReactNode } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  ReactNode,
+} from "react";
 
 // Header 타입 정의
 export type HeaderType =
@@ -12,7 +18,7 @@ export type HeaderType =
   | "postDetail" // 게시글 상세
   | "chatList"
   | "chat"
-  | "productAdd" // 상품 등록
+  | "product" // 상품 등록
   | "productDetail"; //상품 상세
 
 // Header 설정 인터페이스
@@ -22,6 +28,7 @@ export interface HeaderConfig {
   title?: string;
   userName?: string; // chat type에서 사용
   inputState?: boolean; // edit, post type에서 사용
+  rightElement?: React.ReactNode; 
   onBackClick?: () => void;
   onSearchClick?: () => void;
   onMoreClick?: () => void;

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useHeader } from "../../../contexts/HeaderContext";
+import MoreMenu from "../../../components/common/modal/MoreMenu";
 import {
   ProfileSection,
   ProfileContainer,
@@ -255,7 +256,7 @@ function Profile() {
 
   // 상품 등록 버튼 클릭 핸들러
   const handleUploadProduct = (): void => {
-    navigate("/product/upload");
+    navigate("/product");
   };
 
   // ❤️ 좋아요 토글 핸들러 추가
@@ -301,12 +302,31 @@ function Profile() {
   // 컴포넌트 마운트 시 프로필 데이터 및 게시글 로드
   //  API 연동 시 주석 해제
 
+  // 로그아웃 핸들러
+  const handleLogout = () => {
+    console.log("로그아웃");
+    // TODO: 로그아웃 API 호출
+    navigate("/login");
+  };
+
+  // 설정 페이지로 이동
+  const handleSettings = () => {
+    navigate("/settings");
+  };
+
   useEffect(() => {
     // 헤더 설정
     setHeaderConfig({
       show: true,
       type: "profile",
       onBackClick: () => navigate(-1),
+      rightElement: isMyProfile ? (
+        <MoreMenu
+          type="profile"
+          onSettings={handleSettings}
+          onLogout={handleLogout}
+        />
+      ) : undefined,
     });
 
     const loadProfileAndPosts = async (): Promise<void> => {

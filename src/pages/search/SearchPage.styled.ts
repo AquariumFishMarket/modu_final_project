@@ -1,5 +1,6 @@
 import styled from "styled-components";
 
+// 귀신이야 넌 어떤귀신이니
 export const SearchSection = styled.section`
   max-height: calc(100vh - 60px); /* 헤더 높이 제외 */
   overflow-y: auto;

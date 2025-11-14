@@ -8,8 +8,9 @@ import { useAuth } from "../../../contexts/AuthContext";
 interface MoreMenuProps {
   type: "profile" | "post" | "comment" | "chat" | "chatList" | "product";
   size?: "sm" | "md" | "lg";
-  isMyComment?: boolean; // 댓글일 때 내 댓글인지 여부
-  isMyPost?: boolean; // 게시글일 때 내 게시글인지 여부
+  authorAccountname?: string; 
+  isMyComment?: boolean;
+  isMyPost?: boolean; 
   onEdit?: () => void;
   onDelete?: () => void;
   onReport?: () => void;
@@ -17,7 +18,7 @@ interface MoreMenuProps {
   onLeave?: () => void;
   onLogout?: () => void;
   onSettings?: () => void;
-  onMarkAsSold?: () => void; // 상품 판매완료 함수 추가!
+  onMarkAsSold?: () => void; 
 }
 
 const getIconSrc = (size: "sm" | "md" | "lg") => {
@@ -62,6 +63,7 @@ const MoreButton = styled.button<{ $size: "sm" | "md" | "lg" }>`
 export default function MoreMenu({
   type,
   size = "lg",
+  authorAccountname,
   isMyComment,
   isMyPost,
   onEdit,
@@ -77,7 +79,12 @@ export default function MoreMenu({
   const [alertType, setAlertType] = useState<
     "delete" | "deleteComment" | "logout" | "sold" | "reportPost" | null
   >(null);
-  const { logout } = useAuth();
+  const { logout, currentUser } = useAuth();
+
+  // 본인 여부 확인 (authorAccountname이 제공된 경우)
+  const isOwner = authorAccountname
+    ? currentUser?.accountname === authorAccountname
+    : undefined;
 
   const openSheet = () => {
     setIsSheetOpen(true);
@@ -152,23 +159,37 @@ export default function MoreMenu({
 
         {type === "product" && (
           <>
-            <SheetItem
-              onClick={() => {
-                onEdit?.();
-                closeSheet();
-              }}
-            >
-              수정
-            </SheetItem>
-            <SheetItem onClick={handleDelete}>삭제</SheetItem>
-            <SheetItem onClick={handleMarkAsSold}>판매 완료</SheetItem>
+            {isOwner ? (
+              // 본인 상품: 수정, 삭제, 판매완료
+              <>
+                <SheetItem
+                  onClick={() => {
+                    onEdit?.();
+                    closeSheet();
+                  }}
+                >
+                  수정
+                </SheetItem>
+                <SheetItem onClick={handleDelete}>삭제</SheetItem>
+                <SheetItem onClick={handleMarkAsSold}>판매 완료</SheetItem>
+              </>
+            ) : (
+              // 다른 사람 상품: 신고하기
+              <>
+                {onReport && (
+                  <SheetItem className="danger" onClick={handleReportPost}>
+                    신고하기
+                  </SheetItem>
+                )}
+              </>
+            )}
           </>
         )}
 
         {/* 게시글 */}
         {type === "post" && (
           <>
-            {isMyPost ? (
+            {(isOwner !== undefined ? isOwner : isMyPost) ? (
               // 내 게시글: 수정, 삭제
               <>
                 {onEdit && (
@@ -203,7 +224,7 @@ export default function MoreMenu({
         {/* 댓글 */}
         {type === "comment" && (
           <>
-            {isMyComment ? (
+            {(isOwner !== undefined ? isOwner : isMyComment) ? (
               // 내 댓글: 수정, 삭제
               <>
                 {onEdit && (

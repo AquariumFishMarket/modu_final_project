@@ -250,6 +250,7 @@ function CommentField({
         postId={commentId}
         dateTime={dateTime}
         dateText={dateText}
+        authorAccountname={userId}
         isMyComment={isMyComment}
         onEdit={handleEditClick}
         onDelete={onDelete}
