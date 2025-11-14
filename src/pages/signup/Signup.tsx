@@ -25,51 +25,16 @@ const LoginLink = styled(Link)`
   display: inline-block;
   text-align: center;
   margin: 20px auto;
+
+  span {
+    font-weight: 700;
+  }
 `;
 
 export default function Signup() {
   const navigate = useNavigate();
   const [formError, setFormError] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // // 이메일 중복 체크 함수 분리
-  // const handleEmailCheck = async (email: string) => {
-  //   if (!email) return;
-
-  //   setEmailStatus((prev) => ({ ...prev, checking: true }));
-  //   setError(null);
-
-  //   try {
-  //     const res = await checkEmailDuplicate(email);
-  //     console.log("중복 체크 응답:", res);
-
-  //     const isAvailable = res.message === "사용 가능한 이메일 입니다.";
-
-  //     setEmailStatus({
-  //       checking: false,
-  //       checked: true,
-  //       available: isAvailable,
-  //       message: res.message,
-  //     });
-
-  //     if (!isAvailable) {
-  //       setError(res.message);
-  //     }
-  //   } catch (error) {
-  //     console.error("이메일 중복 체크 에러:", error);
-  //     setEmailStatus({
-  //       checking: false,
-  //       checked: false,
-  //       available: false,
-  //       message: "이메일 중복 확인에 실패했습니다.",
-  //     });
-  //     setError(
-  //       error instanceof Error
-  //         ? error.message
-  //         : "이메일 중복 확인에 실패했습니다."
-  //     );
-  //   }
-  // };
 
   // 회원가입 폼 필드 설정 (validator 연결)
   const signupFields = [
@@ -109,14 +74,19 @@ export default function Signup() {
 
     try {
       await signup(email, password);
+
       const loginResult = await login(email, password);
+
       saveToken(loginResult.token);
+
       alert("회원가입이 완료되었습니다. 프로필을 설정해주세요.");
       navigate("/profile/setup");
-    } catch (err) {
+    } catch (error) {
       // 실패 시 alert 대신 하단 메시지로만 표시
       setFormError(
-        err instanceof Error ? err.message : "회원가입에 실패했습니다."
+        error instanceof Error
+          ? error.message
+          : "이메일과 비밀번호를 다시 확인해주세요."
       );
     } finally {
       setIsSubmitting(false);
@@ -135,20 +105,11 @@ export default function Signup() {
         buttonText={isSubmitting ? "처리 중..." : "회원가입"}
         onSubmit={handleSubmit}
         onButtonClick={handleButtonClick}
+        formError={formError}
       />
-      {/* 폼 전체 에러 메시지 (예: 회원가입 실패) */}
-      {formError && (
-        <div
-          style={{
-            color: "var(--color-error)",
-            textAlign: "center",
-            marginTop: "12px",
-          }}
-        >
-          {formError}
-        </div>
-      )}
-      <LoginLink to={"/login/email"}>이미 계정이 있으신가요? 로그인</LoginLink>
+      <LoginLink to={"/login/email"}>
+        이미 계정이 있으신가요? <span>이메일로 로그인</span>
+      </LoginLink>
     </>
   );
 }

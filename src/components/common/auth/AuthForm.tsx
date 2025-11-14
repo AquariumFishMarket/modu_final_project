@@ -7,6 +7,7 @@ import {
   Label,
   Input,
   ErrorMessage,
+  ResultMessage,
 } from "./AuthForm.styled";
 import {
   validateEmail,
@@ -29,6 +30,7 @@ interface AuthFormProps {
   onButtonClick: () => void;
   placeHolder?: string;
   disabled?: boolean;
+  formError?: string;
 }
 
 export default function AuthForm({
@@ -37,30 +39,44 @@ export default function AuthForm({
   onSubmit,
   onButtonClick,
   disabled = false,
+  formError,
 }: AuthFormProps) {
   const [values, setValues] = useState<Record<string, string>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const isFormValid = useMemo(() => {
-    const fieldResults = fields.map((field) => {
-      const value = values[field.name];
+  // 검증 함수 맵
+  const validators: Record<string, (value: string) => string> = {
+    email: validateEmail,
+    password: validatePassword,
+  };
 
-      if (!value || value.trim().length === 0) {
-        return false;
+  const validateField = (name: string, value: string): string => {
+    const field = fields.find((f) => f.name === name);
+    if (!field) return "";
+
+    const validator = validators[field.type];
+    const error = validator ? validator(value) : "";
+
+    setErrors((prev) => ({ ...prev, [name]: error }));
+    return error;
+  };
+
+  const validateForm = (): Record<string, string> => {
+    const newErrors: Record<string, string> = {};
+
+    fields.forEach((field) => {
+      const value = values[field.name] || "";
+      const validator = validators[field.type];
+      const error = validator ? validator(value) : "";
+
+      if (error) {
+        newErrors[field.name] = error;
       }
-
-      let error = "";
-      if (field.name === "email") {
-        error = validateEmail(value);
-      } else if (field.name === "password") {
-        error = validatePassword(value);
-      }
-
-      return error === "";
     });
 
-    return fieldResults.every((result) => result);
-  }, [fields, values]);
+    setErrors(newErrors);
+    return newErrors;
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -68,43 +84,15 @@ export default function AuthForm({
     validateField(name, value);
   };
 
-  const validateField = (name: string, value: string) => {
-    let error = "";
-
-    if (name === "email") {
-      error = validateEmail(value);
-    } else if (name === "password") {
-      error = validatePassword(value);
-    }
-
-    setErrors((prev) => ({ ...prev, [name]: error }));
-    return error === "";
-  };
-
-  const validateForm = (): boolean => {
-    const newErrors: Record<string, string> = {};
-    let isValid = true;
-
-    fields.forEach((field) => {
-      const value = values[field.name] || "";
-      const error =
-        field.name === "email" ? validateEmail(value) : validatePassword(value);
-
-      if (error) {
-        newErrors[field.name] = error;
-        isValid = false;
-      }
-    });
-
-    setErrors(newErrors);
-    return isValid;
-  };
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!validateForm()) {
-      const firstErrorField = fields.find((field) => errors[field.name]);
+    const validationErrors = validateForm();
+
+    if (Object.keys(validationErrors).length > 0) {
+      const firstErrorField = fields.find(
+        (field) => validationErrors[field.name]
+      );
       if (firstErrorField) {
         document.getElementById(firstErrorField.name)?.focus();
       }
@@ -118,9 +106,19 @@ export default function AuthForm({
     }
   };
 
+  const isFormValid = useMemo(() => {
+    return fields.every((field) => {
+      const value = values[field.name];
+      if (!value || value.trim().length === 0) return false;
+
+      const validator = validators[field.type];
+      return validator ? validator(value) === "" : true;
+    });
+  }, [fields, values]);
+
   return (
     <section>
-      <Form onSubmit={handleSubmit}>
+      <Form $status={!!formError} onSubmit={handleSubmit}>
         <Fieldset>
           <legend className="sr-only">로그인 정보 입력</legend>
 
@@ -146,6 +144,10 @@ export default function AuthForm({
             </InputGroup>
           ))}
         </Fieldset>
+
+        {/* 전체 결과 에러 메시지 */}
+        {formError && <ResultMessage>{formError}</ResultMessage>}
+
         <DefaultButton
           text={buttonText}
           disabled={!isFormValid || disabled}
