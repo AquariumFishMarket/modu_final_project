@@ -157,13 +157,13 @@ const PostCard = forwardRef<HTMLDivElement, PostCardProps>(
         <PostMain onClick={handleCardClick}>
           {content && <figcaption>{content}</figcaption>}
 
-          {isLoading && '로딩중'}
           {imageUrls.length > 1 && (
             <ImageCarousel>
               <ImageCarouselViewport ref={emblaRef}>
                 <ImageCarouselContainer>
                   {imageUrls.map((url, index) => (
                     <ImageCarouselSlide key={index}>
+                      {url ? 'ㅇㅇ' : 'ㄴㄴ'}
                       <img
                         src={url}
                         alt={`${imageAlt || "게시글 이미지"} ${index + 1}`}

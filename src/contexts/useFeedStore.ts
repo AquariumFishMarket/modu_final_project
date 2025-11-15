@@ -68,7 +68,6 @@ export const useFeedStore = create<FeedStore>((set, get) => ({
       isFetching: true,
       ...(isLoadMore ? { isRefreshing: true } : {}),
     });
-      console.log(isLoading + '로딩😭')
     try {
       const query = new URLSearchParams();
       const limit = 5;
