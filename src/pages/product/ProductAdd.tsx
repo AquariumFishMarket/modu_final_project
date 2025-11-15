@@ -74,6 +74,7 @@ export default function ProductAdd() {
       fields={productFields}
       onSubmit={handleSubmit}
       onValidationChange={handleValidationChange}
+      imageRequired={true}
     />
   );
 }

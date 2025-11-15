@@ -6,19 +6,9 @@ import { useHeader } from "../../contexts/HeaderContext";
 import {
   deleteProduct,
   fetchProductDetail,
-  toggleProductLike,
 } from "../../services/productService";
 import MoreMenu from "../../components/common/modal/MoreMenu";
-
-// 시간 표시 유틸리티 함수 추가
-const getRelativeTime = (createdAt: string): string => {
-  const created = new Date(createdAt);
-
-  return created.toLocaleDateString("ko-KR", {
-    month: "long",
-    day: "numeric",
-  });
-};
+import { formatPostDate } from "../../utils/formatter/dateFormatter";
 
 const ProductContainer = styled.section`
   max-width: 600px;
@@ -34,46 +24,32 @@ const ProductImage = styled.img`
   margin-bottom: 15px;
 `;
 
-// const SellerSection = styled.div`
-//   display: flex;
-//   padding-bottom: 10px;
-//   border-bottom: 1px solid var(--color-gray-medium);
+const ProductInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+`;
 
-//   img {
-//     width: 40px;
-//     height: 40px;
-//     margin-right: 15px;
-//   }
-
-//   p {
-//     font-size: var(--font-size-lg);
-//     font-weight: 500;
-//     display: flex;
-//     align-items: center;
-//   }
-// `;
-
-// const SoldTag = styled.span`
-//   display: inline-block;
-//   color: var(--color-gray-semi-dark);
-//   font-size: var(--font-size-lg);
-//   font-weight: 700;
-//   margin-right: 5px;
-// `;
-
-const ProductTitle = styled.h2`
+const ProductTitle = styled.h3`
   display: inline-block;
   font-size: var(--font-size-lg);
   font-weight: 500;
-  margin-bottom: 12px;
   color: black;
 `;
 
 const Price = styled.p`
-  font-size: var(--font-size-2xl);
+  font-size: var(--font-size-xl);
   font-weight: 700;
   color: var(--color-primary);
-  margin-bottom: 30px;
+`;
+
+const SoldTag = styled.span`
+  display: inline-block;
+  color: var(--color-gray-semi-dark);
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  margin-right: 5px;
 `;
 
 const ProductStats = styled.div`
@@ -176,15 +152,88 @@ const LikeButton = styled.button<{ $isLiked: boolean }>`
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  position: relative;
   transition: all 0.2s ease;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
 
   img {
     width: 20px;
     aspect-ratio: 1;
     object-fit: contain;
+    transition: transform 0.3s;
+    animation: ${(props) =>
+      props.$isLiked
+        ? "heart 1s cubic-bezier(0.17, 0.89, 0.32, 1.49)"
+        : "none"};
   }
 
-  &:hover {
+  /* 스파클 효과 */
+  &::after {
+    position: absolute;
+    z-index: -1;
+    top: 50%;
+    left: 50%;
+    border-radius: 50%;
+    content: "";
+    margin: -0.1875rem;
+    width: 0.375rem;
+    height: 0.375rem;
+    opacity: ${(props) => (props.$isLiked ? 1 : 0)};
+    animation: ${(props) => (props.$isLiked ? "sparkles 1s ease-out" : "none")};
+    box-shadow: 0 -2.8125rem 0 -0.1875rem hsl(0, 100%, 75%),
+      1.6875rem -2.8125rem 0 -0.1875rem hsl(0, 100%, 75%),
+      2.4375rem -1.125rem 0 -0.1875rem hsl(51.43, 100%, 75%),
+      2.4375rem 1.125rem 0 -0.1875rem hsl(102.86, 100%, 75%),
+      1.6875rem 2.8125rem 0 -0.1875rem hsl(102.86, 100%, 75%),
+      0 3.375rem 0 -0.1875rem hsl(154.29, 100%, 75%),
+      -1.6875rem 2.8125rem 0 -0.1875rem hsl(154.29, 100%, 75%),
+      -2.4375rem 1.125rem 0 -0.1875rem hsl(205.71, 100%, 75%),
+      -2.4375rem -1.125rem 0 -0.1875rem hsl(257.14, 100%, 75%),
+      -1.6875rem -2.8125rem 0 -0.1875rem hsl(257.14, 100%, 75%),
+      0 -3.375rem 0 -0.1875rem hsl(308.57, 100%, 75%),
+      1.6875rem -2.8125rem 0 -0.1875rem hsl(308.57, 100%, 75%);
+  }
+
+  @keyframes heart {
+    0%,
+    17.5% {
+      transform: scale(0);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  @keyframes sparkles {
+    0%,
+    20% {
+      opacity: 0;
+    }
+    25% {
+      opacity: 1;
+      box-shadow: 0 -2.25rem 0 0 hsl(0, 100%, 75%),
+        1.125rem -2.25rem 0 0 hsl(0, 100%, 75%),
+        1.6875rem -0.75rem 0 0 hsl(51.43, 100%, 75%),
+        1.6875rem 0.75rem 0 0 hsl(102.86, 100%, 75%),
+        1.125rem 2.25rem 0 0 hsl(102.86, 100%, 75%),
+        0 2.8125rem 0 0 hsl(154.29, 100%, 75%),
+        -1.125rem 2.25rem 0 0 hsl(154.29, 100%, 75%),
+        -1.6875rem 0.75rem 0 0 hsl(205.71, 100%, 75%),
+        -1.6875rem -0.75rem 0 0 hsl(257.14, 100%, 75%),
+        -1.125rem -2.25rem 0 0 hsl(257.14, 100%, 75%),
+        0 -2.8125rem 0 0 hsl(308.57, 100%, 75%),
+        1.125rem -2.25rem 0 0 hsl(308.57, 100%, 75%);
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+
+  &:not(:disabled):hover img {
     transform: scale(1.1);
   }
 `;
@@ -227,6 +276,7 @@ export default function ProductDetail() {
             })
           }
           onDelete={handleDelete}
+          onMarkAsSold={handleMarkAsSold}
         />
       ),
     });
@@ -242,20 +292,18 @@ export default function ProductDetail() {
       try {
         const productData = await fetchProductDetail(id);
 
-        // ✅ itemImage가 유효한지 확인
         if (
           !productData.itemImage ||
           productData.itemImage.includes("undefined")
         ) {
           console.warn("⚠️ 유효하지 않은 이미지 URL");
-          productData.itemImage = "/img/basic-img.jpg"; // 기본 이미지
+          productData.itemImage = "/img/basic-img.png"; // 기본 이미지
         }
 
         setProduct(productData);
       } catch (error) {
         console.error("상품 정보 로드 실패:", error);
 
-        // ✅ 에러 메시지 표시
         if (error instanceof Error) {
           alert(error.message);
         }
@@ -271,30 +319,22 @@ export default function ProductDetail() {
     return <div>상품을 찾을 수 없습니다.</div>;
   }
 
-  const handleImageError = () => {
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const target = e.currentTarget;
+    // 무한 onError 방지: 이미 기본 이미지로 변경된 경우 중단
+    if (target.src.includes("/img/basic-img.png")) return;
+
     console.error("이미지 로드 실패:", product.itemImage);
+    target.src = "/img/basic-img.png";
   };
 
-  // 찜하기 토글
-  const handleLikeToggle = async () => {
+  // 찜하기
+  const handleLikeToggle = () => {
     if (!product) return;
 
-    const prevLikedState = isLiked;
-    const prevLikeCount = likeCount;
-
-    try {
-      // 낙관적 업데이트 (UI 먼저 업데이트)
-      const newLikedState = !isLiked;
-      setIsLiked(newLikedState);
-      setLikeCount((prev) => (newLikedState ? prev + 1 : prev - 1));
-
-      await toggleProductLike(product.id);
-    } catch (error) {
-      // 실패시 원래 상태로 롤백
-      setIsLiked(prevLikedState);
-      setLikeCount(prevLikeCount);
-      console.error("찜하기 실패:", error);
-    }
+    const newLikedState = !isLiked;
+    setIsLiked(newLikedState);
+    setLikeCount((prev) => (newLikedState ? prev + 1 : prev - 1));
   };
 
   // 채팅하기
@@ -327,6 +367,14 @@ export default function ProductDetail() {
     }
   };
 
+  // 판매 완료 처리 (UI만)
+  const handleMarkAsSold = () => {
+    if (!product) return;
+
+    // API 호출 없이 로컬 상태만 업데이트
+    setProduct({ ...product, status: "sold" });
+  };
+
   return (
     <>
       <ContentWrapper>
@@ -340,36 +388,30 @@ export default function ProductDetail() {
             onError={handleImageError}
           />
 
-          {/* 판매자 부분 */}
-          {/* <SellerSection>
-            <img
-              src={product.author.image}
-              alt={`${product.author}의 프로필 이미지`}
-            />
-            <p>{product.author.accountname}</p>
-          </SellerSection> */}
-
-          {/* 판매 완료 태그 */}
-          {/* <SoldTag>거래완료</SoldTag> */}
-
           {/* 상품 정보 */}
-          <ProductTitle>{product.itemName}</ProductTitle>
-          <Price>{product.price.toLocaleString()}원</Price>
+          <ProductInfo>
+            <div>
+              {/* 판매 완료 태그 */}
+              {product.status === "sold" && <SoldTag>거래완료</SoldTag>}
+              <ProductTitle>{product.itemName}</ProductTitle>
+            </div>
+            <Price>{product.price.toLocaleString()}원</Price>
+          </ProductInfo>
 
           {/* 상품 통계 */}
           <ProductStats>
             <TimeStamp>
-              {product.createdAt && getRelativeTime(product.createdAt)}
+              {product.createdAt && formatPostDate(product.createdAt)}
             </TimeStamp>
             <StatsGroup>
               <StatItem>
-                <img src="/img/icon-eye.svg" alt="" />{" "}
+                <img src="/img/icon-eye.svg" alt="" /> 0
               </StatItem>
               <StatItem>
                 <img src="/img/icon-heart-filled.svg" alt="" /> {likeCount}
               </StatItem>
               <StatItem>
-                <img src="/img/icon-chat.svg" alt="" />{" "}
+                <img src="/img/icon-chat.svg" alt="" /> 0
               </StatItem>
             </StatsGroup>
           </ProductStats>
@@ -378,21 +420,33 @@ export default function ProductDetail() {
 
       {/* 하단 액션 바 */}
       <BottomActionBar>
-        <LikeButton $isLiked={isLiked} onClick={handleLikeToggle}>
+        <LikeButton
+          $isLiked={isLiked}
+          onClick={handleLikeToggle}
+          disabled={product.status === "sold"}
+        >
           {isLiked ? (
-            <img src="/img/icon-like-empty.svg" alt="" />
-          ) : (
             <img src="/img/icon-like-full.svg" alt="" />
+          ) : (
+            <img src="/img/icon-like-empty.svg" alt="" />
           )}
         </LikeButton>
 
         {product.link && (
-          <ActionButton $variant="buy" onClick={handlePurchase}>
+          <ActionButton
+            $variant="buy"
+            onClick={handlePurchase}
+            disabled={product.status === "sold"}
+          >
             구매하기
           </ActionButton>
         )}
 
-        <ActionButton $variant="chat" onClick={handleChatStart}>
+        <ActionButton
+          $variant="chat"
+          onClick={handleChatStart}
+          disabled={product.status === "sold"}
+        >
           채팅하기
         </ActionButton>
       </BottomActionBar>
