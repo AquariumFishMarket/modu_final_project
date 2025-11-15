@@ -1,21 +1,28 @@
 // 토큰 관리 유틸리티
+// ✅ 토큰 CRUD만 담당 = 저장소 계층
+
+const TOKEN_KEY = "authToken";
 
 // 토큰 저장
 export const saveToken = (token: string): void => {
-  localStorage.setItem("authToken", token);
+  localStorage.setItem(TOKEN_KEY, token);
 };
 
 // 토큰 조회
 export const getToken = (): string | null => {
-  return localStorage.getItem("authToken");
+  return localStorage.getItem(TOKEN_KEY);
 };
 
 // 토큰 삭제
 export const removeToken = (): void => {
-  localStorage.removeItem("authToken");
+  localStorage.removeItem(TOKEN_KEY);
 };
 
-// 토큰 존재 여부로 인증 상태 확인
-export const isAuthenticated = (): boolean => {
-  return !!getToken();
+// auth에서 가져옴
+export const getAuthHeaders = (): HeadersInit => {
+  const token = getToken();
+  return {
+    "Content-Type": "application/json",
+    ...(token && { Authorization: `Bearer ${token}` }),
+  };
 };

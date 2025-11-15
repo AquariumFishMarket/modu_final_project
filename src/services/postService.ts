@@ -1,4 +1,4 @@
-import { getToken } from "../utils/tokenManager";
+import { getAuthHeaders } from "../utils/tokenManager";
 
 // API Base URL
 const BASE_URL = "https://dev.wenivops.co.kr/services/mandarin";
@@ -61,14 +61,9 @@ export async function fetchPostDetail(
   postId: string
 ): Promise<PostDetail | null> {
   try {
-    const token = getToken();
-
     const response = await fetch(`${BASE_URL}/post/${postId}`, {
       method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-type": "application/json",
-      },
+      headers: getAuthHeaders(),
     });
 
     if (!response.ok) {
@@ -102,8 +97,6 @@ export async function EditPost(
   image?: string
 ): Promise<PostDetail | null> {
   try {
-    const token = getToken();
-
     console.log("🔧 EditPost 요청:", {
       postId,
       content: content?.substring(0, 50),
@@ -112,10 +105,7 @@ export async function EditPost(
 
     const response = await fetch(`${BASE_URL}/post/${postId}`, {
       method: "PUT",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-type": "application/json",
-      },
+      headers: getAuthHeaders(),
       body: JSON.stringify({
         post: {
           content: content,
@@ -154,16 +144,11 @@ export async function EditPost(
 
 export async function deletePost(postId: string): Promise<boolean> {
   try {
-    const token = getToken();
-
     console.log("deletePost API 요청:", postId);
 
     const response = await fetch(`${BASE_URL}/post/${postId}`, {
       method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-type": "application/json",
-      },
+      headers: getAuthHeaders(),
     });
 
     if (!response.ok) {
@@ -190,16 +175,9 @@ export async function deletePost(postId: string): Promise<boolean> {
 // 게시글 신고
 export async function reportPost(postId: string): Promise<boolean> {
   try {
-    const token = getToken();
-
-
-
     const response = await fetch(`${BASE_URL}/post/${postId}/report`, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-type": "application/json",
-      },
+      headers: getAuthHeaders(),
     });
 
     if (!response.ok) {
@@ -225,14 +203,9 @@ export async function reportPost(postId: string): Promise<boolean> {
 
 export async function likePost(postId: string): Promise<PostDetail | null> {
   try {
-    const token = getToken();
-
     const response = await fetch(`${BASE_URL}/post/${postId}/heart`, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-type": "application/json",
-      },
+      headers: getAuthHeaders(),
     });
 
     if (!response.ok) {
@@ -257,14 +230,9 @@ export async function likePost(postId: string): Promise<PostDetail | null> {
 
 export async function unlikePost(postId: string): Promise<PostDetail | null> {
   try {
-    const token = getToken();
-
     const response = await fetch(`${BASE_URL}/post/${postId}/unheart`, {
       method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-type": "application/json",
-      },
+      headers: getAuthHeaders(),
     });
 
     if (!response.ok) {
@@ -289,16 +257,11 @@ export async function unlikePost(postId: string): Promise<PostDetail | null> {
 
 export async function fetchPostComments(postId: string): Promise<Comment[]> {
   try {
-    const token = getToken();
-
     const response = await fetch(
       `${BASE_URL}/post/${postId}/comments?limit=1000`,
       {
         method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-type": "application/json",
-        },
+        headers: getAuthHeaders(),
       }
     );
 
@@ -330,14 +293,9 @@ export async function createComment(
   content: string
 ): Promise<Comment | null> {
   try {
-    const token = getToken();
-
     const response = await fetch(`${BASE_URL}/post/${postId}/comments`, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-type": "application/json",
-      },
+      headers: getAuthHeaders(),
       body: JSON.stringify({
         comment: {
           content: content,
@@ -370,16 +328,11 @@ export async function updateComment(
   content: string
 ): Promise<Comment | null> {
   try {
-    const token = getToken();
-
     const response = await fetch(
       `${BASE_URL}/post/${postId}/comments/${commentId}`,
       {
         method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-type": "application/json",
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({
           comment: {
             content: content,
@@ -417,17 +370,11 @@ export async function reportComment(
   commentId: string
 ): Promise<boolean> {
   try {
-    const token = getToken();
-
-
     const response = await fetch(
       `${BASE_URL}/post/${postId}/comments/${commentId}/report`,
       {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-type": "application/json",
-        },
+        headers: getAuthHeaders(),
       }
     );
 
@@ -456,18 +403,13 @@ export async function deleteComment(
   commentId: string
 ): Promise<boolean> {
   try {
-    const token = getToken();
-
     console.log("deleteComment API 요청:", postId);
 
     const response = await fetch(
       `${BASE_URL}/post/${postId}/comments/${commentId}`,
       {
         method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-type": "application/json",
-        },
+        headers: getAuthHeaders(),
       }
     );
 

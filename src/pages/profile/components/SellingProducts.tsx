@@ -67,8 +67,6 @@ function SellingProducts({
 
         const result = await fetchProductList(targetAccountname);
 
-        console.log(`${targetAccountname}의 상품 리스트:`, result);
-
         setProducts(result.product);
       } catch (error) {
         if (error instanceof Error && error.name === "AbortError") {

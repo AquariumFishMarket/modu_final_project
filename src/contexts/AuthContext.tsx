@@ -1,6 +1,22 @@
-// 로그인 상태 관리용
+// 인증 상태 관리
+
+/**
+ * ✅ 전역 인증 상태 관리
+ * - currentUser (사용자 정보)
+ * - isAuthenticated (계산된 값)
+ * - login() → saveToken() + setCurrentUser()
+ * - logout() → removeToken() + setCurrentUser(null)
+ * - updateUser() → 사용자 정보만 업데이트
+ * - refreshUserInfo() → API 호출해서 최신 정보 가져오기
+ */
+
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { getToken, saveToken, removeToken } from "../utils/tokenManager";
+import {
+  getToken,
+  saveToken,
+  removeToken,
+  getAuthHeaders,
+} from "../utils/tokenManager";
 
 // 사용자 정보 타입
 export interface AuthUser {
@@ -48,10 +64,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         "https://dev.wenivops.co.kr/services/mandarin/user/myinfo",
         {
           method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-type": "application/json",
-          },
+          headers: getAuthHeaders(),
         }
       );
 
@@ -60,12 +73,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
       }
 
       const data = await response.json();
-      console.log("📦 myinfo 응답:", data);
+      console.log("📦 사용자 정보:", data);
 
       return data.user;
     } catch (error) {
       console.error("사용자 정보 가져오기 실패:", error);
-      // 토큰이 유효하지 않으면 제거
       removeToken();
       return null;
     }

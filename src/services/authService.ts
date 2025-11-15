@@ -1,5 +1,4 @@
 // API 호출 관리 서비스
-
 const BASE_URL = "https://dev.wenivops.co.kr/services/mandarin";
 const DEFAULT_PROFILE_IMG = "/img/empty-profile.png";
 
@@ -115,8 +114,6 @@ export const login = async (
   password: string
 ): Promise<LoginResponse> => {
   try {
-    console.log("🔐 로그인 API 호출 시작");
-
     const response = await fetch(`${BASE_URL}/user/login`, {
       method: "POST",
       headers: {
@@ -130,10 +127,8 @@ export const login = async (
       }),
     });
 
-    console.log("📡 응답 상태:", response.status);
-
     const data = await response.json();
-    console.log("📦 로그인 응답:", data);
+    console.log("✅ 로그인 성공:", data);
 
     if (!response.ok) {
       throw new Error("로그인에 실패했습니다.");
@@ -147,43 +142,3 @@ export const login = async (
 };
 
 // 프로필 조회/수정 API는 profileService로 이동
-
-// 회원 정보 등록 (첫 로그인 시)
-// export const updateUserProfile = async (
-//   username: string,
-//   accountId: string,
-//   token: string
-// ): Promise<AuthResponse> => {
-//   const response = await fetch(`${BASE_URL}/auth/profile`, {
-//     method: "POST",
-//     headers: {
-//       "Content-Type": "application/json",
-//       Authorization: `Bearer ${token}`,
-//     },
-//     body: JSON.stringify({ username, accountId }),
-//   });
-
-//   if (!response.ok) {
-//     const error = await response.json();
-//     throw new Error(error.message || "회원 정보 등록에 실패했습니다.");
-//   }
-
-//   return response.json();
-// };
-
-// 로그아웃
-// export const logout = async (token: string): Promise<void> => {
-//   try {
-//     // 서버에 로그아웃 요청 (선택사항 - API 명세에 없으면 생략 가능)
-//     // await fetch(`${BASE_URL}/user/logout`, {
-//     //   method: "POST",
-//     //   headers: {
-//     //     Authorization: `Bearer ${token}`,
-//     //   },
-//     // });
-//     // 로컬 토큰 삭제는 항상 실행
-//   } catch (err) {
-//     console.error("로그아웃 요청 오류:", err);
-//     // 서버 요청 실패해도 로컬 토큰은 삭제
-//   }
-// };

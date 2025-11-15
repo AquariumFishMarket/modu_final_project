@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import EditForm from "../../components/common/form/EditForm";
 import {
@@ -5,7 +6,6 @@ import {
   ProductFormData,
 } from "../../components/common/form/types";
 import { useHeader } from "../../contexts/HeaderContext";
-import { useEffect, useRef, useState } from "react";
 import { Product } from "../../types/product";
 import {
   fetchProductDetail,
@@ -88,16 +88,10 @@ export default function ProductEdit() {
     }
   };
 
-  // 기존 데이터를 폼 초기값으로 변환
-  const getInitialValues = (): { [key: string]: string } => {
-    if (!product) return {};
-
-    return {
-      productname: product.itemName,
-      price: formatPrice(product.price.toString()),
-      link: product.link || "",
-    };
-  };
+  // 로딩 상태 처리
+  if (!product) {
+    return <div>상품 정보를 불러오는 중...</div>;
+  }
 
   return (
     <EditForm<ProductFormData>
@@ -106,7 +100,12 @@ export default function ProductEdit() {
       fields={productFields}
       onSubmit={handleSubmit}
       onValidationChange={handleValidationChange}
-      initialValues={getInitialValues()} // 🆕 기존 데이터로 초기화
+      initialValues={{
+        itemName: product.itemName,
+        price: formatPrice(product.price.toString()),
+        link: product.link || "",
+      }}
+      initialImageUrl={product.itemImage || ""}
     />
   );
 }

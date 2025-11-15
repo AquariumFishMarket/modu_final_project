@@ -136,22 +136,22 @@ export const ProfileImageOverlay = styled.div`
 `;
 
 // 수정용 폼에서만 사용하는 스타일
-export const EditImagesContainer = styled.div`
-  display: flex;
-  gap: 10px;
-  height: 100%;
-  width: 100%;
-  overflow-x: auto;
+// export const EditImagesContainer = styled.div`
+//   display: flex;
+//   gap: 10px;
+//   height: 100%;
+//   width: 100%;
+//   overflow-x: auto;
 
-  &::-webkit-scrollbar {
-    height: 4px;
-  }
+//   &::-webkit-scrollbar {
+//     height: 4px;
+//   }
 
-  &::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
-    border-radius: 2px;
-  }
-`;
+//   &::-webkit-scrollbar-thumb {
+//     background: #c1c1c1;
+//     border-radius: 2px;
+//   }
+// `;
 
 export const ImageSlide = styled.div`
   position: relative;

@@ -1,11 +1,14 @@
-import React, { useEffect, useState } from "react";
-import { Product } from "../../types/product";
-import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import styled from "styled-components";
+import { Product } from "../../types/product";
+import { useHeader } from "../../contexts/HeaderContext";
 import {
+  deleteProduct,
   fetchProductDetail,
   toggleProductLike,
 } from "../../services/productService";
+import MoreMenu from "../../components/common/modal/MoreMenu";
 
 // 시간 표시 유틸리티 함수 추가
 const getRelativeTime = (createdAt: string): string => {
@@ -50,13 +53,13 @@ const ProductImage = styled.img`
 //   }
 // `;
 
-const SoldTag = styled.span`
-  display: inline-block;
-  color: var(--color-gray-semi-dark);
-  font-size: var(--font-size-lg);
-  font-weight: 700;
-  margin-right: 5px;
-`;
+// const SoldTag = styled.span`
+//   display: inline-block;
+//   color: var(--color-gray-semi-dark);
+//   font-size: var(--font-size-lg);
+//   font-weight: 700;
+//   margin-right: 5px;
+// `;
 
 const ProductTitle = styled.h2`
   display: inline-block;
@@ -192,9 +195,42 @@ const ContentWrapper = styled.div`
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
+  const { setHeaderConfig } = useHeader();
+  const navigate = useNavigate();
   const [product, setProduct] = useState<Product | null>(null);
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
+  const location = useLocation();
+
+  // 헤더 설정
+  useEffect(() => {
+    if (!product) return;
+
+    setHeaderConfig({
+      show: true,
+      type: "productDetail",
+      onBackClick: () => {
+        // edit에서 돌아온 경우(명시적 상태 확인) 항상 상세로 라우트
+        if (location.state && location.state.cameFromEdit) {
+          navigate(`/product/${id}`);
+        } else {
+          navigate(-1);
+        }
+      },
+      rightElement: (
+        <MoreMenu
+          type="product"
+          authorAccountname={product.author.accountname}
+          onEdit={() =>
+            navigate(`/product/${id}/edit`, {
+              state: { from: `/product/${id}` },
+            })
+          }
+          onDelete={handleDelete}
+        />
+      ),
+    });
+  }, [product, location.state]);
 
   useEffect(() => {
     const loadProduct = async () => {
@@ -275,6 +311,22 @@ export default function ProductDetail() {
     console.log("구매 링크로 이동:", product.link);
   };
 
+  // 상품 삭제
+  const handleDelete = async () => {
+    if (!product || !id) return;
+
+    try {
+      await deleteProduct(id);
+      alert("상품이 삭제되었습니다.");
+      navigate("/profile"); // 프로필 페이지로 이동
+    } catch (error) {
+      console.error("상품 삭제 실패:", error);
+      alert(
+        error instanceof Error ? error.message : "상품 삭제에 실패했습니다."
+      );
+    }
+  };
+
   return (
     <>
       <ContentWrapper>
@@ -298,7 +350,7 @@ export default function ProductDetail() {
           </SellerSection> */}
 
           {/* 판매 완료 태그 */}
-          <SoldTag>거래완료</SoldTag>
+          {/* <SoldTag>거래완료</SoldTag> */}
 
           {/* 상품 정보 */}
           <ProductTitle>{product.itemName}</ProductTitle>
@@ -335,7 +387,9 @@ export default function ProductDetail() {
         </LikeButton>
 
         {product.link && (
-          <ActionButton $variant="buy" onClick={handlePurchase}></ActionButton>
+          <ActionButton $variant="buy" onClick={handlePurchase}>
+            구매하기
+          </ActionButton>
         )}
 
         <ActionButton $variant="chat" onClick={handleChatStart}>

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { getAuthHeaders } from "../utils/auth";
+import { getAuthHeaders } from "../utils/tokenManager";
 
 // API Base URL
 const API_BASE_URL =
@@ -73,7 +73,9 @@ export function useSearch() {
     try {
       // 실제 API 호출
       const response = await fetch(
-        `${API_BASE_URL}/user/searchuser/?keyword=${encodeURIComponent(keyword)}`,
+        `${API_BASE_URL}/user/searchuser/?keyword=${encodeURIComponent(
+          keyword
+        )}`,
         {
           headers: getAuthHeaders(),
           signal: controller.signal,

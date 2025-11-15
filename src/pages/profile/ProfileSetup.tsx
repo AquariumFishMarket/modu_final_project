@@ -79,7 +79,7 @@ export default function ProfileSetup() {
       if (imageFile) {
         imageUrl = await uploadImage(imageFile);
       }
-      await updateProfile(username, accountname, intro, imageUrl, token);
+      await updateProfile(username, accountname, intro, imageUrl);
 
       alert("회원 정보가 등록되었습니다.");
       navigate("/");
