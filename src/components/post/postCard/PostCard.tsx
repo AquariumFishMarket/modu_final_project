@@ -17,9 +17,12 @@ import {
   CarouselDot,
   CarouselButton,
 } from "./PostCard.styled";
+import { Skeleton } from "../../common/Skeleton";
 import PostHeader from "../PostHeader";
 import { formatPostDate } from "../../../utils/formatter/dateFormatter";
 import { useNavigate } from "react-router-dom";
+import { useFeedStore } from "../../../contexts/useFeedStore";
+import ImageBox from "../ImageBox";
 
 interface PostCardProps {
   postId: string;
@@ -67,7 +70,7 @@ const PostCard = forwardRef<HTMLDivElement, PostCardProps>(
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(false);
-
+  const { isLoading } = useFeedStore();
   // 이미지 URL 배열 처리
   const getImageUrls = (imageSrc?: string): string[] => {
     if (!imageSrc) return [];
@@ -225,14 +228,15 @@ const PostCard = forwardRef<HTMLDivElement, PostCardProps>(
           )}
 
           {imageUrls.length === 1 && (
-            <img
-              src={imageUrls[0]}
-              alt={imageAlt || "게시글 이미지"}
-              onError={(e) => {
+              <ImageBox
+                src={imageUrls[0]}
+                alt={imageAlt}
+                onError={(e) => {
                 e.currentTarget.style.display = "none";
               }}
-            />
+              />
           )}
+
         </PostMain>
         <PostFooter>
           <PostActions>

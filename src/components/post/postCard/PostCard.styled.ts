@@ -97,6 +97,15 @@ export const PostTime = styled.time`
   color: var(--color-gray-dark);
 `;
 
+//skeleton ui
+export const LoadSkeleton = styled.div`
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  border-radius: 1rem;
+  overflow: hidden;
+`
+
 // Embla Carousel Styles
 export const ImageCarousel = styled.div`
   position: relative;
