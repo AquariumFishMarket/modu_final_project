@@ -21,8 +21,9 @@ function LayoutContent() {
   const path = location.pathname;
   const { setHeaderConfig } = useHeader();
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
-
+  const { isAuthenticated, isAuthenticatedRef, currentUser } = useAuth();
+  const [isHeader,setIsHeader] = useState(true)
+  const [isFooter,setIsFooter] = useState(true)
   //drag 이벤트
   const [pull, setPull] = useState(0);
   const startYRef = useRef(0);
@@ -36,7 +37,6 @@ function LayoutContent() {
   useEffect(() => {
     const path = location.pathname;
     if (path !== '/feed') return; // main feed 페이지에서만 작동합니다
-    if (!isAuthenticated) return; // 로그인상태가 아니면 작동하지 않습니다
 
     const container = scrollContainerRef.current;
     if (!container) return;
@@ -119,19 +119,6 @@ function LayoutContent() {
   // 경로별 헤더 자동 설정
   useEffect(() => {
     const path = location.pathname;
-
-    // Header를 숨길 경로들 (가장 먼저 체크)
-    if (
-      path === "/login" ||
-      path === "/login/email" ||
-      path === "/signup" ||
-      path === "/profile/setup" ||
-      path === "/404" ||
-      !isAuthenticated
-    ) {
-      setHeaderConfig({ show: false });
-      return;
-    }
 
     // 팔로우 페이지 - 자체적으로 헤더 관리
     if (path.match(/^\/profile\/[^/]+\/(followers|following)$/)) {
@@ -247,25 +234,30 @@ function LayoutContent() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
 
-  // Nav 있을 부분
-  const shouldShowNav = (): boolean => {
-    const showNavPaths = ["/", "/feed", "/search", "/chat-list"];
+  useEffect(()=>{
+    const shouldShowHeader = ():boolean => {
+      if( path === "/login" ||
+        path === "/login/email" ||
+        path === "/signup" ||
+        path === "/profile/setup" ||
+        path === "/404" || !isAuthenticatedRef.current
+      ) { return false } else { return true }
+    }
+    const shouldShowNav = (): boolean => {
+      const showNavPaths = ["/", "/feed", "/search", "/chat-list"];
 
-    // 프로필 페이지인지 체크 (동적 라우트 포함)
-    const isProfilePath =
-      path === "/profile" || path.match(/^\/profile\/[^/]+$/);
+      const isProfilePath =
+        path === "/profile" || path.match(/^\/profile\/[^/]+$/);
 
-    return (showNavPaths.includes(path) || !!isProfilePath) && isAuthenticated;
-  };
+      return (showNavPaths.includes(path) || !!isProfilePath) && isAuthenticatedRef.current;
+    };
 
-  const shouldShowHeader = ():boolean => {
-    if( path === "/login" ||
-      path === "/login/email" ||
-      path === "/signup" ||
-      path === "/profile/setup" ||
-      path === "/404" || !isAuthenticated
-    ) { return false; } else { return true }
-  }
+    setIsHeader(shouldShowHeader())
+    setIsFooter(shouldShowNav())
+
+  },[currentUser])
+
+
 
   const isProfilePage =
     location.pathname === "/profile" ||
@@ -276,7 +268,7 @@ function LayoutContent() {
     return (
       <>
         <LayoutContainer $isProfile={isProfilePage}>
-          {shouldShowHeader() && <Header />}
+          {isHeader && <Header />}
         {pull !==0 && (
           <RefreshAlert $letter={isLetterRef.current} $height={pull}>
             <div style={{ position: 'relative' }}>
@@ -293,7 +285,7 @@ function LayoutContent() {
           <AnimatePresence mode="wait">
             <MainContent
               key={location.pathname}
-              $hasFooter={shouldShowNav()}
+              $hasFooter={isFooter}
               $isProfile={isProfilePage}
               $isPostDetail={!!isPostDetailPage}
               as={motion.main}
@@ -306,7 +298,7 @@ function LayoutContent() {
               <Outlet />
             </MainContent>
           </AnimatePresence>
-          {shouldShowNav() && <FooterNav />}
+          {isFooter && <FooterNav />}
         </LayoutContainer>
         {/* 플로팅 챗봇 - position: fixed로 전역에 표시 */}
         <FloatingChatbot />

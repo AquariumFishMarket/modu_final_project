@@ -10,7 +10,7 @@
  * - refreshUserInfo() → API 호출해서 최신 정보 가져오기
  */
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useRef } from "react";
 import {
   getToken,
   saveToken,
@@ -28,11 +28,14 @@ export interface AuthUser {
   intro: string;
 }
 
+const isAuthenticatedRef = { current : false }
+
 // Context 타입 정의
 interface AuthContextType {
   currentUser: AuthUser | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  isAuthenticatedRef: typeof isAuthenticatedRef;
   login: (token: string, user: AuthUser) => void;
   logout: () => void;
   updateUser: (user: Partial<AuthUser>) => void;
@@ -51,6 +54,7 @@ interface AuthProviderProps {
 export function AuthProvider({ children }: AuthProviderProps) {
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+
 
   // 사용자 정보 가져오기
   const fetchUserInfo = async (): Promise<AuthUser | null> => {
@@ -90,8 +94,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const user = await fetchUserInfo();
       setCurrentUser(user);
       setIsLoading(false);
+      isAuthenticatedRef.current = !!user;
     };
-
     initAuth();
   }, []);
 
@@ -122,6 +126,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const user = await fetchUserInfo();
     if (user) {
       setCurrentUser(user);
+      isAuthenticatedRef.current = !!user;
     }
   };
 
@@ -129,6 +134,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     currentUser,
     isAuthenticated: !!currentUser,
     isLoading,
+    isAuthenticatedRef,
     login,
     logout,
     updateUser,
