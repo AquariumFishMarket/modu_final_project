@@ -17,10 +17,12 @@ import {
   CarouselDot,
   CarouselButton,
 } from "./PostCard.styled";
+import { Skeleton } from "../../common/Skeleton";
 import PostHeader from "../PostHeader";
 import { formatPostDate } from "../../../utils/formatter/dateFormatter";
 import { useNavigate } from "react-router-dom";
 import { useFeedStore } from "../../../contexts/useFeedStore";
+import ImageBox from "../ImageBox";
 
 interface PostCardProps {
   postId: string;
@@ -163,7 +165,6 @@ const PostCard = forwardRef<HTMLDivElement, PostCardProps>(
                 <ImageCarouselContainer>
                   {imageUrls.map((url, index) => (
                     <ImageCarouselSlide key={index}>
-                      {url ? 'ㅇㅇ' : 'ㄴㄴ'}
                       <img
                         src={url}
                         alt={`${imageAlt || "게시글 이미지"} ${index + 1}`}
@@ -227,14 +228,15 @@ const PostCard = forwardRef<HTMLDivElement, PostCardProps>(
           )}
 
           {imageUrls.length === 1 && (
-            <img
-              src={imageUrls[0]}
-              alt={imageAlt || "게시글 이미지"}
-              onError={(e) => {
+              <ImageBox
+                src={imageUrls[0]}
+                alt={imageAlt}
+                onError={(e) => {
                 e.currentTarget.style.display = "none";
               }}
-            />
+              />
           )}
+
         </PostMain>
         <PostFooter>
           <PostActions>
