@@ -87,7 +87,7 @@ export default function RootRoute() {
             }
           />
           <Route
-            path="/profile/:userId/:type"
+            path="/profile/:accountname/:type"
             element={
               <GuestRoute>
                 <Follow key={location.pathname} />
@@ -95,7 +95,7 @@ export default function RootRoute() {
             }
           />
           <Route
-            path="/profile/:userId"
+            path="/profile/:accountname"
             element={
               <GuestRoute>
                 <Profile key={location.pathname} />

@@ -33,7 +33,7 @@ function SellingProducts({
   accountname,
 }: SellingProductsProps) {
   const navigate = useNavigate();
-  const params = useParams<{ userId?: string }>();
+  const params = useParams<{ accountname?: string }>();
   const { currentUser } = useAuth();
 
   const [products, setProducts] = useState<Product[]>([]);
@@ -53,7 +53,7 @@ function SellingProducts({
 
     const fetchProducts = async () => {
       const targetAccountname =
-        accountname || params.userId || currentUser?.accountname;
+        accountname || params.accountname || currentUser?.accountname;
 
       if (!targetAccountname) {
         console.error("accountname이 없습니다");
@@ -83,7 +83,7 @@ function SellingProducts({
     fetchProducts();
 
     return () => controller.abort();
-  }, [accountname, params.userId, currentUser?.accountname]);
+  }, [accountname, params.accountname, currentUser?.accountname]);
 
   // 드래그 스크롤 시작 (마우스)
   const handleMouseDown = (e: React.MouseEvent) => {

@@ -58,6 +58,7 @@ export const fetchProfile = async (
     if (!response.ok) throw new Error("프로필을 불러올 수 없습니다");
 
     const data = await response.json();
+
     // 내 프로필: data.user, 타인 프로필: data.profile
     return accountname && accountname !== currentUserAccountname
       ? data.profile
