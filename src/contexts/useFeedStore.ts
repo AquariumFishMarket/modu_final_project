@@ -9,11 +9,13 @@ interface FeedStore {
   hasMore: boolean;
   isInitialLized: boolean;
   isFetching: boolean;
+  isLoading: boolean;
 
   setFeedList: (list: any[]) => void;
   setSkip: (value: number) => void;
   setIsRefreshing: (value: boolean) => void;
   setIsInitialLoading: (value: boolean) => void;
+  setIsLoading: (value: boolean) => void;
 
   refreshFeed: () => void;
   fetchFeeds: (isLoadMore?: boolean) => Promise<void>;
@@ -29,11 +31,13 @@ export const useFeedStore = create<FeedStore>((set, get) => ({
   hasMore: true,
   isInitialLized: false,
   isFetching: false,
+  isLoading: true,
 
   setFeedList: (list) => set({ feedList: list }),
   setSkip: (val) => set({ skip: val }),
   setIsRefreshing: (value) => set({ isRefreshing: value }),
   setIsInitialLoading: (value) => set({ isInitialLoading: value }),
+  setIsLoading: (value) => set({ isLoading: value }),
 
   refreshFeed: async () => {
     set({
@@ -41,6 +45,7 @@ export const useFeedStore = create<FeedStore>((set, get) => ({
       skip: 0,
       feedList: [],
       hasMore: true,
+      isLoading: true,
       isInitialLoading: true,
       isInitialLized: false,
     });
@@ -55,7 +60,7 @@ export const useFeedStore = create<FeedStore>((set, get) => ({
 
     if (get().isFetching) return;
 
-    const { skip, isRefreshing, hasMore } = get();
+    const { skip, isRefreshing, hasMore, isLoading } = get();
 
     if (isLoadMore && (isRefreshing || !hasMore)) return;
 
@@ -63,7 +68,7 @@ export const useFeedStore = create<FeedStore>((set, get) => ({
       isFetching: true,
       ...(isLoadMore ? { isRefreshing: true } : {}),
     });
-
+      console.log(isLoading + '로딩😭')
     try {
       const query = new URLSearchParams();
       const limit = 5;
@@ -122,6 +127,7 @@ export const useFeedStore = create<FeedStore>((set, get) => ({
           isInitialLoading: false,
           isRefreshing: false,
           hasMore: serverCount === limit,
+          isLoading: false,
           isInitialLized: true,
           isFetching: false,
         };

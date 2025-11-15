@@ -20,6 +20,7 @@ import {
 import PostHeader from "../PostHeader";
 import { formatPostDate } from "../../../utils/formatter/dateFormatter";
 import { useNavigate } from "react-router-dom";
+import { useFeedStore } from "../../../contexts/useFeedStore";
 
 interface PostCardProps {
   postId: string;
@@ -67,7 +68,7 @@ const PostCard = forwardRef<HTMLDivElement, PostCardProps>(
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(false);
-
+  const { isLoading } = useFeedStore();
   // 이미지 URL 배열 처리
   const getImageUrls = (imageSrc?: string): string[] => {
     if (!imageSrc) return [];
@@ -156,6 +157,7 @@ const PostCard = forwardRef<HTMLDivElement, PostCardProps>(
         <PostMain onClick={handleCardClick}>
           {content && <figcaption>{content}</figcaption>}
 
+          {isLoading && '로딩중'}
           {imageUrls.length > 1 && (
             <ImageCarousel>
               <ImageCarouselViewport ref={emblaRef}>
