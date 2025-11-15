@@ -4,6 +4,7 @@ import styled from "styled-components";
 import { Link, useNavigate } from "react-router-dom";
 import { signup, login } from "../../services/authService";
 import { saveToken } from "../../utils/tokenManager";
+import { useAuth } from "../../contexts/AuthContext";
 import {
   validateEmail,
   validatePassword,
@@ -35,6 +36,7 @@ export default function Signup() {
   const navigate = useNavigate();
   const [formError, setFormError] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { refreshUserInfo } = useAuth();
 
   // 회원가입 폼 필드 설정 (validator 연결)
   const signupFields = [
@@ -79,7 +81,10 @@ export default function Signup() {
 
       saveToken(loginResult.token);
 
+      await refreshUserInfo(); // 사용자 정보 즉시 갱신
+
       alert("회원가입이 완료되었습니다. 프로필을 설정해주세요.");
+
       navigate("/profile/setup");
     } catch (error) {
       // 실패 시 alert 대신 하단 메시지로만 표시

@@ -51,6 +51,31 @@ export const formatPrice = (price: string): string => {
   return parseInt(numbersOnly).toLocaleString();
 };
 
+// URL 유효성 검사
+export const validateProductLink = (link: string): string | null => {
+  const trimmedLink = link.trim();
+
+  if (!trimmedLink) {
+    return "판매 링크를 입력해주세요.";
+  }
+
+  // URL 형식 검사 (http:// 또는 https://로 시작)
+  const urlPattern = /^https?:\/\/.+/i;
+
+  if (!urlPattern.test(trimmedLink)) {
+    return "올바른 URL 형식이 아닙니다. (http:// 또는 https://로 시작해야 합니다)";
+  }
+
+  // 유효한 URL인지 추가 검사
+  try {
+    new URL(trimmedLink);
+  } catch {
+    return "유효하지 않은 URL입니다.";
+  }
+
+  return null;
+};
+
 // 상품 설명 유효성 검사 (10-500자)
 // export const validateDescription = (description: string): string | null => {
 //   const trimmedDesc = description.trim();
@@ -91,8 +116,9 @@ export const getProductFields = () => {
     {
       name: "link",
       label: "판매 링크",
-      placeholder: "URL을 입력해 주세요.",
-      required: false,
+      placeholder: "https://example.com",
+      required: true,
+      validator: validateProductLink,
     },
     // {
     //   name: "description",

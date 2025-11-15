@@ -8,9 +8,9 @@ export interface Product {
   createdAt: string;
   updatedAt: string;
   author: Author;
+  status?: "selling" | "sold"; // 판매 상태
   /* 나중에 구현할 필드들 */
   // itemImage: string | string[];
-  // status: "selling" | "sold" /* 추가 */;
   // description: string;
   // interactions?: {
   //   views: number;

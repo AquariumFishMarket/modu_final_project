@@ -106,15 +106,18 @@ export interface BaseFormProps<T extends FormData = FormData> {
 /**
  * CreateForm Props (새로 생성)
  */
-export interface CreateFormProps<T extends FormData = FormData> extends BaseFormProps<T> {
+export interface CreateFormProps<T extends FormData = FormData>
+  extends BaseFormProps<T> {
   buttonText?: string;
   disabled?: boolean;
+  imageRequired?: boolean; // 상품 이미지 필수 여부
 }
 
 /**
  * EditForm Props (수정)
  */
-export interface EditFormProps<T extends FormData = FormData> extends BaseFormProps<T> {
+export interface EditFormProps<T extends FormData = FormData>
+  extends BaseFormProps<T> {
   initialValues?: Record<string, string>;
   initialImageUrl?: string;
 }

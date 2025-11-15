@@ -135,24 +135,6 @@ export const ProfileImageOverlay = styled.div`
   z-index: 10;
 `;
 
-// 수정용 폼에서만 사용하는 스타일
-// export const EditImagesContainer = styled.div`
-//   display: flex;
-//   gap: 10px;
-//   height: 100%;
-//   width: 100%;
-//   overflow-x: auto;
-
-//   &::-webkit-scrollbar {
-//     height: 4px;
-//   }
-
-//   &::-webkit-scrollbar-thumb {
-//     background: #c1c1c1;
-//     border-radius: 2px;
-//   }
-// `;
-
 export const ImageSlide = styled.div`
   position: relative;
   flex: 0 0 auto;
@@ -205,4 +187,11 @@ export const ImageCountBadge = styled.div`
   background-color: rgba(255, 255, 255, 0.8);
   padding: 2px 8px;
   border-radius: 12px;
+`;
+
+export const ImageLabel = styled.div`
+  font-size: var(--font-size-md);
+  font-weight: 500;
+  margin-bottom: -6px;
+  color: var(--color-gray-dark);
 `;

@@ -59,7 +59,10 @@ function Profile() {
   const [isFollowLoading, setIsFollowLoading] = useState(false);
 
   const currentUserAccountname = currentUser?.accountname || "";
-  const targetAccountname = paramAccountname || currentUserAccountname;
+  const targetAccountname =
+    paramAccountname && paramAccountname.trim() !== ""
+      ? paramAccountname
+      : currentUserAccountname;
   const isMyProfile = targetAccountname === currentUserAccountname;
 
   // 🔄 팔로우/언팔로우 처리 (낙관적 업데이트)
@@ -179,8 +182,11 @@ function Profile() {
       try {
         let profileToLoad;
 
+        console.log("targetAccountname: ", targetAccountname);
+
         // 내 프로필인 경우 currentUser 사용
         if (isMyProfile) {
+          console.log("👤 내 프로필 로드");
           profileToLoad = {
             _id: currentUser._id,
             username: currentUser.username,
@@ -311,7 +317,7 @@ function Profile() {
 
               {/* 채팅 버튼 */}
               <IconButton
-                $iconUrl="/img/message-circle.svg"
+                $iconUrl="/img/icon-message.svg"
                 onClick={handleChatClick}
                 aria-label="채팅하기"
               />

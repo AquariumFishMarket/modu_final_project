@@ -24,6 +24,7 @@ import {
   RequiredCheck,
   ProfileImageOverlay,
   ProfileImageWrapper,
+  ImageLabel,
 } from "./Form.styled";
 
 function CreateFormInner<T extends FormData>(
@@ -38,6 +39,7 @@ function CreateFormInner<T extends FormData>(
     onValidationChange,
     buttonText = "등록",
     disabled = false,
+    imageRequired = false,
   } = props;
   // 초기값은 모두 빈 문자열
   const [formValues, setFormValues] = useState(() => {
@@ -89,8 +91,18 @@ function CreateFormInner<T extends FormData>(
       (status) => status === "checking"
     );
 
-    return allRequiredFilled && hasNoErrors && !isChecking;
-  }, [fields, formValues, errors, validationStatus]); // 실제 의존성
+    // 이미지 필수
+    const imageValid = !imageRequired || hasSelectedImage;
+
+    return allRequiredFilled && hasNoErrors && !isChecking && imageValid;
+  }, [
+    fields,
+    formValues,
+    errors,
+    validationStatus,
+    imageRequired,
+    hasSelectedImage,
+  ]); // 실제 의존성
 
   // useEffect에서 안전하게 사용
   useEffect(() => {
@@ -228,6 +240,14 @@ function CreateFormInner<T extends FormData>(
       <InputForm onSubmit={handleSubmit}>
         <legend className="sr-only">사용자 설정</legend>
 
+        {/* 이미지 필드 라벨 (상품일 때만 표시) */}
+        {formType === "product" && imageRequired && (
+          <ImageLabel>
+            상품 이미지
+            <RequiredCheck>*</RequiredCheck>
+          </ImageLabel>
+        )}
+
         <FormImgContainer
           $formType={formType}
           $hasSelectedImage={hasSelectedImage}
@@ -340,8 +360,6 @@ function CreateFormInner<T extends FormData>(
 
         {showButton && formType === "profile" && (
           <DefaultButton
-            // text="저장"
-            // disabled={!isFormValid}
             text={buttonText || "저장"}
             disabled={disabled ?? !isFormValid}
             onClick={handleButtonClick}
