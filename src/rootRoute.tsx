@@ -36,112 +36,158 @@ export default function RootRoute() {
         <Route path="/" element={<Splash />} />
         <Route element={<GlobalLayout />}>
           {/* 로그인, 회원가입 */}
-          <Route path="/login" element={
-            <MemberRoute>
-              <Login />
-            </MemberRoute>
-            } />
-          <Route path="/login/email" element={
-            <MemberRoute>
-              <LoginEmail />
-            </MemberRoute>
+          <Route
+            path="/login"
+            element={
+              <MemberRoute>
+                <Login />
+              </MemberRoute>
             }
-            />
-          <Route path="/signup" element={
-            <MemberRoute>
-              <Signup />
-            </MemberRoute>
-          } />
+          />
+          <Route
+            path="/login/email"
+            element={
+              <MemberRoute>
+                <LoginEmail />
+              </MemberRoute>
+            }
+          />
+          <Route
+            path="/signup"
+            element={
+              <MemberRoute>
+                <Signup />
+              </MemberRoute>
+            }
+          />
           {/* 피드 */}
-          <Route path="/feed" element={
-            <GuestRoute>
-              <FeedPage />
-            </GuestRoute>
-            } />
+          <Route
+            path="/feed"
+            element={
+              <GuestRoute>
+                <FeedPage />
+              </GuestRoute>
+            }
+          />
           {/* 프로필 */}
-          <Route path="/profile/setup" element={
-
-              <ProfileSetup />
-
-          } />
-          <Route path="/profile/edit" element={
-            <GuestRoute>
-              <ProfileEdit />
-            </GuestRoute>
-            } />
+          <Route
+            path="/profile/setup"
+            element={
+              <GuestRoute>
+                <ProfileSetup />
+              </GuestRoute>
+            }
+          />
+          <Route
+            path="/profile/edit"
+            element={
+              <GuestRoute>
+                <ProfileEdit />
+              </GuestRoute>
+            }
+          />
           <Route
             path="/profile/:userId/:type"
             element={
-            <GuestRoute>
-              <Follow key={location.pathname} />
-            </GuestRoute>
+              <GuestRoute>
+                <Follow key={location.pathname} />
+              </GuestRoute>
             }
           />
           <Route
             path="/profile/:userId"
             element={
-            <GuestRoute>
-              <Profile key={location.pathname} />
-            </GuestRoute>
+              <GuestRoute>
+                <Profile key={location.pathname} />
+              </GuestRoute>
             }
           />
           <Route
             path="/profile"
             element={
-            <GuestRoute>
-              <Profile key={location.pathname} />
-            </GuestRoute>
+              <GuestRoute>
+                <Profile key={location.pathname} />
+              </GuestRoute>
             }
           />
           {/* 메인 피드, 검색 */}
-          <Route path="/search" element={
-            <GuestRoute>
-              <SearchPage />
-            </GuestRoute>} />
+          <Route
+            path="/search"
+            element={
+              <GuestRoute>
+                <SearchPage />
+              </GuestRoute>
+            }
+          />
           {/* 상품 */}
-          <Route path="/product" element={
-            <GuestRoute>
-              <ProductAdd />
-            </GuestRoute>} />
-          <Route path="/product/:id/edit" element={
-            <GuestRoute>
-              <ProductEdit />
-            </GuestRoute>
-            } />
-          <Route path="/product/:id" element={
-            <GuestRoute>
-              <ProductDetail />
-            </GuestRoute>
-            } />
+          <Route
+            path="/product"
+            element={
+              <GuestRoute>
+                <ProductAdd />
+              </GuestRoute>
+            }
+          />
+          <Route
+            path="/product/:id/edit"
+            element={
+              <GuestRoute>
+                <ProductEdit />
+              </GuestRoute>
+            }
+          />
+          <Route
+            path="/product/:id"
+            element={
+              <GuestRoute>
+                <ProductDetail />
+              </GuestRoute>
+            }
+          />
           {/* 게시글 */}
-          <Route path="/post" element={
-            <GuestRoute>
-              <PostWrite />
-            </GuestRoute>
-              } />
+          <Route
+            path="/post"
+            element={
+              <GuestRoute>
+                <PostWrite />
+              </GuestRoute>
+            }
+          />
           {/* 게시글 수정 */}
-          <Route path="/post/:postId/edit" element={
-            <GuestRoute>
-              <PostWrite />
-            </GuestRoute>
-            } />
+          <Route
+            path="/post/:postId/edit"
+            element={
+              <GuestRoute>
+                <PostWrite />
+              </GuestRoute>
+            }
+          />
           {/* 상세게시글 */}
-          <Route path="/post/:postId" element={
-            <GuestRoute>
-              <PostDetail />
-            </GuestRoute>
-            } />
+          <Route
+            path="/post/:postId"
+            element={
+              <GuestRoute>
+                <PostDetail />
+              </GuestRoute>
+            }
+          />
           {/* 채팅 */}
-          <Route path="/chat-list" element={
-            <GuestRoute>
-              <ChatList />
-            </GuestRoute>
-            } />
-          <Route path="/chat-room/:roomId" element={
-            <GuestRoute>
-              <ChatRoom />
-            </GuestRoute>
-            } />
+          <Route
+            path="/chat-list"
+            element={
+              <GuestRoute>
+                <ChatList />
+              </GuestRoute>
+            }
+          />
+          <Route
+            path="/chat-room/:roomId"
+            element={
+              <GuestRoute>
+                <ChatRoom />
+              </GuestRoute>
+            }
+          />
           {/* 에러 페이지 */}
           <Route path="/404" element={<ErrPage />} />
         </Route>
