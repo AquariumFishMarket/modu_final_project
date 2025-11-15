@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import {
   PostHeader as StyledPostHeader,
   UserInfo,
-  UserAvatar,
   UserDetails,
   UserName,
   UserId,
@@ -11,6 +10,7 @@ import {
 import MoreMenu from "../common/modal/MoreMenu";
 import { formatPostDate } from "../../utils/formatter/dateFormatter";
 import { deletePost, EditPost } from "../../services/postService";
+import UserAvatarBox from "./UserAvatar";
 
 interface PostHeaderProps {
   userName: string;
@@ -75,11 +75,11 @@ function PostHeader({
         {variant === "comment" ? "댓글 작성자 정보" : "게시자 정보"}
       </h2>
       <UserInfo>
-        <UserAvatar
-          src={imgSrc || "/img/fish-logo-GB.png"}
+        <UserAvatarBox
+          src={imgSrc}
           alt={avatarAlt}
           onError={handleImageError}
-          $variant={variant}
+          variant={variant}
         />
         {variant === "comment" ? (
           <>

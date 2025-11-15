@@ -3,7 +3,7 @@ import { Skeleton } from "../common/Skeleton";
 import { LoadSkeleton } from "./postCard/PostCard.styled";
 
 interface ImageBox{
-    src: string;
+    src?: string;
     alt?: string;
     onError:(e:React.SyntheticEvent<HTMLImageElement>)=>void;
 }

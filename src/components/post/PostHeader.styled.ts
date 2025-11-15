@@ -23,6 +23,14 @@ export const UserAvatar = styled.img<{ $variant?: "post" | "comment" }>`
   border: 0.5px solid var(--color-gray-medium);
 `;
 
+export const EmptyUserAvatar = styled.div<{$variant?: "post"|"comment"}>`
+  width: ${(props) => (props.$variant === "comment" ? "3.6rem" : "4.2rem")};
+  height: ${(props) => (props.$variant === "comment" ? "3.6rem" : "4.2rem")};
+  border-radius: 50%;
+  overflow: hidden;
+  border: 0.5px solid var(--color-gray-medium);
+`
+
 export const UserDetails = styled.div`
   display: flex;
   flex-direction: column;
