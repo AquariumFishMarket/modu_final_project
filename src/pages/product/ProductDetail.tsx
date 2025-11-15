@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 import { Product } from "../../types/product";
 import { useHeader } from "../../contexts/HeaderContext";
@@ -249,7 +249,6 @@ export default function ProductDetail() {
   const [product, setProduct] = useState<Product | null>(null);
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
-  const location = useLocation();
 
   // 헤더 설정
   useEffect(() => {
@@ -258,14 +257,7 @@ export default function ProductDetail() {
     setHeaderConfig({
       show: true,
       type: "productDetail",
-      onBackClick: () => {
-        // edit에서 돌아온 경우(명시적 상태 확인) 항상 상세로 라우트
-        if (location.state && location.state.cameFromEdit) {
-          navigate(`/product/${id}`);
-        } else {
-          navigate(-1);
-        }
-      },
+      onBackClick: () => navigate(`/profile`),
       rightElement: (
         <MoreMenu
           type="product"
@@ -280,7 +272,7 @@ export default function ProductDetail() {
         />
       ),
     });
-  }, [product, location.state]);
+  }, [product]);
 
   useEffect(() => {
     const loadProduct = async () => {
