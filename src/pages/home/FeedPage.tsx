@@ -1,6 +1,5 @@
 import { useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
 
 import { InitialLoadingSection } from "./FeedPage.styled";
 import PostCard from "../../components/post/postCard/PostCard";
@@ -8,6 +7,8 @@ import PostCard from "../../components/post/postCard/PostCard";
 import { useFeedStore } from "../../contexts/useFeedStore";
 import { useAuth } from "../../contexts/AuthContext";
 import { reportPost } from "../../services/postService";
+
+import SkeletonWrapper from "../../components/common/SkeletonWrapper";
 
 const FeedPage = () => {
   const navigate = useNavigate();
@@ -77,15 +78,15 @@ const FeedPage = () => {
     [fetchFeeds]
   );
 
-  if (isLoading) {
-    return (
-        <main>
-          <InitialLoadingSection>
-            <p>불러오는 중...</p>
-          </InitialLoadingSection>
-        </main>
-    );
-  }
+  // if (isLoading) {
+  //   return (
+  //       <main>
+  //         <InitialLoadingSection>
+  //           <p>불러오는 중...</p>
+  //         </InitialLoadingSection>
+  //       </main>
+  //   );
+  // }
 
   return (
     <>
@@ -122,7 +123,7 @@ const FeedPage = () => {
         </div>
       )}
 
-      {!isRefreshing && (
+      {!hasMore && (
         <div style={{ textAlign: "center", padding: "20px", color: "#999" }}>
           마지막 페이지입니다.
         </div>
