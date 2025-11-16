@@ -15,22 +15,53 @@ import DefaultButton from "../common/buttons/Button";
 
 import { useHeader } from "../../contexts/HeaderContext";
 import { useSearchContext } from "../../contexts/SearchContext";
+import { useLocation, useNavigate } from "react-router-dom";
 
 function Header() {
   const { config } = useHeader();
   const { inputValue, handleInputChange, clearSearch } = useSearchContext();
+  const location = useLocation();
+  const navigate = useNavigate();
 
-  // Header를 숨길 경우 아무것도 렌더링하지 않음
-  if (!config.show) {
-    return null;
+  // URL 기준으로 팔로워 / 팔로잉 페이지 판별
+  const isFollowerPage = location.pathname.endsWith("/follower");
+  const isFollowingPage = location.pathname.endsWith("/following");
+
+  if (!config.show) return null;
+
+  if (isFollowerPage) {
+    return (
+      <HeaderContainer>
+        <SectionCombine>
+          <BackButton onClick={() => navigate(-1)}>
+            <img src="/img/icon-arrow-left.svg" alt="이전 페이지로 이동" />
+          </BackButton>
+          <SubTitle>팔로워</SubTitle>
+        </SectionCombine>
+      </HeaderContainer>
+    );
   }
 
+  if (isFollowingPage) {
+    return (
+      <HeaderContainer>
+        <SectionCombine>
+          <BackButton onClick={() => navigate(-1)}>
+            <img src="/img/icon-arrow-left.svg" alt="이전 페이지로 이동" />
+          </BackButton>
+          <SubTitle>팔로잉</SubTitle>
+        </SectionCombine>
+      </HeaderContainer>
+    );
+  }
+
+  // 그 외 페이지는 기존 로직 유지
   return (
     <HeaderContainer>
       <h1 className="sr-only">물고기 마켓</h1>
 
       {/* 피드 */}
-      {(!config.type || config.type === "feed") && (
+      {config.type === "feed" && (
         <Section>
           <Title>{config.title || "물고기마켓 피드"}</Title>
           <IconButton onClick={config.onSearchClick}>
@@ -45,7 +76,7 @@ function Header() {
           <AllyHiddenTitle>검색</AllyHiddenTitle>
           <SearchForm
             onSubmit={(e) => {
-              e.preventDefault(); // 폼 제출 방지
+              e.preventDefault();
             }}
           >
             <BackButton
@@ -63,9 +94,7 @@ function Header() {
               value={inputValue}
               onChange={(e) => handleInputChange(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault(); // 엔터키로 폼 제출 방지
-                }
+                if (e.key === "Enter") e.preventDefault();
               }}
               onBlur={() => {
                 if (!inputValue.trim()) {
@@ -75,26 +104,6 @@ function Header() {
             />
           </SearchForm>
         </Section>
-      )}
-
-      {/* 팔로워 목록 */}
-      {config.type === "followers" && (
-        <SectionCombine>
-          <BackButton onClick={config.onBackClick}>
-            <img src="/img/icon-arrow-left.svg" alt="이전 페이지로 이동" />
-          </BackButton>
-          <SubTitle>{config.title || "Followers"}</SubTitle>
-        </SectionCombine>
-      )}
-
-      {/* 팔로잉 목록 */}
-      {config.type === "following" && (
-        <SectionCombine>
-          <BackButton onClick={config.onBackClick}>
-            <img src="/img/icon-arrow-left.svg" alt="이전 페이지로 이동" />
-          </BackButton>
-          <SubTitle>{config.title || "Following"}</SubTitle>
-        </SectionCombine>
       )}
 
       {/* 프로필 */}
@@ -176,7 +185,7 @@ function Header() {
         </Section>
       )}
 
-      {/* 채팅 목록*/}
+      {/* 채팅 목록 */}
       {config.type === "chatList" && (
         <Section>
           <IconButton onClick={config.onBackClick}>

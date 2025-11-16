@@ -10,6 +10,7 @@ import React, {
 export type HeaderType =
   | "feed"
   | "search"
+  | "follower"
   | "followers"
   | "following"
   | "profile"

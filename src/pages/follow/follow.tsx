@@ -1,6 +1,6 @@
+// src/pages/follow/Follow.tsx
 import { useEffect, useState, useCallback } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { useHeader } from "../../contexts/HeaderContext";
+import { useParams, useLocation } from "react-router-dom";
 import FollowUserCard from "../../components/common/follow/FollowUserCard";
 import type { FollowUser } from "../../types/follow";
 import {
@@ -9,56 +9,34 @@ import {
   toggleFollow,
 } from "../../services/followService";
 import { FollowListContainer, EmptyState } from "./follow.styled";
+import { useFollowStore } from "../../contexts/followStore";
 
 function Follow() {
-  const navigate = useNavigate();
-  const { userId, type } = useParams<{
-    userId: string;
-    type: "followers" | "following";
-  }>();
+  const location = useLocation();
+  const { accountname } = useParams<{ accountname: string }>();
 
-  const { setHeaderConfig } = useHeader();
+  const updateFollowStore = useFollowStore((state) => state.updateFollow);
+
   const [users, setUsers] = useState<FollowUser[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // ✔ 헤더 설정
+  const isFollowerPage = location.pathname.endsWith("/follower");
+
+  // 목록 로드
   useEffect(() => {
-    if (!type || !userId) return;
+    if (!accountname) return;
 
-    if (type !== "followers" && type !== "following") {
-      navigate("/404", { replace: true });
-      return;
-    }
-
-    const isFollowers = type === "followers";
-
-    setHeaderConfig({
-      show: true,
-      type,
-      title: isFollowers ? "팔로워" : "팔로잉",
-      onBackClick: () => navigate(`/profile/${userId}`),
-    });
-  }, [type, userId, navigate]);
-
-  // ✔ 데이터 로드
-  useEffect(() => {
-    if (!type || !userId) return;
-
-    const isFollowers = type === "followers";
-
-    const loadFollowList = async () => {
+    const load = async () => {
       setIsLoading(true);
       setError(null);
 
       try {
-        const data = isFollowers
-          ? await fetchFollowers(userId)
-          : await fetchFollowing(userId);
-
+        const data = isFollowerPage
+          ? await fetchFollowers(accountname)
+          : await fetchFollowing(accountname);
         setUsers(data);
       } catch (err) {
-        console.error("팔로우 목록 로드 실패:", err);
         setError("목록을 불러오는데 실패했습니다.");
         setUsers([]);
       } finally {
@@ -66,47 +44,54 @@ function Follow() {
       }
     };
 
-    loadFollowList();
-  }, [type, userId]);
+    load();
+  }, [accountname, isFollowerPage]);
 
-  // ✔ 팔로우 토글 (낙관적 업데이트)
+  // 팔로우 토글
   const handleFollowToggle = useCallback(
-    async (targetUserId: string) => {
-      const target = users.find((u) => u.userId === targetUserId);
+    async (targetAccountname: string) => {
+      const target = users.find((u) => u.userId === targetAccountname);
       if (!target) return;
 
-      const prevUsers = [...users]; // 롤백용 복사본
+      const prevUsers = [...users];
 
-      // 즉시 UI 반영
       setUsers((prev) =>
         prev.map((u) =>
-          u.userId === targetUserId ? { ...u, isFollowing: !u.isFollowing } : u
+          u.userId === targetAccountname
+            ? { ...u, isFollowing: !u.isFollowing }
+            : u
         )
       );
 
       try {
-        await toggleFollow(targetUserId, target.isFollowing);
+        await toggleFollow(targetAccountname, target.isFollowing);
+
+        updateFollowStore({
+          accountname: targetAccountname,
+          isfollow: !target.isFollowing,
+          followerCountDiff: target.isFollowing ? -1 : 1,
+        });
       } catch (err) {
-        console.error("팔로우 처리 실패:", err);
-        setUsers(prevUsers); // 실패 시 롤백
+        setUsers(prevUsers);
       }
     },
-    [users]
+    [users, updateFollowStore]
   );
 
   return (
     <FollowListContainer>
       {isLoading && <EmptyState>불러오는 중...</EmptyState>}
-
-      {!isLoading && users.length === 0 && (
+      {!isLoading && error && <EmptyState>{error}</EmptyState>}
+      {!isLoading && !error && users.length === 0 && (
         <EmptyState>
-          {type === "followers"
+          {isFollowerPage
             ? "팔로워가 없습니다."
             : "팔로잉한 사용자가 없습니다."}
         </EmptyState>
       )}
 
       {!isLoading &&
+        !error &&
         users.map((user) => (
           <li key={user.userId}>
             <FollowUserCard

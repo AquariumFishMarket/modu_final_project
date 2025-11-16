@@ -64,7 +64,6 @@ export const fetchProfile = async (
       ? data.profile
       : data.user;
   } catch (error) {
-    console.error("프로필 데이터 가져오기 실패:", error);
     return null;
   }
 };
@@ -97,7 +96,6 @@ export const updateProfile = async (
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("❌ 프로필 업데이트 실패:", errorText);
       throw new Error(`프로필 업데이트에 실패했습니다: ${response.status}`);
     }
 
@@ -105,7 +103,6 @@ export const updateProfile = async (
 
     return data;
   } catch (error) {
-    console.error("❌ 프로필 업데이트 에러:", error);
     throw error;
   }
 };
@@ -138,29 +135,40 @@ export const fetchUserPosts = async (
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
   } catch (error) {
-    console.error("게시글 데이터 가져오기 실패:", error);
     return null;
   }
 };
 
 /**
  * 🔄 팔로우/언팔로우 처리
+ * POST /profile/:accountname/follow - 팔로우
+ * DELETE /profile/:accountname/unfollow - 언팔로우
  */
 export async function toggleProfileFollow(
   accountname: string,
   isFollowing: boolean
 ): Promise<boolean> {
   try {
-    const response = await fetch(`${BASE_URL}/profile/${accountname}/follow`, {
-      method: isFollowing ? "DELETE" : "POST",
+    const url = isFollowing
+      ? `${BASE_URL}/profile/${accountname}/unfollow`
+      : `${BASE_URL}/profile/${accountname}/follow`;
+
+    const method = isFollowing ? "DELETE" : "POST";
+
+    const response = await fetch(url, {
+      method,
       headers: getAuthHeaders(),
     });
 
-    if (!response.ok) throw new Error("팔로우 처리 실패");
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(
+        data.message || `${isFollowing ? "언팔로우" : "팔로우"} 실패`
+      );
+    }
 
     return true;
   } catch (error) {
-    console.error("팔로우 처리 실패:", error);
     throw error;
   }
 }
@@ -179,7 +187,6 @@ export async function togglePostLike(postId: string): Promise<boolean> {
 
     return true;
   } catch (error) {
-    console.error("좋아요 처리 실패:", error);
     throw error;
   }
 }

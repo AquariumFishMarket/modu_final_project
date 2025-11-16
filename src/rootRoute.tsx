@@ -32,10 +32,11 @@ export default function RootRoute() {
 
   return (
       <Routes location={location} key={location.pathname}>
-        {/* 스플래시 - 앱 진입점 */}
+        {/* 스플래시 */}
         <Route path="/" element={<Splash />} />
+
         <Route element={<GlobalLayout />}>
-          {/* 로그인, 회원가입 */}
+          {/* 로그인 */}
           <Route
             path="/login"
             element={
@@ -60,6 +61,7 @@ export default function RootRoute() {
               </MemberRoute>
             }
           />
+
           {/* 피드 */}
           <Route
             path="/feed"
@@ -69,6 +71,7 @@ export default function RootRoute() {
               </GuestRoute>
             }
           />
+
           {/* 프로필 */}
           <Route
             path="/profile/setup"
@@ -86,14 +89,26 @@ export default function RootRoute() {
               </GuestRoute>
             }
           />
+
+          {/*  follower / following  */}
           <Route
-            path="/profile/:accountname/:type"
+            path="/profile/:accountname/follower"
             element={
               <GuestRoute>
-                <Follow key={location.pathname} />
+                <Follow />
               </GuestRoute>
             }
           />
+          <Route
+            path="/profile/:accountname/following"
+            element={
+              <GuestRoute>
+                <Follow />
+              </GuestRoute>
+            }
+          />
+
+          {/* 프로필 메인 */}
           <Route
             path="/profile/:accountname"
             element={
@@ -110,7 +125,8 @@ export default function RootRoute() {
               </GuestRoute>
             }
           />
-          {/* 메인 피드, 검색 */}
+
+          {/* 검색 */}
           <Route
             path="/search"
             element={
@@ -119,6 +135,7 @@ export default function RootRoute() {
               </GuestRoute>
             }
           />
+
           {/* 상품 */}
           <Route
             path="/product"
@@ -144,6 +161,7 @@ export default function RootRoute() {
               </GuestRoute>
             }
           />
+
           {/* 게시글 */}
           <Route
             path="/post"
@@ -153,7 +171,6 @@ export default function RootRoute() {
               </GuestRoute>
             }
           />
-          {/* 게시글 수정 */}
           <Route
             path="/post/:postId/edit"
             element={
@@ -162,7 +179,6 @@ export default function RootRoute() {
               </GuestRoute>
             }
           />
-          {/* 상세게시글 */}
           <Route
             path="/post/:postId"
             element={
@@ -171,6 +187,7 @@ export default function RootRoute() {
               </GuestRoute>
             }
           />
+
           {/* 채팅 */}
           <Route
             path="/chat-list"
@@ -188,6 +205,7 @@ export default function RootRoute() {
               </GuestRoute>
             }
           />
+
           {/* 에러 페이지 */}
           <Route path="/404" element={<ErrPage />} />
         </Route>
