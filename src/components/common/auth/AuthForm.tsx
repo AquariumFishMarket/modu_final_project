@@ -10,7 +10,10 @@ import {
   ResultMessage,
 } from "./AuthForm.styled";
 
-import { validateEmail, validatePassword } from "../../../utils/validation/AuthValidation";
+import {
+  validateEmail,
+  validatePassword,
+} from "../../../utils/validation/AuthValidation";
 
 interface FormField {
   type: "email" | "password";
@@ -25,7 +28,6 @@ interface AuthFormProps {
   fields: FormField[];
   buttonText: string;
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
-  onButtonClick: () => void;
   placeHolder?: string;
   disabled?: boolean;
   formError?: string;
@@ -35,7 +37,6 @@ export default function AuthForm({
   fields,
   buttonText,
   onSubmit,
-  onButtonClick,
   disabled = false,
   formError,
 }: AuthFormProps) {
@@ -149,7 +150,7 @@ export default function AuthForm({
         <DefaultButton
           text={buttonText}
           disabled={!isFormValid || disabled}
-          onClick={onButtonClick}
+          type="submit"
         />
       </Form>
     </section>
