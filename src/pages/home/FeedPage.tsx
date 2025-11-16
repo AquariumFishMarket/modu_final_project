@@ -2,7 +2,6 @@ import { useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
-import { ToastContainer } from "react-toastify";
 import Toast from "../../components/common/modal/Toast";
 
 import { InitialLoadingSection } from "./FeedPage.styled";
@@ -105,8 +104,7 @@ const FeedPage = () => {
 
   return (
     <>
-      <ToastContainer />
-      <Toast />
+    <Toast />
 
     <motion.div
       initial="initial"

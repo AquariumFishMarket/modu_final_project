@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ScrollButton from "../common/buttons/ScrollButton";
 import { useFeedData } from "../../hooks/useFeedData";
+import { ToastContainer } from "react-toastify";
 //zustand 전역
 import { useFeedStore } from "../../contexts/useFeedStore";
 //인증관련 전역
@@ -306,6 +307,7 @@ function LayoutContent() {
               ref={scrollContainerRef}
               isPadding={location.pathname}
             >
+              <ToastContainer></ToastContainer>
               <Outlet />
             </MainContent>
           </AnimatePresence>

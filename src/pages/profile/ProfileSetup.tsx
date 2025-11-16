@@ -8,6 +8,7 @@ import { useState } from "react";
 import { updateProfile } from "../../services/profileService";
 import { uploadImage } from "../../services/imageService";
 import { getToken } from "../../utils/tokenManager";
+import Toast from "../../components/common/modal/Toast";
 
 const ProfileTitle = styled.div`
   text-align: center;
@@ -94,6 +95,7 @@ export default function ProfileSetup() {
 
   return (
     <>
+      <Toast />
       <ProfileTitle>
         <h2>프로필 설정</h2>
         <p>나중에 언제든지 변경할 수 있습니다.</p>
