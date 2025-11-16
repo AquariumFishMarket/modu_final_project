@@ -41,6 +41,8 @@ import {
 } from "../../../services/profileService";
 import MoreMenu from "../../../components/common/modal/MoreMenu";
 
+import { formatPostDate } from "../../../utils/formatter/dateFormatter";
+
 function Profile() {
   const navigate = useNavigate();
   const { setHeaderConfig } = useHeader();
@@ -50,7 +52,7 @@ function Profile() {
     accountname?: string;
   }>();
 
-  const updatedFollow = useFollowStore((state) => state.updatedUser);
+  const updatedFollow = useFollowStore((state) => state.lastUpdate);
   const clearFollowUpdate = useFollowStore((state) => state.clearUpdate);
 
   const [profileData, setProfileData] = useState<UserProfile | null>(null);
@@ -330,6 +332,7 @@ function Profile() {
                   content: post.content,
                   imageSrc: post.image,
                   dateTime: post.createdAt,
+                  dateText: formatPostDate(post.createdAt),
                   likeCount: post.heartCount,
                   commentCount: post.commentCount,
                   isLiked: post.hearted,
