@@ -11,7 +11,7 @@ import {
 import MoreMenu from "../../components/common/modal/MoreMenu";
 import { formatPostDate } from "../../utils/formatter/dateFormatter";
 // import { useToastStore } from "../../contexts/useToastStore";
-import { toast } from "react-toastify";
+// import { toast } from "react-toastify";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -349,16 +349,17 @@ export default function ProductDetail() {
 
   // 채팅하기
   const handleChatStart = () => {
-    toast("서비스 준비 중입니다! 🐠 ", {
-      position: "top-center",
-      autoClose: 1000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "colored",
-    });
+    // toast("서비스 준비 중입니다! 🐠 ", {
+    //   position: "top-center",
+    //   autoClose: 1000,
+    //   hideProgressBar: false,
+    //   closeOnClick: true,
+    //   pauseOnHover: true,
+    //   draggable: true,
+    //   progress: undefined,
+    //   theme: "colored",
+    // });
+    console.log("채팅하기 버튼");
   };
 
   // 구매하기
