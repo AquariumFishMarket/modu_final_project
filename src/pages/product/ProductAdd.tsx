@@ -6,13 +6,14 @@ import { useEffect, useRef, useState } from "react";
 import { getProductFields } from "../../utils/validation/productValidation";
 import { fetchProductUpload } from "../../services/productService";
 import { uploadImage } from "../../services/imageService";
+import { useToastStore } from "../../contexts/useToastStore";
 
 export default function ProductAdd() {
   const navigate = useNavigate();
   const { setHeaderConfig } = useHeader();
   const formRef = useRef<CommonFormRef>(null);
   const [isFormValid, setIsFormValid] = useState(false); // 폼 유효성 상태
-
+  const { setToast } = useToastStore();
   const productFields = getProductFields();
 
   useEffect(() => {
@@ -55,15 +56,12 @@ export default function ProductAdd() {
 
       const newProduct = await fetchProductUpload(productData);
 
-      console.log("상품 등록 완료 :", newProduct);
-
-      // 등록된 상품 상세 페이지로 이동
-      navigate(`/product/${newProduct.id}`);
-
+      setToast("상품 등록이 완료됐습니다😊",()=>{navigate(`/product/${newProduct.id}`)})
       //
     } catch (error) {
-      console.error("상품 등록 실패: ", error);
-      alert("상품 등록에 실패했습니다.");
+      //console.error("상품 등록 실패: ", error);
+      setToast("상품 등록에 실패했습니다😭")
+
     }
   };
 
