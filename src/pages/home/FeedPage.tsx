@@ -26,12 +26,6 @@ const FeedPage = () => {
     }
   };
 
-  const pageVariants = {
-    initial: { opacity: 0, y: 10 },
-    animate: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-    exit: { opacity: 0, transition: { duration: 0.3 } },
-  };
-
   const feedList = useFeedStore((state) => state.feedList);
   const isLoading = useFeedStore((state) => state.isInitialLoading);
   const fetchFeeds = useFeedStore((state) => state.fetchFeeds);
@@ -85,29 +79,16 @@ const FeedPage = () => {
 
   if (isLoading) {
     return (
-      <motion.div
-        initial="initial"
-        animate="animate"
-        exit="exit"
-        variants={pageVariants}
-      >
         <main>
           <InitialLoadingSection>
             <p>불러오는 중...</p>
           </InitialLoadingSection>
         </main>
-      </motion.div>
     );
   }
 
   return (
     <>
-    <motion.div
-      initial="initial"
-      animate="animate"
-      exit="exit"
-      variants={pageVariants}
-    >
       {feedList.map((feed, idx) => {
         const isLast = idx === feedList.length - 1;
         const isMyPost = currentUser?.accountname === feed.userId;
@@ -146,7 +127,6 @@ const FeedPage = () => {
           마지막 페이지입니다.
         </div>
       )}
-    </motion.div>
     </>
   );
 };
