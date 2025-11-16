@@ -15,6 +15,7 @@ import {
   getProductFields,
   formatPrice,
 } from "../../utils/validation/productValidation";
+import { useToastStore } from "../../contexts/useToastStore";
 
 export default function ProductEdit() {
   const navigate = useNavigate();
@@ -25,6 +26,7 @@ export default function ProductEdit() {
   const [product, setProduct] = useState<Product | null>(null); // 기존 상품 데이터
 
   const productFields = getProductFields();
+  const { setToast } = useToastStore()
 
   // 기존 상품 데이터 불러오기
   useEffect(() => {
@@ -81,7 +83,8 @@ export default function ProductEdit() {
       };
 
       await updateProduct(id, updatedProductData);
-      navigate(`/product/${id}`);
+      setToast('상품 수정을 완료했습니다😀',()=>{navigate(`/product/${id}`)})
+
     } catch (error) {
       console.error("상품 수정 실패:", error);
       alert("상품 수정에 실패했습니다. 다시 시도해주세요.");

@@ -8,6 +8,7 @@ import { useState } from "react";
 import { updateProfile } from "../../services/profileService";
 import { uploadImage } from "../../services/imageService";
 import { getToken } from "../../utils/tokenManager";
+import { useToastStore } from "../../contexts/useToastStore";
 
 const ProfileTitle = styled.div`
   text-align: center;
@@ -38,6 +39,7 @@ export default function ProfileSetup() {
   const [error, setError] = useState<string>("");
   const [isValid, setIsValid] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { setToast } = useToastStore()
 
   // 유효성 검사 상태 변경 핸들러
   const handleValidationChange = (valid: boolean) => {
@@ -79,9 +81,8 @@ export default function ProfileSetup() {
         imageUrl = await uploadImage(imageFile);
       }
       await updateProfile(username, accountname, intro, imageUrl);
+      setToast("회원정보가 등록되었습니다😊",()=>navigate("/"))
 
-      alert("회원 정보가 등록되었습니다.");
-      navigate("/");
     } catch (error) {
       setError(
         error instanceof Error ? error.message : "정보 등록에 실패했습니다."

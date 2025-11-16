@@ -10,6 +10,8 @@ import {
   validatePassword,
   validateEmailDuplicate,
 } from "../../utils/validation/AuthValidation";
+import { toast } from "react-toastify";
+import { useToastStore } from "../../contexts/useToastStore";
 
 const Signuptitle = styled.h2`
   text-align: center;
@@ -32,11 +34,14 @@ const LoginLink = styled(Link)`
   }
 `;
 
+
+
 export default function Signup() {
   const navigate = useNavigate();
   const [formError, setFormError] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { refreshUserInfo } = useAuth();
+  const { setToast } = useToastStore();
 
   // 회원가입 폼 필드 설정
   const signupFields = [
@@ -82,10 +87,8 @@ export default function Signup() {
       saveToken(loginResult.token);
 
       await refreshUserInfo(); // 사용자 정보 즉시 갱신
+      setToast("회원가입 완료😊")
 
-      alert("회원가입이 완료되었습니다. 프로필을 설정해주세요.");
-
-      navigate("/profile/setup");
     } catch (error) {
       setFormError(
         error instanceof Error

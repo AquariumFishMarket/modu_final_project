@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const Toast = () => {
-  const { message, show, hideToast } = useToastStore();
+  const { message, show, hideToast, callback } = useToastStore();
 
   useEffect(() => {
     if(!show || message == null) return;
@@ -19,10 +19,12 @@ const Toast = () => {
         draggable: true,
         progress: undefined,
         theme: "light",
+        onClose:()=>{
+          callback?.();
+          hideToast();
+        }
       });
     }
-
-  return hideToast()
   }, [show]);
 
   return null;
