@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 import { useState } from "react";
+import { useAuth } from "../../contexts/AuthContext";
 import { updateProfile } from "../../services/profileService";
 import { uploadImage } from "../../services/imageService";
 import { getToken } from "../../utils/tokenManager";
@@ -38,6 +39,7 @@ export default function ProfileSetup() {
   const [error, setError] = useState<string>("");
   const [isValid, setIsValid] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { refreshUserInfo } = useAuth();
 
   // 유효성 검사 상태 변경 핸들러
   const handleValidationChange = (valid: boolean) => {
@@ -81,7 +83,10 @@ export default function ProfileSetup() {
       }
       await updateProfile(username, accountname, intro, imageUrl);
 
+      await refreshUserInfo(); // 프로필 정보 즉시 갱신
+
       alert("회원 정보가 등록되었습니다.");
+
       navigate("/");
     } catch (error) {
       setError(
