@@ -60,7 +60,6 @@ export default function ProfileSetup() {
     }
 
     if (!accountname || !accountname.trim()) {
-      console.log(accountname);
       setError("사용할 수 없는 계정 ID입니다.");
       return;
     }

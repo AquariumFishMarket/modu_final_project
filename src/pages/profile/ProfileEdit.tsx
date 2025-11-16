@@ -110,8 +110,6 @@ export default function ProfileEdit() {
   // 폼 제출 핸들러
   const handleSubmit = async (data: ProfileFormData) => {
     try {
-      console.log("📤 제출 데이터:", data);
-
       const token = getToken();
       if (!token) {
         throw new Error("로그인이 필요합니다."); // ☑️ 예외처리 필요
@@ -120,13 +118,10 @@ export default function ProfileEdit() {
       let imageUrl = "";
 
       if (data.image instanceof File) {
-        console.log("🖼️ 새 이미지 업로드");
         imageUrl = await uploadImage(data.image);
       } else if (typeof data.image === "string" && data.image) {
-        console.log("🖼️ 기존 이미지 유지:", data.image);
         imageUrl = data.image;
       } else {
-        console.log("🖼️ 기본 이미지 사용");
         imageUrl = "/img/empty-profile.png";
       }
 
@@ -136,8 +131,6 @@ export default function ProfileEdit() {
         data.intro || "",
         imageUrl
       );
-
-      console.log("✅ 프로필 수정 성공");
 
       // AuthContext 업데이트 - 서버에서 최신 정보 가져오기
       await refreshUserInfo();

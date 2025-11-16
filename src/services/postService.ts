@@ -77,11 +77,6 @@ export async function fetchPostDetail(
     }
 
     const data: PostDetailApiResponse = await response.json();
-    console.log("📸 fetchPostDetail 응답:", {
-      id: data.post.id,
-      content: data.post.content?.substring(0, 50),
-      image: data.post.image,
-    });
     return data.post;
   } catch (error) {
     console.error("게시글 상세 조회 실패:", error);
@@ -97,12 +92,6 @@ export async function EditPost(
   image?: string
 ): Promise<PostDetail | null> {
   try {
-    console.log("🔧 EditPost 요청:", {
-      postId,
-      content: content?.substring(0, 50),
-      image,
-    });
-
     const response = await fetch(`${BASE_URL}/post/${postId}`, {
       method: "PUT",
       headers: getAuthHeaders(),
@@ -128,11 +117,6 @@ export async function EditPost(
     }
 
     const data: PostDetailApiResponse = await response.json();
-    console.log("✅ EditPost 응답:", {
-      id: data.post.id,
-      content: data.post.content?.substring(0, 50),
-      image: data.post.image,
-    });
     return data.post;
   } catch (error) {
     console.error("게시글 수정 실패:", error);
@@ -144,8 +128,6 @@ export async function EditPost(
 
 export async function deletePost(postId: string): Promise<boolean> {
   try {
-    console.log("deletePost API 요청:", postId);
-
     const response = await fetch(`${BASE_URL}/post/${postId}`, {
       method: "DELETE",
       headers: getAuthHeaders(),
@@ -164,7 +146,6 @@ export async function deletePost(postId: string): Promise<boolean> {
       throw new Error("게시글 삭제 실패");
     }
 
-    console.log("deletePost API 응답:", response.status);
     return true;
   } catch (error) {
     console.error("게시글 삭제 실패:", error);
@@ -355,7 +336,6 @@ export async function updateComment(
     }
 
     const data: CommentApiResponse = await response.json();
-    console.log("updateComment API 응답:", data);
     return data.comment;
   } catch (error) {
     console.error("댓글 수정 실패:", error);
@@ -403,8 +383,6 @@ export async function deleteComment(
   commentId: string
 ): Promise<boolean> {
   try {
-    console.log("deleteComment API 요청:", postId);
-
     const response = await fetch(
       `${BASE_URL}/post/${postId}/comments/${commentId}`,
       {
@@ -426,7 +404,6 @@ export async function deleteComment(
       throw new Error("댓글 삭제 실패");
     }
 
-    console.log("deleteComment API 응답:", response.status);
     return true;
   } catch (error) {
     console.error("댓글 삭제 실패:", error);

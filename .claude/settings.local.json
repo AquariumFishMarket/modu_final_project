@@ -3,7 +3,8 @@
     "allow": [
       "Bash(npx tsc:*)",
       "Bash(git add:*)",
-      "Bash(git stash drop:*)"
+      "Bash(git stash drop:*)",
+      "Bash(rm:*)"
     ],
     "deny": [],
     "ask": []

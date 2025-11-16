@@ -1,8 +1,9 @@
 import { create } from "zustand";
 import { getToken } from "../utils/tokenManager";
+import type { Feed } from "../types/feed";
 
 interface FeedStore {
-  feedList: any[];
+  feedList: Feed[];
   skip: number;
   isRefreshing: boolean;
   isInitialLoading: boolean;
@@ -11,7 +12,7 @@ interface FeedStore {
   isFetching: boolean;
   isLoading: boolean;
 
-  setFeedList: (list: any[]) => void;
+  setFeedList: (list: Feed[]) => void;
   setSkip: (value: number) => void;
   setIsRefreshing: (value: boolean) => void;
   setIsInitialLoading: (value: boolean) => void;
@@ -20,7 +21,7 @@ interface FeedStore {
   refreshFeed: () => void;
   fetchFeeds: (isLoadMore?: boolean) => Promise<void>;
   toggleLike: (postId: string) => void;
-  updatePost: (updatedPost: any) => void;
+  updatePost: (updatedPost: Feed) => void;
 }
 
 export const useFeedStore = create<FeedStore>((set, get) => ({
@@ -103,8 +104,8 @@ export const useFeedStore = create<FeedStore>((set, get) => ({
       }
 
       const normalized = datalist
-        .filter((ele: any) => ele.author.email.includes("pirate"))
-        .map((ele: any) => ({
+        .filter((ele: Feed) => ele.author.email.includes("pirate"))
+        .map((ele: Feed) => ({
           ...ele,
           isLiked: ele.hearted ?? false,
           likeCount: ele.heartCount ?? ele.author?.hearts?.length ?? 0,
@@ -156,7 +157,7 @@ export const useFeedStore = create<FeedStore>((set, get) => ({
     set({ feedList: updated });
   },
 
-  updatePost: (updatedPost: any) => {
+  updatePost: (updatedPost: Feed) => {
     const { feedList } = get();
 
     const updated = feedList.map((feed) =>
