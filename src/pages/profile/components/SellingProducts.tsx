@@ -5,15 +5,11 @@ import {
   ProductTitle,
   ProductListContainer,
   ProductCard,
-  ProductImageBox,
-  ProductImage,
   ProductInfoBox,
   ProductName,
   ProductPrice,
-  // EmptyMessage,
-  // LoadingMessage,
-  // ErrorMessage,
 } from "./SellingProducts.styled";
+import ProductImageContainer from "./ProductImageContainer";
 import type { Product } from "../../../types/product";
 import { fetchProductList } from "../../../services/productService";
 import { useAuth } from "../../../contexts/AuthContext";
@@ -206,13 +202,11 @@ function SellingProducts({
               onClick={() => handleProductClick(product)}
               role="listitem"
             >
-              <ProductImageBox>
-                <ProductImage
-                  src={getProductImageUrl(product.itemImage)}
-                  alt={product.itemName}
-                  onError={handleImageError}
-                />
-              </ProductImageBox>
+              <ProductImageContainer
+              src={getProductImageUrl(product.itemImage)}
+              alt={product.itemName}
+              onError={(e)=>handleImageError(e)}
+              />
 
               <ProductInfoBox>
                 <ProductName>{product.itemName}</ProductName>
