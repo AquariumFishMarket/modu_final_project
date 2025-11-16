@@ -88,7 +88,7 @@ export default function Signup() {
 
       await refreshUserInfo(); // 사용자 정보 즉시 갱신
       setToast("회원가입 완료😊")
-      navigate(`/profile/setup`)
+
     } catch (error) {
       setFormError(
         error instanceof Error
