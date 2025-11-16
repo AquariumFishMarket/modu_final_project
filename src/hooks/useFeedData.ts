@@ -1,10 +1,9 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import type { Feed } from "../types/feed";
 import { fetchFeed, toggleLike } from "../services/feedService";
-import { getToken } from "../utils/tokenManager";
 
 export const useFeedData = () => {
-  const [feedList, setFeedList] = useState<any[]>([]);
+  const [feedList, setFeedList] = useState<Feed[]>([]);
   const [page, setPage] = useState<number>(1);
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);

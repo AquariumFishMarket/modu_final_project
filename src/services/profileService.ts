@@ -78,13 +78,6 @@ export const updateProfile = async (
   intro: string,
   image: string
 ): Promise<AuthResponse> => {
-  console.log("📤 프로필 업데이트 요청:", {
-    username,
-    accountname,
-    intro,
-    image,
-  });
-
   const profileImage =
     image && image.trim() !== "" ? image : DEFAULT_PROFILE_IMG;
 
@@ -102,8 +95,6 @@ export const updateProfile = async (
       }),
     });
 
-    console.log("📡 프로필 업데이트 응답 상태:", response.status);
-
     if (!response.ok) {
       const errorText = await response.text();
       console.error("❌ 프로필 업데이트 실패:", errorText);
@@ -111,7 +102,6 @@ export const updateProfile = async (
     }
 
     const data = await response.json();
-    console.log("✅ 프로필 업데이트 성공:", data);
 
     return data;
   } catch (error) {

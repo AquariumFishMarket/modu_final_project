@@ -55,8 +55,6 @@ export default function ProductAdd() {
 
       const newProduct = await fetchProductUpload(productData);
 
-      console.log("상품 등록 완료 :", newProduct);
-
       // 등록된 상품 상세 페이지로 이동
       navigate(`/product/${newProduct.id}`);
 

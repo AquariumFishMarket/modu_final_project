@@ -277,7 +277,6 @@ export default function ProductDetail() {
   useEffect(() => {
     const loadProduct = async () => {
       if (!id) {
-        console.log("상품 ID 없음");
         return;
       }
 
@@ -331,7 +330,6 @@ export default function ProductDetail() {
 
   // 채팅하기
   const handleChatStart = () => {
-    console.log("채팅 시작:", product.id);
     // navigate(`/chat-room/${product.seller.id}`);
   };
 
@@ -340,7 +338,6 @@ export default function ProductDetail() {
     if (!product.link) return;
 
     window.open(product.link, "_blank");
-    console.log("구매 링크로 이동:", product.link);
   };
 
   // 상품 삭제
