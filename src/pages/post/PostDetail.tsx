@@ -86,16 +86,12 @@ function PostDetail() {
 
     try {
       await deletePost(postId);
-      console.log("게시글 삭제 성공");
       navigate(-1);
     } catch (error) {
       console.error("게시글 삭제 실패:", error);
       alert("게시글 삭제에 실패했습니다.");
     }
   };
-
-  // 디버깅: 현재 사용자 정보 확인
-  useEffect(() => {}, [currentUser]);
 
   // 게시글 및 댓글 데이터 불러오기
   useEffect(() => {
@@ -114,6 +110,7 @@ function PostDetail() {
         //   content: postData?.content?.substring(0, 50),
         //   image: postData?.image,
         // });
+
         setPost(postData);
         // 댓글을 역순으로 정렬 (오래된 댓글이 위로)
         setComments([...commentsData].reverse());
@@ -257,10 +254,6 @@ function PostDetail() {
     newContent: string
   ): Promise<void> => {
     if (!postId || !newContent.trim()) {
-      console.log("댓글 수정 중단: postId 또는 newContent가 없음", {
-        postId,
-        newContent,
-      });
       return;
     }
 
@@ -368,6 +361,7 @@ function PostDetail() {
           //   `isMyComment=${isMyComment}`,
           //   `userName=${comment.author.username}`
           // );
+
           return (
             <div
               key={comment.id}

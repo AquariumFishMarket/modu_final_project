@@ -1,8 +1,10 @@
 import { create } from "zustand";
 import { getToken } from "../utils/tokenManager";
+import type { Feed } from "../types/feed";
+import type { Post } from "../types/post";
 
 interface FeedStore {
-  feedList: any[];
+  feedList: Feed[];
   skip: number;
   isRefreshing: boolean;
   isInitialLoading: boolean;
@@ -11,7 +13,7 @@ interface FeedStore {
   isFetching: boolean;
   isLoading: boolean;
 
-  setFeedList: (list: any[]) => void;
+  setFeedList: (list: Feed[]) => void;
   setSkip: (value: number) => void;
   setIsRefreshing: (value: boolean) => void;
   setIsInitialLoading: (value: boolean) => void;
@@ -20,7 +22,7 @@ interface FeedStore {
   refreshFeed: () => void;
   fetchFeeds: (isLoadMore?: boolean) => Promise<void>;
   toggleLike: (postId: string) => void;
-  updatePost: (updatedPost: any) => void;
+  updatePost: (updatedPost: Post) => void;
 }
 
 export const useFeedStore = create<FeedStore>((set, get) => ({
@@ -103,12 +105,18 @@ export const useFeedStore = create<FeedStore>((set, get) => ({
       }
 
       const normalized = datalist
-        .filter((ele: any) => ele.author.email.includes("pirate"))
-        .map((ele: any) => ({
-          ...ele,
-          isLiked: ele.hearted ?? false,
-          likeCount: ele.heartCount ?? ele.author?.hearts?.length ?? 0,
+        .filter((ele: Post) => ele.author.email.includes("pirate"))
+        .map((ele: Post): Feed => ({
+          id: ele.id,
           profileImg: ele.author?.image ?? "/img/empty-profile.png",
+          userName: ele.author.username,
+          userId: ele.author.accountname,
+          content: ele.content,
+          image: ele.image ?? "",
+          isLiked: ele.hearted ?? false,
+          likeCount: ele.heartCount ?? 0,
+          commentCount: ele.commentCount ?? 0,
+          createdAt: ele.createdAt,
         }));
 
       const shuffled = normalized.sort(() => 0.5 - Math.random());
@@ -156,16 +164,18 @@ export const useFeedStore = create<FeedStore>((set, get) => ({
     set({ feedList: updated });
   },
 
-  updatePost: (updatedPost: any) => {
+  updatePost: (updatedPost: Post) => {
     const { feedList } = get();
 
     const updated = feedList.map((feed) =>
       feed.id === updatedPost.id
         ? {
             ...feed,
-            ...updatedPost,
+            content: updatedPost.content,
+            image: updatedPost.image ?? "",
             isLiked: updatedPost.hearted ?? feed.isLiked,
             likeCount: updatedPost.heartCount ?? feed.likeCount,
+            commentCount: updatedPost.commentCount ?? feed.commentCount,
           }
         : feed
     );

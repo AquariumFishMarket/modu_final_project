@@ -55,9 +55,8 @@ export default function ProductAdd() {
       };
 
       const newProduct = await fetchProductUpload(productData);
-
       setToast("상품 등록이 완료됐습니다😊",()=>{navigate(`/product/${newProduct.id}`)})
-      //
+
     } catch (error) {
       //console.error("상품 등록 실패: ", error);
       setToast("상품 등록에 실패했습니다😭")

@@ -77,7 +77,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
       }
 
       const data = await response.json();
-      console.log("📦 사용자 정보:", data);
 
       return data.user;
     } catch (error) {

@@ -110,21 +110,21 @@ const FeedPage = () => {
     >
       {feedList.map((feed, idx) => {
         const isLast = idx === feedList.length - 1;
-        const isMyPost = currentUser?.accountname === feed.author.accountname;
+        const isMyPost = currentUser?.accountname === feed.userId;
         return (
           <PostCard
             key={`${feed.id}-${idx}`}
             postId={feed.id}
-            userName={feed.author.username}
-            userId={feed.author.accountname}
+            userName={feed.userName}
+            userId={feed.userId}
             avatarSrc={feed.profileImg}
-            avatarAlt={`${feed.author.username} 프로필`}
+            avatarAlt={`${feed.userName} 프로필`}
             content={feed.content}
             imageSrc={feed.image}
             imageAlt="게시글 이미지"
-            dateTime={feed.updatedAt}
+            dateTime={feed.createdAt}
             likeCount={feed.likeCount}
-            commentCount={feed.comments.length}
+            commentCount={feed.commentCount}
             isLiked={feed.isLiked}
             isMyPost={isMyPost}
             onLikeClick={() => toggleLike(feed.id)}

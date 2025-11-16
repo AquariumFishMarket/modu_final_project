@@ -122,13 +122,10 @@ export default function ProfileEdit() {
       let imageUrl = "";
 
       if (data.image instanceof File) {
-        //console.log("🖼️ 새 이미지 업로드");
         imageUrl = await uploadImage(data.image);
       } else if (typeof data.image === "string" && data.image) {
-        //console.log("🖼️ 기존 이미지 유지:", data.image);
         imageUrl = data.image;
       } else {
-        //console.log("🖼️ 기본 이미지 사용");
         imageUrl = "/img/empty-profile.png";
       }
 

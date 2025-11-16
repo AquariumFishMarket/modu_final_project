@@ -104,13 +104,13 @@ function Profile() {
   // 팔로워 목록 클릭 핸들러
   const handleFollowerClick = (): void => {
     if (!profileData) return;
-    navigate(`${BASE_URL}/profile/${profileData.accountname}/follower`);
+    navigate(`/profile/${profileData.accountname}/follower`);
   };
 
   // 팔로잉 목록 클릭 핸들러
   const handleFollowingClick = (): void => {
     if (!profileData) return;
-    navigate(`${BASE_URL}/profile/${profileData.accountname}/following`);
+    navigate(`/profile/${profileData.accountname}/following`);
   };
 
   // 이미지 로드 에러 핸들러
@@ -136,7 +136,6 @@ function Profile() {
   // ❤️ 좋아요 토글 핸들러 추가
   const handlePostLikeToggle = (postId: string): void => {
     // TODO: 좋아요 API 연동
-    console.log("좋아요 토글:", postId);
 
     // 임시 낙관적 업데이트
     setUserPosts((prev) =>
@@ -181,11 +180,8 @@ function Profile() {
       try {
         let profileToLoad;
 
-        console.log("targetAccountname: ", targetAccountname);
-
         // 내 프로필인 경우 currentUser 사용
         if (isMyProfile) {
-          console.log("👤 내 프로필 로드");
           profileToLoad = {
             _id: currentUser._id,
             username: currentUser.username,
@@ -199,7 +195,6 @@ function Profile() {
             isfollow: false,
           };
         } else {
-          console.log("👥 다른 사용자 프로필 로드");
           const fetchedProfile = await fetchProfile(
             targetAccountname,
             currentUserAccountname

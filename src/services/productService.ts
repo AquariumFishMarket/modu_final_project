@@ -37,8 +37,6 @@ export const fetchProductUpload = async (
 
   const data = await response.json();
 
-  console.log("📦상품 등록: ", data.product);
-
   return data.product;
 };
 
@@ -104,8 +102,6 @@ export const updateProduct = async (
 
   const data = await response.json();
 
-  console.log("✅ 상품 수정 완료: ", data.product);
-
   return data.product;
 };
 
@@ -133,8 +129,6 @@ export const deleteProduct = async (productId: string): Promise<void> => {
   }
 
   const data = await response.json();
-
-  console.log("📦상품 삭제 메세지: ", data);
 
   // 삭제만 하면 되니까 반환 하지 않음
 };
