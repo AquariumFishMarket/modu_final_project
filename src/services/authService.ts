@@ -99,7 +99,6 @@ export const signup = async (
   });
 
   const data = await response.json();
-  console.log("회원가입 응답: ", data.message);
 
   if (!response.ok) {
     throw new Error("이미 사용 중인 이메일입니다.");
@@ -127,7 +126,6 @@ export const login = async (
   });
 
   const data = await response.json();
-  console.log("로그인 응답:", data.message);
 
   if (!response.ok) {
     throw new Error("이메일 또는 비밀번호가 일치하지 않습니다.");

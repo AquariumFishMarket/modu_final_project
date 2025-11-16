@@ -292,7 +292,6 @@ export default function ProductDetail() {
   useEffect(() => {
     const loadProduct = async () => {
       if (!id) {
-        console.log("상품 ID 없음");
         return;
       }
 

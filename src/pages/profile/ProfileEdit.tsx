@@ -11,6 +11,7 @@ import { getProfileFields } from "../../utils/validation/userValidation";
 import { fetchProfile, updateProfile } from "../../services/profileService";
 import { uploadImage } from "../../services/imageService";
 import { getToken } from "../../utils/tokenManager";
+import { useToastStore } from "../../contexts/useToastStore";
 
 // 사용자 프로필 타입 정의
 interface UserProfile {
@@ -25,6 +26,7 @@ export default function ProfileEdit() {
   const { setHeaderConfig } = useHeader();
   const formRef = useRef<CommonFormRef>(null);
   const [isFormValid, setIsFormValid] = useState(false);
+  const { setToast } = useToastStore()
 
   // 상태
   const [loading, setLoading] = useState(true);
@@ -110,7 +112,7 @@ export default function ProfileEdit() {
   // 폼 제출 핸들러
   const handleSubmit = async (data: ProfileFormData) => {
     try {
-      console.log("📤 제출 데이터:", data);
+      //console.log("📤 제출 데이터:", data);
 
       const token = getToken();
       if (!token) {
@@ -120,13 +122,10 @@ export default function ProfileEdit() {
       let imageUrl = "";
 
       if (data.image instanceof File) {
-        console.log("🖼️ 새 이미지 업로드");
         imageUrl = await uploadImage(data.image);
       } else if (typeof data.image === "string" && data.image) {
-        console.log("🖼️ 기존 이미지 유지:", data.image);
         imageUrl = data.image;
       } else {
-        console.log("🖼️ 기본 이미지 사용");
         imageUrl = "/img/empty-profile.png";
       }
 
@@ -137,26 +136,22 @@ export default function ProfileEdit() {
         imageUrl
       );
 
-      console.log("✅ 프로필 수정 성공");
+      //console.log("✅ 프로필 수정 성공");
 
       // AuthContext 업데이트 - 서버에서 최신 정보 가져오기
       await refreshUserInfo();
+      setToast("프로필이 수정되었습니다😎",()=>navigate("/profile", { replace: true }))
 
-      alert("프로필이 수정되었습니다.");
-      navigate("/profile", { replace: true });
+      //navigate("/profile", { replace: true });
     } catch (error) {
       console.error("프로필 수정 실패:", error);
-      alert(
-        error instanceof Error
-          ? error.message
-          : "프로필 수정에 실패했습니다. 다시 시도해주세요."
-      );
+      setToast("프로필 수정을 실패했습니다😭")
     }
   };
 
   // 🆕 로딩 상태 -> 처리 어떻게 할지
   if (loading) {
-    return <div>프로필 정보를 불러오는 중...</div>;
+    return <div style={{ textAlign: 'center' }}>프로필 정보를 불러오는 중...</div>;
   }
 
   // 🆕 에러 상태 -> 처리 어떻게 할지

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import styled from "styled-components";
 import BottomSheet, { SheetItem } from "./BottomSheet";
 import AlertModal from "./AlertModal";
@@ -8,17 +8,16 @@ import { useAuth } from "../../../contexts/AuthContext";
 interface MoreMenuProps {
   type: "profile" | "post" | "comment" | "chat" | "chatList" | "product";
   size?: "sm" | "md" | "lg";
-  authorAccountname?: string; 
+  authorAccountname?: string;
   isMyComment?: boolean;
-  isMyPost?: boolean; 
+  isMyPost?: boolean;
   onEdit?: () => void;
   onDelete?: () => void;
   onReport?: () => void;
-  onBlock?: () => void;
   onLeave?: () => void;
   onLogout?: () => void;
   onSettings?: () => void;
-  onMarkAsSold?: () => void; 
+  onMarkAsSold?: () => void;
 }
 
 const getIconSrc = (size: "sm" | "md" | "lg") => {
@@ -99,7 +98,6 @@ export default function MoreMenu({
   const handleDelete = () => {
     closeSheet();
     setAlertType("delete");
-    console.log("삭제 버튼 클릭, 모달 오픈");
   };
 
   const handleDeleteComment = () => {
@@ -111,13 +109,11 @@ export default function MoreMenu({
   const handleLogout = () => {
     closeSheet();
     setAlertType("logout");
-    console.log("로그아웃?");
   };
 
   const handleMarkAsSold = () => {
     closeSheet();
     setAlertType("sold");
-    console.log("판매완료?");
   };
 
   const handleReportPost = () => {
