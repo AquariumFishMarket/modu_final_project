@@ -8,6 +8,7 @@ export interface Author {
   _id: string;
   username: string;
   accountname: string;
+  email: string;
   intro: string;
   image: string;
   isfollow: boolean;
