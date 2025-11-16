@@ -19,8 +19,6 @@ import {
 import { useAuth } from "../../contexts/AuthContext";
 import { useHeader } from "../../contexts/HeaderContext";
 import MoreMenu from "../../components/common/modal/MoreMenu";
-import { ToastContainer } from "react-toastify";
-import Toast from "../../components/common/modal/Toast";
 
 interface Author {
   _id: string;
@@ -111,11 +109,11 @@ function PostDetail() {
           fetchPostComments(postId),
         ]);
 
-        console.log("🔄 PostDetail 데이터 로드:", {
-          id: postData?.id,
-          content: postData?.content?.substring(0, 50),
-          image: postData?.image,
-        });
+        // console.log("🔄 PostDetail 데이터 로드:", {
+        //   id: postData?.id,
+        //   content: postData?.content?.substring(0, 50),
+        //   image: postData?.image,
+        // });
         setPost(postData);
         // 댓글을 역순으로 정렬 (오래된 댓글이 위로)
         setComments([...commentsData].reverse());
@@ -241,7 +239,7 @@ function PostDetail() {
 
     try {
       await deleteComment(postId, commentId);
-      console.log("댓글 삭제 성공");
+      //console.log("댓글 삭제 성공");
     } catch (error) {
       console.error("댓글 삭제 실패:", error);
       // 실패 시 롤백
@@ -266,7 +264,7 @@ function PostDetail() {
       return;
     }
 
-    console.log("댓글 수정 시작:", { postId, commentId, newContent });
+    //console.log("댓글 수정 시작:", { postId, commentId, newContent });
 
     const prevComments = [...comments];
 
@@ -339,8 +337,6 @@ function PostDetail() {
 
   return (
     <PostDetailContainer>
-            <ToastContainer />
-      <Toast />
       {/* 게시글 카드 */}
       <PostCard
         postId={post.id}
@@ -365,13 +361,13 @@ function PostDetail() {
         {comments.map((comment, index) => {
           const isMyComment =
             currentUser?.accountname === comment.author.accountname;
-          console.log(
-            `댓글 ${index}:`,
-            `currentUser=${currentUser?.accountname}`,
-            `commentAuthor=${comment.author.accountname}`,
-            `isMyComment=${isMyComment}`,
-            `userName=${comment.author.username}`
-          );
+          // console.log(
+          //   `댓글 ${index}:`,
+          //   `currentUser=${currentUser?.accountname}`,
+          //   `commentAuthor=${comment.author.accountname}`,
+          //   `isMyComment=${isMyComment}`,
+          //   `userName=${comment.author.username}`
+          // );
           return (
             <div
               key={comment.id}

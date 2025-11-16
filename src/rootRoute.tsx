@@ -31,7 +31,6 @@ export default function RootRoute() {
   const location = useLocation();
 
   return (
-    <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
         {/* 스플래시 - 앱 진입점 */}
         <Route path="/" element={<Splash />} />
@@ -193,6 +192,5 @@ export default function RootRoute() {
           <Route path="/404" element={<ErrPage />} />
         </Route>
       </Routes>
-    </AnimatePresence>
   );
 }
