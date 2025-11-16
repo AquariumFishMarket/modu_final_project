@@ -16,7 +16,8 @@ import {
   reportPost,
   deletePost,
 } from "../../services/postService";
-import { useAuth } from "../../contexts/AuthContext";
+// import { useAuth } from "../../contexts/AuthContext";
+import { useAuthStore } from "../../contexts/useAuthStore";
 import { useHeader } from "../../contexts/HeaderContext";
 import MoreMenu from "../../components/common/modal/MoreMenu";
 
@@ -72,7 +73,8 @@ function PostDetail() {
   const { postId } = useParams<{ postId: string }>();
   const navigate = useNavigate();
   const location = useLocation();
-  const { currentUser } = useAuth();
+  // const { currentUser } = useAuth();
+  const currentUser = useAuthStore((s) => s.user);
   const { setHeaderConfig } = useHeader();
   const [commentText, setCommentText] = useState("");
   const [post, setPost] = useState<Post | null>(null);

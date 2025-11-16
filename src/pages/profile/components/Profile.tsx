@@ -29,15 +29,16 @@ import PostStateBar from "../../../components/post/PostStateBar";
 import PostGallery from "./PostGallery";
 import ProfileImageContainer from "./ProfileImageContainer";
 import { Post } from "../../../types/post";
-import { useAuth } from "../../../contexts/AuthContext";
+// import { useAuth } from "../../../contexts/AuthContext";
 import {
   fetchProfile,
   fetchUserPosts,
   toggleProfileFollow,
 } from "../../../services/profileService";
 import MoreMenu from "../../../components/common/modal/MoreMenu";
+import { useAuthStore } from "../../../contexts/useAuthStore";
 
-const BASE_URL = `https://dev.wenivops.co.kr/services/mandarin`;
+// const BASE_URL = `https://dev.wenivops.co.kr/services/mandarin`;
 
 //  Profile 컴포넌트
 //  - 내 프로필과 다른 유저의 프로필을 조건부 렌더링
@@ -46,7 +47,11 @@ const BASE_URL = `https://dev.wenivops.co.kr/services/mandarin`;
 function Profile() {
   const navigate = useNavigate();
   const { setHeaderConfig } = useHeader();
-  const { currentUser, isLoading: isAuthLoading, logout } = useAuth();
+  // const { currentUser, isLoading: isAuthLoading, logout } = useAuth();
+  const currentUser = useAuthStore((s) => s.user);
+  const isAuthLoading = useAuthStore((s) => s.isLoading);
+  const logout = useAuthStore((s) => s.logout);
+
   // URL 파라미터에서 계정ID 가져오기
   const { accountname: paramAccountname } = useParams<{
     accountname?: string;
@@ -153,6 +158,11 @@ function Profile() {
     );
   };
 
+  const handleLogout = (): void => {
+    logout();
+    navigate("/login", { replace: true });
+  };
+
   useEffect(() => {
     // 헤더 설정
     setHeaderConfig({
@@ -163,7 +173,7 @@ function Profile() {
         <MoreMenu
           type="profile"
           onSettings={() => navigate("/settings")}
-          onLogout={() => logout()}
+          onLogout={handleLogout}
         />
       ),
     });
@@ -261,9 +271,9 @@ function Profile() {
 
             {/* 프로필 이미지 */}
             <ProfileImageContainer
-                src={profileData.image}
-                alt={`${profileData.username}의 프로필 이미지`}
-                onError={handleImageError}
+              src={profileData.image}
+              alt={`${profileData.username}의 프로필 이미지`}
+              onError={handleImageError}
             />
 
             {/* 팔로잉 수 */}

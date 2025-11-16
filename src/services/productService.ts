@@ -128,7 +128,7 @@ export const deleteProduct = async (productId: string): Promise<void> => {
     throw new Error(`상품 삭제 실패: ${response.status}`);
   }
 
-  const data = await response.json();
+  // const data = await response.json();
 
   // 삭제만 하면 되니까 반환 하지 않음
 };
@@ -157,8 +157,6 @@ export const fetchProductList = async (
   }
 
   const data = await response.json();
-
-  console.log("📦 상품 리스트: ", data); // { data, product: [] }
 
   return data;
 };

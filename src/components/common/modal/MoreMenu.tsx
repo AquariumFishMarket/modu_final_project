@@ -3,7 +3,8 @@ import styled from "styled-components";
 import BottomSheet, { SheetItem } from "./BottomSheet";
 import AlertModal from "./AlertModal";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../../contexts/AuthContext";
+// import { useAuth } from "../../../contexts/AuthContext";
+import { useAuthStore } from "../../../contexts/useAuthStore";
 
 interface MoreMenuProps {
   type: "profile" | "post" | "comment" | "chat" | "chatList" | "product";
@@ -78,7 +79,9 @@ export default function MoreMenu({
   const [alertType, setAlertType] = useState<
     "delete" | "deleteComment" | "logout" | "sold" | "reportPost" | null
   >(null);
-  const { logout, currentUser } = useAuth();
+  // const { logout, currentUser } = useAuth();
+  const currentUser = useAuthStore((s) => s.user);
+  const logout = useAuthStore((s) => s.logout);
 
   // 본인 여부 확인 (authorAccountname이 제공된 경우)
   const isOwner = authorAccountname
@@ -103,7 +106,6 @@ export default function MoreMenu({
   const handleDeleteComment = () => {
     closeSheet();
     setAlertType("deleteComment");
-
   };
 
   const handleLogout = () => {
@@ -119,7 +121,6 @@ export default function MoreMenu({
   const handleReportPost = () => {
     closeSheet();
     setAlertType("reportPost");
-
   };
 
   // 실제 로그아웃 처리 함수

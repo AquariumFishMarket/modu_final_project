@@ -5,7 +5,8 @@ import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 import { useState } from "react";
-import { useAuth } from "../../contexts/AuthContext";
+// import { useAuth } from "../../contexts/AuthContext";
+import { useAuthStore } from "../../contexts/useAuthStore";
 import { updateProfile } from "../../services/profileService";
 import { uploadImage } from "../../services/imageService";
 import { getToken } from "../../utils/tokenManager";
@@ -41,7 +42,8 @@ export default function ProfileSetup() {
   const [isValid, setIsValid] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { setToast } = useToastStore();
-  const { refreshUserInfo } = useAuth();
+  // const { refreshUserInfo } = useAuth();
+  const refreshUserInfo = useAuthStore((s) => s.refreshUser);
 
   // 유효성 검사 상태 변경 핸들러
   const handleValidationChange = (valid: boolean) => {

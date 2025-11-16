@@ -101,7 +101,7 @@ export default function AuthForm({
     try {
       await onSubmit(e);
     } catch (error) {
-      console.error("Form submission error:", error);
+      console.error("인증 폼 제출 에러: ", error);
     }
   };
 

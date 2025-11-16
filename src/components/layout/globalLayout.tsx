@@ -9,21 +9,31 @@ import ScrollButton from "../common/buttons/ScrollButton";
 import { useFeedData } from "../../hooks/useFeedData";
 //zustand 전역
 import { useFeedStore } from "../../contexts/useFeedStore";
+import { useAuthStore } from "../../contexts/useAuthStore";
 //인증관련 전역
-import { useAuth } from "../../contexts/AuthContext";
+// import { useAuth } from "../../contexts/AuthContext";
 import { getToken } from "../../utils/tokenManager";
-import { LayoutContainer, MainContent, RefreshAlert, Fish1, Fish2,
-  Seashall, Coral, Drop, Drop2
- } from "./globalLayout.styled";
+import {
+  LayoutContainer,
+  MainContent,
+  RefreshAlert,
+  Fish1,
+  Fish2,
+  Seashall,
+  Coral,
+  Drop,
+  Drop2,
+} from "./globalLayout.styled";
 
 function LayoutContent() {
   const location = useLocation();
   const path = location.pathname;
   const { setHeaderConfig } = useHeader();
   const navigate = useNavigate();
-  const { isAuthenticated, isAuthenticatedRef, currentUser } = useAuth();
-  const [isHeader,setIsHeader] = useState(true)
-  const [isFooter,setIsFooter] = useState(true)
+  // const { isAuthenticated, isAuthenticatedRef, currentUser } = useAuth();
+  const user = useAuthStore((s) => s.user);
+  const [isHeader, setIsHeader] = useState(true);
+  const [isFooter, setIsFooter] = useState(true);
   //drag 이벤트
   const [pull, setPull] = useState(0);
   const startYRef = useRef(0);
@@ -36,7 +46,7 @@ function LayoutContent() {
 
   useEffect(() => {
     const path = location.pathname;
-    if (path !== '/feed') return; // main feed 페이지에서만 작동합니다
+    if (path !== "/feed") return; // main feed 페이지에서만 작동합니다
 
     const container = scrollContainerRef.current;
     if (!container) return;
@@ -50,14 +60,13 @@ function LayoutContent() {
       }
     };
 
-
     const handleDragMove = (clientY: number, preventDefault: () => void) => {
       if (!isDraggingRef.current) return;
 
       const distance = clientY - startYRef.current;
 
-      if(Math.abs(distance) > 7) {
-        hasMoveRef.current = true
+      if (Math.abs(distance) > 7) {
+        hasMoveRef.current = true;
       }
 
       if (distance > 0) {
@@ -67,12 +76,11 @@ function LayoutContent() {
         currentPullRef.current = Math.min(distance, 120);
       }
 
-      if( distance > 60) {
+      if (distance > 60) {
         preventDefault();
         isLetterRef.current = true;
       }
     };
-
 
     const handleDragEnd = () => {
       if (isDraggingRef.current) {
@@ -81,7 +89,7 @@ function LayoutContent() {
         setPull(0);
         isLetterRef.current = false;
 
-        if(hasMoveRef.current && currentPullRef.current > 80) {
+        if (hasMoveRef.current && currentPullRef.current > 80) {
           refreshFeed();
         }
 
@@ -90,11 +98,14 @@ function LayoutContent() {
     };
 
     const handleMouseDown = (e: MouseEvent) => handleDragStart(e.clientY);
-    const handleMouseMove = (e: MouseEvent) => handleDragMove(e.clientY, () => e.preventDefault());
+    const handleMouseMove = (e: MouseEvent) =>
+      handleDragMove(e.clientY, () => e.preventDefault());
     const handleMouseUp = () => handleDragEnd();
 
-    const handleTouchStart = (e: TouchEvent) => handleDragStart(e.touches[0].clientY);
-    const handleTouchMove = (e: TouchEvent) => handleDragMove(e.touches[0].clientY, () => e.preventDefault());
+    const handleTouchStart = (e: TouchEvent) =>
+      handleDragStart(e.touches[0].clientY);
+    const handleTouchMove = (e: TouchEvent) =>
+      handleDragMove(e.touches[0].clientY, () => e.preventDefault());
 
     container.addEventListener("mousedown", handleMouseDown);
     container.addEventListener("mousemove", handleMouseMove);
@@ -112,7 +123,6 @@ function LayoutContent() {
       container.removeEventListener("touchstart", handleTouchStart);
       container.removeEventListener("touchmove", handleTouchMove);
       container.removeEventListener("touchend", handleMouseUp);
-
     };
   }, []);
 
@@ -234,88 +244,108 @@ function LayoutContent() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
 
-
-  useEffect(()=>{
+  useEffect(() => {
     const token = getToken();
-    let isToken = token ? true : false;
+    const isToken = token ? true : false;
 
-    const shouldShowHeader = ():boolean => {
-      if( path === "/login" ||
+    const shouldShowHeader = (): boolean => {
+      if (
+        path === "/login" ||
         path === "/login/email" ||
         path === "/signup" ||
         path === "/profile/setup" ||
-        path === "/404" || !isToken
-      ) { return false } else { return true }
-    }
+        path === "/404" ||
+        !isToken
+      ) {
+        return false;
+      } else {
+        return true;
+      }
+    };
     const shouldShowNav = (): boolean => {
       const showNavPaths = ["/", "/feed", "/search", "/chat-list"];
 
       const isProfilePath =
         path === "/profile" || path.match(/^\/profile\/[^/]+$/);
 
-        const rew = (showNavPaths.includes(path) || !!isProfilePath)
+      const rew = showNavPaths.includes(path) || !!isProfilePath;
 
-      if(rew) {
-        if(isToken) return true
-        else return false
+      if (rew) {
+        if (isToken) return true;
+        else return false;
       } else {
-        return false
+        return false;
       }
     };
 
-    setIsHeader(shouldShowHeader())
-    setIsFooter(shouldShowNav())
-
-  },[currentUser])
-
-
+    setIsHeader(shouldShowHeader());
+    setIsFooter(shouldShowNav());
+  }, [path, user]);
 
   const isProfilePage =
     location.pathname === "/profile" ||
     !!location.pathname.match(/^\/profile\/[^/]+$/);
 
-    const isPostDetailPage = location.pathname.match(/^\/post\/[^/]+$/);
+  const isPostDetailPage = location.pathname.match(/^\/post\/[^/]+$/);
 
-    return (
-      <>
-        <LayoutContainer $isProfile={isProfilePage}>
-          {isHeader && <Header />}
-        {pull !==0 && (
+  return (
+    <>
+      <LayoutContainer $isProfile={isProfilePage}>
+        {isHeader && <Header />}
+        {pull !== 0 && (
           <RefreshAlert $letter={isLetterRef.current} $height={pull}>
-            <div style={{ position: 'relative' }}>
-              <Fish1 src="/img/fish-character.png" $transform={pull} alt="물고기"/>
-              <Seashall src="/img/seashall-character.png" $transform={pull} alt="조개껍질"></Seashall>
-              <p>땡겨서 <span>피쉬마켓</span> 새로고침</p>
-              <Fish2 src="/img/fish-character.png" $transform={pull} alt="물고기"/>
-              <Coral src="/img/coral-character.png" $transform={pull} alt="산호"/>
-              <Drop src="/img/drop.png" $transform={pull} alt="물방울"/>
-              <Drop2 src="/img/drop.png" $transform={pull} alt="물방울"/>
+            <div style={{ position: "relative" }}>
+              <Fish1
+                src="/img/fish-character.png"
+                $transform={pull}
+                alt="물고기"
+              />
+              <Seashall
+                src="/img/seashall-character.png"
+                $transform={pull}
+                alt="조개껍질"
+              ></Seashall>
+              <p>
+                땡겨서 <span>피쉬마켓</span> 새로고침
+              </p>
+              <Fish2
+                src="/img/fish-character.png"
+                $transform={pull}
+                alt="물고기"
+              />
+              <Coral
+                src="/img/coral-character.png"
+                $transform={pull}
+                alt="산호"
+              />
+              <Drop src="/img/drop.png" $transform={pull} alt="물방울" />
+              <Drop2 src="/img/drop.png" $transform={pull} alt="물방울" />
             </div>
           </RefreshAlert>
-          )}
-          <AnimatePresence mode="wait">
-            <MainContent
-              key={location.pathname}
-              $hasFooter={isFooter}
-              $isProfile={isProfilePage}
-              $isPostDetail={!!isPostDetailPage}
-              as={motion.main}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.26, ease: "easeOut" }}
-              ref={scrollContainerRef}
-              isPadding={location.pathname}
-            >
-              <Outlet />
-            </MainContent>
-          </AnimatePresence>
-          {isFooter && <FooterNav />}
-        </LayoutContainer>
-        {/* 플로팅 챗봇 - position: fixed로 전역에 표시 */}
-        <FloatingChatbot />
-        <ScrollButton scrollContainerRef={scrollContainerRef}></ScrollButton>
-      </>
-    );
+        )}
+        <AnimatePresence mode="wait">
+          <MainContent
+            key={location.pathname}
+            $hasFooter={isFooter}
+            $isProfile={isProfilePage}
+            $isPostDetail={!!isPostDetailPage}
+            as={motion.main}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.26, ease: "easeOut" }}
+            ref={scrollContainerRef}
+            isPadding={location.pathname}
+          >
+            <Outlet />
+          </MainContent>
+        </AnimatePresence>
+        {isFooter && <FooterNav />}
+      </LayoutContainer>
+      {/* 플로팅 챗봇 - position: fixed로 전역에 표시 */}
+      <FloatingChatbot />
+      <ScrollButton scrollContainerRef={scrollContainerRef}></ScrollButton>
+    </>
+  );
 }
 
 export default function GlobalLayout() {

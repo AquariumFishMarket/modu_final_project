@@ -1,16 +1,17 @@
 import React, { useState } from "react";
-import AuthForm from "../../components/common/auth/AuthForm";
-import styled from "styled-components";
 import { Link, useNavigate } from "react-router-dom";
-import { signup, login } from "../../services/authService";
-import { saveToken } from "../../utils/tokenManager";
-import { useAuth } from "../../contexts/AuthContext";
+import styled from "styled-components";
+import AuthForm from "../../components/common/auth/AuthForm";
+// import { signup, login } from "../../services/authService";
+// import { saveToken } from "../../utils/tokenManager";
+// import { useAuth } from "../../contexts/AuthContext";
+import { useAuthStore } from "../../contexts/useAuthStore";
 import {
   validateEmail,
   validatePassword,
   validateEmailDuplicate,
 } from "../../utils/validation/AuthValidation";
-import { toast } from "react-toastify";
+// import { toast } from "react-toastify";
 import { useToastStore } from "../../contexts/useToastStore";
 
 const Signuptitle = styled.h2`
@@ -34,14 +35,13 @@ const LoginLink = styled(Link)`
   }
 `;
 
-
-
 export default function Signup() {
   const navigate = useNavigate();
   const [formError, setFormError] = useState<string>("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { refreshUserInfo } = useAuth();
+  // const { refreshUserInfo } = useAuth();
   const { setToast } = useToastStore();
+  const signup = useAuthStore((s) => s.signup);
+  const isLoading = useAuthStore((state) => state.isLoading);
 
   // 회원가입 폼 필드 설정
   const signupFields = [
@@ -72,7 +72,6 @@ export default function Signup() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setIsSubmitting(true);
     setFormError("");
 
     const formData = new FormData(e.currentTarget);
@@ -80,23 +79,22 @@ export default function Signup() {
     const password = formData.get("password") as string;
 
     try {
-      await signup(email, password);
+      // await signup(email, password);
+      // const loginResult = await login(email, password);
+      // saveToken(loginResult.token);
+      // await refreshUserInfo();
 
-      const loginResult = await login(email, password);
+      const user = await signup(email, password);
 
-      saveToken(loginResult.token);
-
-      await refreshUserInfo(); // 사용자 정보 즉시 갱신
-      setToast("회원가입 완료😊")
-
+      if (user) {
+        setToast("회원가입 완료😊", () => navigate("/profile/setup"));
+      }
     } catch (error) {
       setFormError(
         error instanceof Error
           ? error.message
           : "알 수 없는 오류가 발생했습니다. 다시 시도해주세요."
       );
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -105,7 +103,7 @@ export default function Signup() {
       <Signuptitle>회원가입</Signuptitle>
       <AuthForm
         fields={signupFields}
-        buttonText={isSubmitting ? "처리 중..." : "회원가입"}
+        buttonText={isLoading ? "처리 중..." : "회원가입"}
         onSubmit={handleSubmit}
         formError={formError}
       />
