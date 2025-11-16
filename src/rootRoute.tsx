@@ -29,6 +29,7 @@ import GuestRoute from "./utils/GuestRoute";
 
 export default function RootRoute() {
   const location = useLocation();
+
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>

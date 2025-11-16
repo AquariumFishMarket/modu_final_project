@@ -11,7 +11,7 @@ import { useFeedData } from "../../hooks/useFeedData";
 import { useFeedStore } from "../../contexts/useFeedStore";
 //인증관련 전역
 import { useAuth } from "../../contexts/AuthContext";
-
+import { getToken } from "../../utils/tokenManager";
 import { LayoutContainer, MainContent, RefreshAlert, Fish1, Fish2,
   Seashall, Coral, Drop, Drop2
  } from "./globalLayout.styled";
@@ -234,13 +234,17 @@ function LayoutContent() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
 
+
   useEffect(()=>{
+    const token = getToken();
+    let isToken = token ? true : false;
+
     const shouldShowHeader = ():boolean => {
       if( path === "/login" ||
         path === "/login/email" ||
         path === "/signup" ||
         path === "/profile/setup" ||
-        path === "/404" || !isAuthenticatedRef.current
+        path === "/404" || !isToken
       ) { return false } else { return true }
     }
     const shouldShowNav = (): boolean => {
@@ -249,7 +253,14 @@ function LayoutContent() {
       const isProfilePath =
         path === "/profile" || path.match(/^\/profile\/[^/]+$/);
 
-      return (showNavPaths.includes(path) || !!isProfilePath) && isAuthenticatedRef.current;
+        const rew = (showNavPaths.includes(path) || !!isProfilePath)
+
+      if(rew) {
+        if(isToken) return true
+        else return false
+      } else {
+        return false
+      }
     };
 
     setIsHeader(shouldShowHeader())
