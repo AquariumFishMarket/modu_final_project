@@ -3,12 +3,17 @@ import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 import { Product } from "../../types/product";
 import { useHeader } from "../../contexts/HeaderContext";
+import { useAuth } from "../../contexts/AuthContext";
 import {
   deleteProduct,
   fetchProductDetail,
 } from "../../services/productService";
 import MoreMenu from "../../components/common/modal/MoreMenu";
 import { formatPostDate } from "../../utils/formatter/dateFormatter";
+// import { useToastStore } from "../../contexts/useToastStore";
+// import { toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const ProductContainer = styled.section`
   max-width: 600px;
@@ -98,7 +103,7 @@ const BottomActionBar = styled.div`
 `;
 
 const ActionButton = styled.button<{
-  $variant: "chat" | "buy";
+  $variant: "chat" | "buy" | "chatting";
   $disabled?: boolean;
 }>`
   flex: 1;
@@ -106,7 +111,7 @@ const ActionButton = styled.button<{
   border-radius: 8px;
   background-color: var(--color-gray-light);
   font-size: var(--font-size-md);
-  font-weight: 600;
+  font-weight: 500;
   transition: all 0.2s ease;
 
   ${(props) =>
@@ -115,10 +120,19 @@ const ActionButton = styled.button<{
       background: var(--color-primary-600);
       color: white;
       `
+      : props.$variant === "chatting"
+      ? `
+        background: rgba(41, 48, 56, 1);
+        color: white;
+
+        span {
+            font-weight: 700;
+          }
+      `
       : `
-      background-color: var(--color-gray-light);
-      color: black;
-    `}
+        background: var(--color-gray-light);
+        color: black;
+      `}
 
   &:disabled {
     ${(props) =>
@@ -249,6 +263,7 @@ export default function ProductDetail() {
   const [product, setProduct] = useState<Product | null>(null);
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
+  const { currentUser } = useAuth();
 
   // 헤더 설정
   useEffect(() => {
@@ -310,6 +325,9 @@ export default function ProductDetail() {
     return <div>상품을 찾을 수 없습니다.</div>;
   }
 
+  // 내 상품
+  const isMine = product.author.accountname === currentUser?.accountname;
+
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const target = e.currentTarget;
     // 무한 onError 방지: 이미 기본 이미지로 변경된 경우 중단
@@ -330,13 +348,22 @@ export default function ProductDetail() {
 
   // 채팅하기
   const handleChatStart = () => {
-    // navigate(`/chat-room/${product.seller.id}`);
+    // toast("서비스 준비 중입니다! 🐠 ", {
+    //   position: "top-center",
+    //   autoClose: 1000,
+    //   hideProgressBar: false,
+    //   closeOnClick: true,
+    //   pauseOnHover: true,
+    //   draggable: true,
+    //   progress: undefined,
+    //   theme: "colored",
+    // });
+    console.log("채팅하기 버튼");
   };
 
   // 구매하기
   const handlePurchase = () => {
     if (!product.link) return;
-
     window.open(product.link, "_blank");
   };
 
@@ -366,6 +393,7 @@ export default function ProductDetail() {
 
   return (
     <>
+      <ToastContainer />
       <ContentWrapper>
         <ProductContainer>
           <h2 className="sr-only">판매상품 상세 페이지</h2>
@@ -409,35 +437,62 @@ export default function ProductDetail() {
 
       {/* 하단 액션 바 */}
       <BottomActionBar>
-        <LikeButton
-          $isLiked={isLiked}
-          onClick={handleLikeToggle}
-          disabled={product.status === "sold"}
-        >
-          {isLiked ? (
-            <img src="/img/icon-like-full.svg" alt="" />
-          ) : (
-            <img src="/img/icon-like-empty.svg" alt="" />
-          )}
-        </LikeButton>
+        {isMine ? (
+          // 내 상품
+          <>
+            <LikeButton
+              $isLiked={isLiked}
+              onClick={handleLikeToggle}
+              disabled={product.status === "sold"}
+            >
+              {isLiked ? (
+                <img src="/img/icon-like-full.svg" alt="" />
+              ) : (
+                <img src="/img/icon-like-empty.svg" alt="" />
+              )}
+            </LikeButton>
+            <ActionButton
+              $variant="chatting"
+              onClick={handleChatStart}
+              disabled={product.status === "sold"}
+            >
+              대화 중인 채팅 <span>{0}</span>
+            </ActionButton>
+          </>
+        ) : (
+          // 다른 사용자의 상품
+          <>
+            <LikeButton
+              $isLiked={isLiked}
+              onClick={handleLikeToggle}
+              disabled={product.status === "sold"}
+            >
+              {isLiked ? (
+                <img src="/img/icon-like-full.svg" alt="" />
+              ) : (
+                <img src="/img/icon-like-empty.svg" alt="" />
+              )}
+            </LikeButton>
 
-        {product.link && (
-          <ActionButton
-            $variant="buy"
-            onClick={handlePurchase}
-            disabled={product.status === "sold"}
-          >
-            구매하기
-          </ActionButton>
+            {product.link && (
+              <ActionButton
+                $variant="buy"
+                onClick={handlePurchase}
+                disabled={product.status === "sold"}
+              >
+                구매하기
+              </ActionButton>
+            )}
+
+            <ActionButton
+              $variant="chat"
+              onClick={handleChatStart}
+              disabled={product.status === "sold"}
+            >
+              채팅하기
+            </ActionButton>
+          </>
         )}
-
-        <ActionButton
-          $variant="chat"
-          onClick={handleChatStart}
-          disabled={product.status === "sold"}
-        >
-          채팅하기
-        </ActionButton>
       </BottomActionBar>
     </>
   );
