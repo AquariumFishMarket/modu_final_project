@@ -9,8 +9,6 @@ import {
   FollowText,
   FollowerValue,
   FollowingValue,
-  ProfileImageBox,
-  ProfileImage,
   UserInfoBox,
   UserName,
   UserId,
@@ -29,6 +27,7 @@ import type { UserProfile } from "../../../types/user";
 import PostCard from "../../../components/post/postCard/PostCard";
 import PostStateBar from "../../../components/post/PostStateBar";
 import PostGallery from "./PostGallery";
+import ProfileImageContainer from "./ProfileImageContainer";
 import { Post } from "../../../types/post";
 import { useAuth } from "../../../contexts/AuthContext";
 import {
@@ -266,13 +265,11 @@ function Profile() {
             </FollowStatBox>
 
             {/* 프로필 이미지 */}
-            <ProfileImageBox>
-              <ProfileImage
+            <ProfileImageContainer
                 src={profileData.image}
                 alt={`${profileData.username}의 프로필 이미지`}
                 onError={handleImageError}
-              />
-            </ProfileImageBox>
+            />
 
             {/* 팔로잉 수 */}
             <FollowStatBox onClick={handleFollowingClick}>
