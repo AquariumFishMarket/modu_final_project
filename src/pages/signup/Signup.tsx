@@ -38,7 +38,7 @@ export default function Signup() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { refreshUserInfo } = useAuth();
 
-  // 회원가입 폼 필드 설정 (validator 연결)
+  // 회원가입 폼 필드 설정
   const signupFields = [
     {
       type: "email" as const,
@@ -47,11 +47,11 @@ export default function Signup() {
       placeholder: "이메일 주소를 입력해 주세요.",
       required: true,
       validator: async (value: string) => {
-        // 형식 검사
         const formatError = validateEmail(value);
         if (formatError) return formatError;
-        // 중복 검사
+
         const duplicateError = await validateEmailDuplicate(value);
+        console.log("이메일 중복 체크: ", duplicateError);
         return duplicateError || "";
       },
     },
@@ -87,19 +87,14 @@ export default function Signup() {
 
       navigate("/profile/setup");
     } catch (error) {
-      // 실패 시 alert 대신 하단 메시지로만 표시
       setFormError(
         error instanceof Error
           ? error.message
-          : "이메일과 비밀번호를 다시 확인해주세요."
+          : "알 수 없는 오류가 발생했습니다. 다시 시도해주세요."
       );
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const handleButtonClick = (): void => {
-    console.log("회원가입 버튼 클릭");
   };
 
   return (
@@ -109,7 +104,6 @@ export default function Signup() {
         fields={signupFields}
         buttonText={isSubmitting ? "처리 중..." : "회원가입"}
         onSubmit={handleSubmit}
-        onButtonClick={handleButtonClick}
         formError={formError}
       />
       <LoginLink to={"/login/email"}>

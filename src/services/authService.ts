@@ -99,10 +99,10 @@ export const signup = async (
   });
 
   const data = await response.json();
-  console.log("회원가입 응답:", data);
+  console.log("회원가입 응답: ", data.message);
 
   if (!response.ok) {
-    throw new Error("회원가입에 실패했습니다.");
+    throw new Error("이미 사용 중인 이메일입니다.");
   }
 
   return data;
@@ -113,32 +113,25 @@ export const login = async (
   email: string,
   password: string
 ): Promise<LoginResponse> => {
-  try {
-    const response = await fetch(`${BASE_URL}/user/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+  const response = await fetch(`${BASE_URL}/user/login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      user: {
+        email: email,
+        password: password,
       },
-      body: JSON.stringify({
-        user: {
-          email: email,
-          password: password,
-        },
-      }),
-    });
+    }),
+  });
 
-    const data = await response.json();
-    console.log("✅ 로그인 성공:", data);
+  const data = await response.json();
+  console.log("로그인 응답:", data.message);
 
-    if (!response.ok) {
-      throw new Error("로그인에 실패했습니다.");
-    }
-
-    return data;
-  } catch (error) {
-    console.error("❌ 로그인 에러:", error);
-    throw error;
+  if (!response.ok) {
+    throw new Error("이메일 또는 비밀번호가 일치하지 않습니다.");
   }
-};
 
-// 프로필 조회/수정 API는 profileService로 이동
+  return data;
+};

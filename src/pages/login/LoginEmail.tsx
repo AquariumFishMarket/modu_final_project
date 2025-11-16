@@ -64,15 +64,11 @@ export default function LoginEmail() {
       setFormError(
         error instanceof Error
           ? error.message
-          : "이메일과 비밀번호를 다시 확인해주세요."
+          : "알 수 없는 오류가 발생했습니다. 다시 시도해주세요."
       );
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const handleButtonClick = (): void => {
-    console.log("로그인 버튼 클릭");
   };
 
   // 로그인 폼 필드 설정
@@ -98,7 +94,6 @@ export default function LoginEmail() {
         fields={loginFields}
         buttonText={isSubmitting ? "로그인 중..." : "로그인"}
         onSubmit={handleSubmit}
-        onButtonClick={handleButtonClick}
         disabled={isSubmitting}
         formError={formError}
       />

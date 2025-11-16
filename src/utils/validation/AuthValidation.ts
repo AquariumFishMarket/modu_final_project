@@ -13,18 +13,18 @@ export const validateEmailDuplicate = async (
   email: string
 ): Promise<string | null> => {
   try {
-    const result = await checkEmailDuplicate(email);
+    const data = await checkEmailDuplicate(email);
 
-    if (result.message === "사용 가능한 이메일 입니다.") {
+    if (data.message === "사용 가능한 이메일 입니다.") {
       return null;
     }
-    if (result.message === "이미 가입된 이메일 주소 입니다.") {
+    if (data.message === "이미 가입된 이메일 주소 입니다.") {
       return "이미 사용 중인 이메일입니다.";
     }
-    if (result.message === "잘못된 접근입니다.") {
+    if (data.message === "잘못된 접근입니다.") {
       return "잘못된 접근입니다.";
     }
-    if (result.message === "잘못된 이메일 형식입니다.") {
+    if (data.message === "잘못된 이메일 형식입니다.") {
       return "올바른 이메일 형식이 아닙니다.";
     }
     return "이메일 확인 중 오류가 발생했습니다.";
