@@ -14,7 +14,7 @@ const ImageArea = styled.div<{
   width: ${(props) => `${props.width}px`};
   height: ${(props) => `${props.width}px`};
   border-radius: 100%;
-  border: 10px solid var(--color-gray-medium);
+  border: 1px solid var(--color-gray-medium);
   background-image: ${(props) =>
     props.$thumbimg === false
       ? "url(/img/empty-profile.png)"
