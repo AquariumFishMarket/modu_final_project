@@ -39,9 +39,12 @@ import {
   fetchUserPosts,
   toggleProfileFollow,
 } from "../../../services/profileService";
-import MoreMenu from "../../../components/common/modal/MoreMenu";
 
+import { likePost, unlikePost } from "../../../services/postService";
+import MoreMenu from "../../../components/common/modal/MoreMenu";
 import { formatPostDate } from "../../../utils/formatter/dateFormatter";
+import { fetchPostMeta } from "../../../utils/fetchPostMeta";
+import { useFeedStore } from "../../../contexts/useFeedStore";
 
 function Profile() {
   const navigate = useNavigate();
@@ -61,6 +64,8 @@ function Profile() {
   const [postState, setPostState] = useState<"list" | "gallery">("list");
   const [isFollowLoading, setIsFollowLoading] = useState(false);
 
+  const toggleFeedLike = useFeedStore((state) => state.toggleLike);
+
   const currentUserAccountname = currentUser?.accountname ?? "";
 
   const targetAccountname =
@@ -70,6 +75,7 @@ function Profile() {
 
   const isMyProfile = currentUserAccountname === targetAccountname;
 
+  // 헤더 설정
   useEffect(() => {
     setHeaderConfig({
       show: true,
@@ -85,15 +91,18 @@ function Profile() {
     });
   }, [navigate, setHeaderConfig, logout]);
 
+  // 프로필 / 게시글 불러오기
   useEffect(() => {
     const loadProfile = async () => {
       if (isAuthLoading) return;
+
       if (!currentUser) {
         navigate("/login");
         return;
       }
 
       setIsLoading(true);
+
       try {
         let profile: UserProfile;
 
@@ -122,7 +131,35 @@ function Profile() {
         setProfileData(profile);
 
         const posts = await fetchUserPosts(profile.accountname);
-        setPostsList(posts || []);
+
+        const enhancedPosts: Post[] = await Promise.all(
+          (posts || []).map(async (post) => {
+            try {
+              const meta = await fetchPostMeta(post.id);
+
+              return {
+                ...post,
+                heartCount:
+                  typeof meta.heartCount === "number"
+                    ? meta.heartCount
+                    : post.heartCount,
+                commentCount:
+                  typeof meta.commentCount === "number"
+                    ? meta.commentCount
+                    : post.commentCount,
+                hearted:
+                  typeof meta.hearted === "boolean"
+                    ? meta.hearted
+                    : post.hearted,
+                image: meta.image || post.image,
+              };
+            } catch {
+              return post;
+            }
+          })
+        );
+
+        setPostsList(enhancedPosts);
       } catch (err) {
         console.error("프로필 로드 실패:", err);
       } finally {
@@ -140,9 +177,11 @@ function Profile() {
     currentUserAccountname,
   ]);
 
+  // 팔로우 상태가 다른 곳에서 바뀐 경우 동기화
   useEffect(() => {
     if (!updatedFollow || !profileData) return;
 
+    // 내가 보고 있는 프로필의 팔로우 정보가 바뀐 경우
     if (updatedFollow.accountname === profileData.accountname) {
       setProfileData((prev) =>
         prev
@@ -158,6 +197,7 @@ function Profile() {
       );
     }
 
+    // 내 프로필이면 내가 팔로우한 수 갱신
     if (isMyProfile) {
       setProfileData((prev) =>
         prev
@@ -175,32 +215,62 @@ function Profile() {
     clearFollowUpdate();
   }, [updatedFollow, profileData, clearFollowUpdate, isMyProfile]);
 
+  // 팔로우 / 언팔 토글
   const handleFollowToggle = async () => {
     if (!profileData || isFollowLoading) return;
-
-    const prev = profileData;
-    const newState = !profileData.isfollow;
-
-    setProfileData({
-      ...profileData,
-      isfollow: newState,
-      followerCount: profileData.followerCount + (newState ? 1 : -1),
-    });
 
     setIsFollowLoading(true);
 
     try {
-      await toggleProfileFollow(profileData.accountname, prev.isfollow);
+      await toggleProfileFollow(profileData.accountname, profileData.isfollow);
 
-      useFollowStore.getState().updateFollow({
-        accountname: profileData.accountname,
-        isfollow: newState,
-        followerCountDiff: newState ? 1 : -1,
-      });
+      setProfileData((prev) =>
+        prev
+          ? {
+              ...prev,
+              isfollow: !prev.isfollow,
+              followerCount: prev.isfollow
+                ? prev.followerCount - 1
+                : prev.followerCount + 1,
+            }
+          : prev
+      );
     } catch (err) {
-      setProfileData(prev); // 롤백
+      console.error("팔로우 토글 실패:", err);
     } finally {
       setIsFollowLoading(false);
+    }
+  };
+
+  // 좋아요 기능
+  const handleProfileLike = async (post: Post) => {
+    const isLikedNow = post.hearted;
+
+    setPostsList((prev) =>
+      prev.map((p) =>
+        p.id === post.id
+          ? {
+              ...p,
+              hearted: !p.hearted,
+              heartCount: p.hearted ? p.heartCount - 1 : p.heartCount + 1,
+            }
+          : p
+      )
+    );
+
+    toggleFeedLike(post.id);
+
+    try {
+      const updatedPost = isLikedNow
+        ? await unlikePost(post.id)
+        : await likePost(post.id);
+
+      if (updatedPost) {
+        useFeedStore.getState().updatePost(updatedPost);
+      }
+    } catch (err) {
+      console.error("좋아요 처리 실패:", err);
+      // 실패 시 롤백까지 하고 싶다면 여기서 setPostsList(prev => ...) 로 복구 가능
     }
   };
 
@@ -215,10 +285,7 @@ function Profile() {
   return (
     <>
       <ProfileSection>
-        <h2 className="sr-only">프로필</h2>
-
         <ProfileContainer>
-          {/* 상단 FOLLOWER - IMAGE - FOLLOWING */}
           <ProfileTopSection>
             <FollowStatBox
               onClick={() =>
@@ -249,7 +316,6 @@ function Profile() {
             </FollowStatBox>
           </ProfileTopSection>
 
-          {/* 유저 정보 */}
           <UserInfoBox>
             <UserName>{profileData.username}</UserName>
             <UserId>@{profileData.accountname}</UserId>
@@ -257,7 +323,6 @@ function Profile() {
 
           <UserDescription>{profileData.intro}</UserDescription>
 
-          {/* 버튼 그룹 */}
           <ActionButtonsContainer>
             {isMyProfile ? (
               <>
@@ -285,6 +350,7 @@ function Profile() {
                   variant={profileData.isfollow ? "secondary" : "primary"}
                   width={120}
                   onClick={handleFollowToggle}
+                  disabled={isFollowLoading}
                 />
                 <IconButton $iconUrl="/img/icon-share.svg" />
               </>
@@ -293,10 +359,8 @@ function Profile() {
         </ProfileContainer>
       </ProfileSection>
 
-      {/* 상품 */}
       <SellingProducts isLastSection={postsList.length === 0} />
 
-      {/* 게시글 */}
       {postsList.length > 0 && (
         <>
           <PostStateBar postState={postState} setPostState={setPostState} />
@@ -308,16 +372,19 @@ function Profile() {
                   <PostCard
                     key={post.id}
                     postId={post.id}
-                    userName={post.author.username}
-                    userId={post.author.accountname}
-                    avatarSrc={post.author.image}
-                    avatarAlt={`@${post.author.accountname} 프로필 이미지`}
+                    userName={post.author?.username || "알 수 없음"}
+                    userId={post.author?.accountname || ""}
+                    avatarSrc={post.author?.image || "/img/empty-profile.png"}
+                    avatarAlt={`@${
+                      post.author?.accountname || "unknown"
+                    } 프로필 이미지`}
                     content={post.content}
                     imageSrc={post.image}
                     dateTime={post.createdAt}
                     likeCount={post.heartCount}
                     commentCount={post.commentCount}
                     isLiked={post.hearted}
+                    onLikeClick={() => handleProfileLike(post)}
                     onCommentClick={() => navigate(`/post/${post.id}`)}
                   />
                 ))}
@@ -326,9 +393,9 @@ function Profile() {
               <PostGallery
                 posts={postsList.map((post) => ({
                   postId: post.id,
-                  userName: post.author.username,
-                  userId: post.author.accountname,
-                  avatarSrc: post.author.image,
+                  userName: post.author?.username || "알 수 없음",
+                  userId: post.author?.accountname || "",
+                  avatarSrc: post.author?.image || "/img/empty-profile.png",
                   content: post.content,
                   imageSrc: post.image,
                   dateTime: post.createdAt,
