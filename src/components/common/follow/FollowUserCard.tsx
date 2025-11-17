@@ -10,7 +10,8 @@ import {
   UserIntro,
 } from "./FollowUserCard.styled";
 import DefaultButton from "../buttons/Button";
-import { useAuth } from "../../../contexts/AuthContext";
+// import { useAuth } from "../../../contexts/AuthContext";
+import { useAuthStore } from "../../../contexts/useAuthStore";
 
 interface FollowUserCardProps {
   userName: string;
@@ -29,7 +30,8 @@ function FollowUserCard({
   isFollowing,
   onFollowToggle,
 }: FollowUserCardProps) {
-  const { currentUser } = useAuth();
+  // const { currentUser } = useAuth();
+  const currentUser = useAuthStore((s) => s.user);
   const isMe = currentUser?.accountname === userId;
 
   const handleFollowClick = () => {

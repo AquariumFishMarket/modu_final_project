@@ -11,6 +11,8 @@ import MoreMenu from "../common/modal/MoreMenu";
 import { formatPostDate } from "../../utils/formatter/dateFormatter";
 import { deletePost, EditPost } from "../../services/postService";
 import UserAvatarBox from "./UserAvatar";
+import SkeletonWrapper from "../common/SkeletonWrapper";
+import { useFeedStore } from "../../contexts/useFeedStore";
 
 interface PostHeaderProps {
   userName: string;
@@ -47,7 +49,7 @@ function PostHeader({
 }: PostHeaderProps) {
   const navigate = useNavigate();
   const [imgSrc, setImgSrc] = useState(avatarSrc);
-
+  const { isLoading } = useFeedStore();
   const handleImageError = () => {
     setImgSrc("/img/fish-logo-GB.png");
   };
