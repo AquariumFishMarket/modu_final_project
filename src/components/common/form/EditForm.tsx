@@ -54,10 +54,26 @@ function EditFormInner<T extends FormData>(
   const [imageUrl, setImageUrl] = useState<string>(initialImageUrl); // 기존 이미지 URL
   const [hasUserInteraction, setHasUserInteraction] = useState(false);
 
-  // 프로필 이미지 프리뷰 URL 캐싱 -> 이미지 깜빡거림 해결
   const previewUrl = useMemo(
     () => (imgFile ? URL.createObjectURL(imgFile) : imageUrl || undefined),
     [imgFile, imageUrl]
+  );
+
+  useEffect(() => {
+    if (initialImageUrl) {
+      setImageUrl(initialImageUrl);
+    }
+  }, [initialImageUrl]);
+
+  // 이미지 업로드 핸들러 (배열 → 단일)
+  const handleImageChange: Dispatch<SetStateAction<File[]>> = useCallback(
+    (filesOrUpdater) => {
+      if (typeof filesOrUpdater === "function") return;
+
+      const files = filesOrUpdater as File[];
+      setImgFile(files[0] || null);
+    },
+    []
   );
 
   // 버튼 활성화 조건
@@ -77,7 +93,6 @@ function EditFormInner<T extends FormData>(
     onValidationChange?.(isFormValid);
   }, [isFormValid, onValidationChange]);
 
-  // 입력 변경 핸들러
   const handleInputChange = (fieldName: string, value: string) => {
     const field = fields.find((f) => f.name === fieldName);
 
@@ -92,13 +107,11 @@ function EditFormInner<T extends FormData>(
     }
   };
 
-  // 포커스 아웃 시 유효성 검사
   const handleBlur = async (fieldName: string, value: string) => {
     if (!hasUserInteraction) return; // 사용자가 실제로 수정한 경우에만 유효성 검사
 
     const field = fields.find((f) => f.name === fieldName);
 
-    // 기존 값과 같으면 검사 안함 (중복 체크 불필요)
     if (value === initialValues[fieldName]) {
       setErrors((prev) => ({ ...prev, [fieldName]: "" }));
       return;
@@ -121,11 +134,11 @@ function EditFormInner<T extends FormData>(
   // 폼 제출 로직
   const performSubmit = useCallback(async () => {
     const newErrors: ValidationErrors = {};
+
     for (const field of fields) {
       if (field.required && !formValues[field.name]?.trim()) {
         newErrors[field.name] = `${field.label}는 필수입니다.`;
       } else if (field.validator && formValues[field.name]?.trim()) {
-        // 기존 값과 같으면 검증 안함
         if (formValues[field.name] !== initialValues[field.name]) {
           const error = await field.validator(formValues[field.name]);
           if (error) newErrors[field.name] = error;
@@ -145,18 +158,14 @@ function EditFormInner<T extends FormData>(
     return false;
   }, [fields, formValues, imgFile, imageUrl, initialValues, onSubmit]);
 
-  // 외부에서 호출할 수 있는 제출 함수
   const submitForm = async () => {
-    console.log("📤 submitForm 호출됨");
     await performSubmit();
   };
 
-  // ref를 통해 submitForm 메서드 노출
   useImperativeHandle(ref, () => ({
     submitForm,
   }));
 
-  // 폼 제출 핸들러 (기본 폼 제출 방지)
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
   };
@@ -174,29 +183,6 @@ function EditFormInner<T extends FormData>(
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // 초기 이미지 URL이 변경될 때 업데이트
-  useEffect(() => {
-    if (initialImageUrl) {
-      setImageUrl(initialImageUrl);
-    }
-  }, [initialImageUrl]);
-
-  // ⁉️ 이미지 업로드 핸들러 (배열 → 단일)
-  const handleImageChange: Dispatch<SetStateAction<File[]>> = useCallback(
-    (filesOrUpdater) => {
-      // SetStateAction은 값 또는 함수일 수 있음
-      if (typeof filesOrUpdater === "function") {
-        // 함수형 업데이트는 사용 안함
-        return;
-      }
-
-      // 배열을 받아서 첫 번째 요소만 사용
-      const files = filesOrUpdater as File[];
-      setImgFile(files[0] || null);
-    },
-    []
-  );
 
   return (
     <section>
@@ -232,7 +218,13 @@ function EditFormInner<T extends FormData>(
           {formType === "product" && previewUrl && (
             <ImageContainer
               key={`product-images-${previewUrl}`}
-              imgArr={imgFile ? [imgFile] : imageUrl ? [imageUrl as unknown as File] : []}
+              imgArr={
+                imgFile
+                  ? [imgFile]
+                  : imageUrl
+                  ? [imageUrl as unknown as File]
+                  : []
+              }
               setDeleteIdx={() => {
                 setImgFile(null);
                 setImageUrl("");

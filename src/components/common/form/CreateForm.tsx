@@ -58,13 +58,12 @@ function CreateFormInner<T extends FormData>(
   const [deleteIdx, setDeleteIdx] = useState<number | undefined>();
 
   const hasSelectedImage = imgFiles.length > 0;
-  // 이미지 프리뷰 URL 캐싱
+
   const previewUrl = useMemo(
     () => (imgFiles[0] ? URL.createObjectURL(imgFiles[0]) : undefined),
     [imgFiles]
   );
 
-  // 프로필 이미지 클릭 시 삭제 핸들러
   const handleProfileImageClick = () => {
     if (hasSelectedImage) {
       setImgFiles([]);
@@ -91,7 +90,6 @@ function CreateFormInner<T extends FormData>(
       (status) => status === "checking"
     );
 
-    // 이미지 필수
     const imageValid = !imageRequired || hasSelectedImage;
 
     return allRequiredFilled && hasNoErrors && !isChecking && imageValid;
@@ -102,14 +100,12 @@ function CreateFormInner<T extends FormData>(
     validationStatus,
     imageRequired,
     hasSelectedImage,
-  ]); // 실제 의존성
+  ]);
 
-  // useEffect에서 안전하게 사용
   useEffect(() => {
     onValidationChange?.(isFormValid);
   }, [isFormValid, onValidationChange]);
 
-  // 입력 변경 핸들러
   const handleInputChange = (fieldName: string, value: string) => {
     const field = fields.find((f) => f.name === fieldName);
 
@@ -120,21 +116,17 @@ function CreateFormInner<T extends FormData>(
 
     setFormValues((prev) => ({ ...prev, [fieldName]: formattedValue }));
 
-    // 기존 에러 제거
     if (errors[fieldName]) {
       setErrors((prev) => ({ ...prev, [fieldName]: "" }));
     }
     setValidationStatus((prev) => ({ ...prev, [fieldName]: "idle" }));
   };
 
-  // 포커스 아웃 시 유효성 검사
   const handleBlur = async (fieldName: string, value: string) => {
     const field = fields.find((f) => f.name === fieldName);
 
-    // validator가 없으면 검사 안함
     if (!field?.validator) return;
 
-    // 필수 필드가 아니고 비어있으면 검사 안함
     if (!field.required && !value.trim()) {
       return;
     }
@@ -161,9 +153,7 @@ function CreateFormInner<T extends FormData>(
     }
   };
 
-  // 폼 제출 로직 (버튼 클릭과 외부 호출 모두 사용)
   const performSubmit = async () => {
-    // 전체 유효성 검사
     const newErrors: ValidationErrors = {};
 
     for (const field of fields) {
@@ -171,10 +161,6 @@ function CreateFormInner<T extends FormData>(
         newErrors[field.name] = `${field.label}는 필수입니다.`;
       } else if (field.validator && formValues[field.name]?.trim()) {
         const error = await field.validator(formValues[field.name]);
-        // 계정ID 제출 시 검사 로그
-        if (field.name === "accountname") {
-          console.log("계정ID 제출 에러 메시지:", error);
-        }
         if (error) newErrors[field.name] = error;
       }
     }
@@ -186,14 +172,11 @@ function CreateFormInner<T extends FormData>(
       return false;
     }
 
-    // onSubmit 호출 - FormData 형식으로 전달
     if (onSubmit) {
-      // FormData 형식으로 변환
       const submissionData: Record<string, string | File | undefined> = {
         ...formValues,
       };
 
-      // 이미지 파일이 있으면 추가
       if (imgFiles.length > 0) {
         if (formType === "profile") {
           submissionData.image = imgFiles[0];
@@ -202,7 +185,6 @@ function CreateFormInner<T extends FormData>(
         }
       }
 
-      // 성공 시 에러 메시지 초기화
       setErrors({});
       onSubmit(submissionData as T);
     }
@@ -210,17 +192,14 @@ function CreateFormInner<T extends FormData>(
     return true;
   };
 
-  // 외부에서 호출할 수 있는 제출 함수
   const submitForm = async () => {
     await performSubmit();
   };
 
-  // ref를 통해 submitForm 메서드 노출
   useImperativeHandle(ref, () => ({
     submitForm,
   }));
 
-  // 폼 제출 핸들러 (기본 폼 제출 방지)
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
   };

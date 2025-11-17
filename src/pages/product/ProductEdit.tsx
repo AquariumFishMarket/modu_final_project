@@ -16,6 +16,7 @@ import {
   formatPrice,
 } from "../../utils/validation/productValidation";
 import { useToastStore } from "../../contexts/useToastStore";
+import { uploadImage } from "../../services/imageService";
 
 export default function ProductEdit() {
   const navigate = useNavigate();
@@ -23,6 +24,7 @@ export default function ProductEdit() {
   const { setHeaderConfig } = useHeader();
   const formRef = useRef<CommonFormRef>(null);
   const [isFormValid, setIsFormValid] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [product, setProduct] = useState<Product | null>(null); // 기존 상품 데이터
 
   const productFields = getProductFields();
@@ -50,11 +52,16 @@ export default function ProductEdit() {
     setHeaderConfig({
       show: true,
       type: "edit",
-      title: "상품 수정",
+      title: isSubmitting ? "저장 중..." : "저장",
       pageTitle: "상품 수정",
-      inputState: isFormValid,
-      onBackClick: () => navigate(`/product/${id}`),
+      inputState: isFormValid && !isSubmitting,
+      onBackClick: () => {
+        if (isSubmitting) return;
+        navigate(`/product/${id}`);
+      },
       onButtonClick: () => {
+        if (isSubmitting) return;
+
         if (formRef.current && isFormValid) {
           formRef.current.submitForm();
         }
@@ -64,7 +71,7 @@ export default function ProductEdit() {
     return () => {
       setHeaderConfig({ show: false });
     };
-  }, [isFormValid, id]);
+  }, [isFormValid, isSubmitting, navigate, setHeaderConfig, id]);
 
   // 폼 유효성 변경 핸들러
   const handleValidationChange = (isValid: boolean) => {
@@ -74,22 +81,42 @@ export default function ProductEdit() {
   // 폼 제출 핸들러
   const handleSubmit = async (data: ProductFormData) => {
     if (!id) return;
+    if (isSubmitting) return;
+    setIsSubmitting(true);
 
     try {
+      let imageUrl = "";
+
+      if (data.image instanceof File) {
+        // 새로 업로드한 이미지
+        imageUrl = await uploadImage(data.image);
+      } else if (typeof data.image === "string" && data.image) {
+        // 기존 이미지 그대로 유지
+        imageUrl = data.image;
+      }
+
       const updatedProductData = {
         itemName: data.itemName,
         price: parseInt(data.price.replace(/,/g, "")),
         link: data.link || "",
-        // itemImage: 이미지 업로드 후 string URL로 할당 필요
+        itemImage: imageUrl,
       };
 
       await updateProduct(id, updatedProductData);
-      setToast("상품 수정을 완료했습니다😀", () => {
+
+      setToast("상품 수정을 완료했습니다😀");
+      setTimeout(() => {
         navigate(`/product/${id}`);
-      });
+      }, 1500);
+
+      // setToast("상품 수정을 완료했습니다😀", () => {
+      //   navigate(`/product/${id}`);
+      // });
     } catch (error) {
       console.error("상품 수정 실패:", error);
       alert("상품 수정에 실패했습니다. 다시 시도해주세요.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 

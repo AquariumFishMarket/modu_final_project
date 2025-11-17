@@ -116,14 +116,15 @@ function Header() {
         </Section>
       )}
 
-      {/* 프로필 수정 */}
+      {/* 프로필, 상품 수정 */}
       {config.type === "edit" && (
         <Section>
           <IconButton onClick={config.onBackClick}>
             <img src="/img/icon-arrow-left.svg" alt="이전 페이지로 이동" />
           </IconButton>
           <DefaultButton
-            text="저장"
+            text={config.title || "저장"}
+            type="submit"
             width={90}
             height="medium"
             disabled={!config.inputState}
@@ -139,7 +140,8 @@ function Header() {
             <img src="/img/icon-arrow-left.svg" alt="이전 페이지로 이동" />
           </IconButton>
           <DefaultButton
-            text="등록"
+            text={config.title || ""}
+            type="submit"
             width={90}
             height="medium"
             disabled={!config.inputState}
