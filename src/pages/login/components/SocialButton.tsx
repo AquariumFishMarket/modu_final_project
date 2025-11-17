@@ -43,7 +43,7 @@ const SocialBtn = styled.button<{
   background-size: 20px 20px;
   background-repeat: no-repeat;
   background-position: 14px;
-  background-image: ${(props)=>props.$icon};
+  background-image: url(${(props)=>props.$icon});
 
   &:active {
     transform: scale(0.98);

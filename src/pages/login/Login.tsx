@@ -173,7 +173,7 @@ function Login() {
             text="페이스북 계정으로 로그인"
             onClick={handleFacebookLogin}
             borderColor="#2D9CDB"
-            icon="/icons/facebook-logo-low.svg"
+            icon="/icons/facebook-logo-low.png"
             ref={FaceBookRef}
             loading={FaceBookLoad}
           />
