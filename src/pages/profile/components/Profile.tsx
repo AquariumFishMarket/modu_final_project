@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { useHeader } from "../../../contexts/HeaderContext";
-import { useAuth } from "../../../contexts/AuthContext";
+// import { useAuth } from "../../../contexts/AuthContext";
+import { useAuthStore } from "../../../contexts/useAuthStore";
 import { useFollowStore } from "../../../contexts/followStore";
 
 import {
@@ -40,7 +41,6 @@ import {
   toggleProfileFollow,
 } from "../../../services/profileService";
 import MoreMenu from "../../../components/common/modal/MoreMenu";
-import { useAuthStore } from "../../../contexts/useAuthStore";
 
 //  Profile 컴포넌트
 //  - 내 프로필과 다른 유저의 프로필을 조건부 렌더링

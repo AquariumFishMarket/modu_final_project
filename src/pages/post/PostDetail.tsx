@@ -15,6 +15,7 @@ import {
   reportPost,
   deletePost,
 } from "../../services/postService";
+import { useFeedStore } from "../../contexts/useFeedStore";
 import { useAuthStore } from "../../contexts/useAuthStore";
 import { useHeader } from "../../contexts/HeaderContext";
 import MoreMenu from "../../components/common/modal/MoreMenu";
@@ -23,7 +24,6 @@ import {
   likePost as apiLikePost,
   unlikePost as apiUnlikePost,
 } from "../../services/postService";
-
 
 function PostDetail() {
   const { postId } = useParams<{ postId: string }>();
