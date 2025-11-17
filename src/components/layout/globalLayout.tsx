@@ -28,9 +28,11 @@ function LayoutContent() {
   const path = location.pathname;
   const { setHeaderConfig } = useHeader();
   const navigate = useNavigate();
+
+  const [isHeader,setIsHeader] = useState(false)
+  const [isFooter,setIsFooter] = useState(false)
   const user = useAuthStore((s) => s.user);
-  const [isHeader, setIsHeader] = useState(true);
-  const [isFooter, setIsFooter] = useState(true);
+ 
   //drag 이벤트
   const [pull, setPull] = useState(0);
   const startYRef = useRef(0);
@@ -42,7 +44,7 @@ function LayoutContent() {
   const refreshFeed = useFeedStore((state) => state.refreshFeed);
 
   const pageVariants = {
-    initial: { opacity: 0, y: 10 },
+    initial: { opacity: 0, y: 0 },
     animate: { opacity: 1, y: 0, transition: { duration: 0.5 } },
     exit: { opacity: 0, transition: { duration: 0.3 } },
   };

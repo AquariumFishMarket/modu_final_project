@@ -1,9 +1,11 @@
 import styled from "styled-components";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, scale } from "framer-motion";
+import { Variants } from "framer-motion";
 import SocialButton from "./components/SocialButton";
 
-const LoginContainer = styled.section`
+const LoginContainer = styled(motion.section)`
   position: absolute; /* 전체화면을 위해 */
   top: 0;
   left: 50%;
@@ -24,7 +26,7 @@ const LogoArea = styled.div`
   align-items: center;
 `;
 
-const LogoImage = styled.img`
+const LogoImage = styled(motion.img)`
   width: 300px;
   height: 300px;
   object-fit: contain;
@@ -69,6 +71,42 @@ const Separator = styled.span`
 `;
 
 function Login() {
+  const KakaoRef = useRef<HTMLButtonElement>(null)
+  const GoogleRef = useRef<HTMLButtonElement>(null)
+  const FaceBookRef = useRef<HTMLButtonElement>(null)
+  const [kakaoLoad,setKakaoLoad] = useState(false)
+  const [GoogleLoad,setGoogleLoad] = useState(false)
+  const [FaceBookLoad,setFaceBookLoad] = useState(false)
+
+  useEffect(()=>{
+    const kakaoimg = new Image();
+    const googleimg = new Image();
+    const facebookimg = new Image();
+    kakaoimg.src = '/icons/kakao-logo.svg'
+    googleimg.src = '/icons/google-logo.svg'
+    facebookimg.src = '/icons/facebook-logo.svg'
+
+    const ImageLoad = (
+      iconRef:React.RefObject<HTMLButtonElement | null>,
+      set:React.Dispatch<React.SetStateAction<boolean>>,
+      url:string) => {
+      if(!iconRef.current) return;
+      iconRef.current.style.backgroundImage = `url(${url})`
+      set(true)
+    }
+
+    kakaoimg.onload = () => {
+      ImageLoad(KakaoRef,setKakaoLoad,'/icons/kakao-logo.svg')
+    }
+    googleimg.onload = () => {
+      ImageLoad(GoogleRef,setGoogleLoad,'/icons/google-logo.svg')
+    }
+    facebookimg.onload = () => {
+      ImageLoad(FaceBookRef,setFaceBookLoad,'/icons/facebook-logo.svg')
+    }
+
+  },[])
+
   const handleKakaoLogin = () => {
     console.log("카카오 로그인 클릭!");
   };
@@ -81,31 +119,30 @@ function Login() {
     console.log("페이스북 로그인 클릭!");
   };
 
-  // 페이지 전환 애니메이션
-  const pageVariants = {
-    initial: { opacity: 0, y: 30 },
+  const logoVariants:Variants = {
+    initial: {  opacity: 0, scale: 1.3},
     animate: {
+      scale: 1,
       opacity: 1,
-      y: 0,
-      transition: { duration: 0.7 },
+      transition: { duration: 0.7, delay: 0.3, ease: "easeInOut" },
     },
     exit: {
+      scale: 0.9,
       opacity: 0,
-      transition: { duration: 0.7 },
+      transition: { duration: 0.6, ease: [0.43, 0.13, 0.23, 0.96] },
     },
   };
 
   return (
-    <motion.div
-      initial="initial"
-      animate="animate"
-      exit="exit"
-      variants={pageVariants}
-    >
       <LoginContainer>
         <LogoArea>
-          {" "}
-          <LogoImage src="/icons/fish-logo.svg" alt="생선마켓 로고" />
+          <LogoImage
+          src="/icons/fish-logo.svg" alt="물고기마켓 로고"
+          initial="initial"
+          animate="animate"
+          exit="exit"
+          variants={logoVariants}
+          />
         </LogoArea>
 
         <LoginSection>
@@ -115,7 +152,10 @@ function Login() {
             text="카카오 계정으로 로그인"
             onClick={handleKakaoLogin}
             borderColor="#F2C94C"
-            icon="/icons/kakao-logo.svg"
+            icon="/icons/kakao-logo-low.png"
+            ref={KakaoRef}
+            loading={kakaoLoad}
+            skeleton="#F2C94C"
           />
 
           {/* 구글 로그인 버튼 */}
@@ -124,7 +164,10 @@ function Login() {
             text="구글 계정으로 로그인"
             onClick={handleGoogleLogin}
             borderColor="var(--color-gray-dark)"
-            icon="/icons/google-logo.svg"
+            icon="/icons/google-logo-low.png"
+            ref={GoogleRef}
+            loading={GoogleLoad}
+            skeleton="linear-gradient(45deg, #ea4335, #fbbc05, #34a853, #4285f4)"
           />
 
           {/* 페이스북 로그인 버튼 */}
@@ -133,7 +176,10 @@ function Login() {
             text="페이스북 계정으로 로그인"
             onClick={handleFacebookLogin}
             borderColor="#2D9CDB"
-            icon="/icons/facebook-logo.svg"
+            icon="/icons/facebook-logo-low.png"
+            ref={FaceBookRef}
+            loading={FaceBookLoad}
+            skeleton="#9fd8f8"
           />
           <EmailLoginSignup>
             <StyledLink to="/login/email">이메일로 로그인</StyledLink>
@@ -142,7 +188,6 @@ function Login() {
           </EmailLoginSignup>
         </LoginSection>
       </LoginContainer>
-    </motion.div>
   );
 }
 
