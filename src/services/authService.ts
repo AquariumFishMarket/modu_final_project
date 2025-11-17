@@ -1,3 +1,5 @@
+import { getAuthHeaders } from "../utils/tokenManager";
+
 // API 호출 관리 서비스
 const BASE_URL = "https://dev.wenivops.co.kr/services/mandarin";
 
@@ -124,8 +126,24 @@ export const login = async (
   const data = await response.json();
 
   if (!response.ok) {
+    console.log("API 응답 실패:", response.status, data); // 확인
     throw new Error("이메일 또는 비밀번호가 일치하지 않습니다.");
   }
 
   return data;
+};
+
+export const getMyInfo = async () => {
+  const response = await fetch(`${BASE_URL}/user/myinfo`, {
+    method: "GET",
+    headers: getAuthHeaders(),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error("사용자 정보를 불러오는 데 실패했습니다.");
+  }
+
+  return data; // { user: {} }
 };

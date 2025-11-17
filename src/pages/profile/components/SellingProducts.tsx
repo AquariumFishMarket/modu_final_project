@@ -12,7 +12,6 @@ import {
 import ProductImageContainer from "./ProductImageContainer";
 import type { Product } from "../../../types/product";
 import { fetchProductList } from "../../../services/productService";
-// import { useAuth } from "../../../contexts/AuthContext";
 import { useAuthStore } from "../../../contexts/useAuthStore";
 
 interface SellingProductsProps {

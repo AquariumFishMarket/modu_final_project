@@ -10,8 +10,6 @@ import { useFeedData } from "../../hooks/useFeedData";
 //zustand 전역
 import { useFeedStore } from "../../contexts/useFeedStore";
 import { useAuthStore } from "../../contexts/useAuthStore";
-//인증관련 전역
-// import { useAuth } from "../../contexts/AuthContext";
 import { getToken } from "../../utils/tokenManager";
 import {
   LayoutContainer,
@@ -30,7 +28,6 @@ function LayoutContent() {
   const path = location.pathname;
   const { setHeaderConfig } = useHeader();
   const navigate = useNavigate();
-  // const { isAuthenticated, isAuthenticatedRef, currentUser } = useAuth();
   const user = useAuthStore((s) => s.user);
   const [isHeader, setIsHeader] = useState(true);
   const [isFooter, setIsFooter] = useState(true);

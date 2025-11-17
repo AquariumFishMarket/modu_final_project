@@ -3,7 +3,6 @@ import styled from "styled-components";
 import BottomSheet, { SheetItem } from "./BottomSheet";
 import AlertModal from "./AlertModal";
 import { useNavigate } from "react-router-dom";
-// import { useAuth } from "../../../contexts/AuthContext";
 import { useAuthStore } from "../../../contexts/useAuthStore";
 
 interface MoreMenuProps {
@@ -79,7 +78,6 @@ export default function MoreMenu({
   const [alertType, setAlertType] = useState<
     "delete" | "deleteComment" | "logout" | "sold" | "reportPost" | null
   >(null);
-  // const { logout, currentUser } = useAuth();
   const currentUser = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
 

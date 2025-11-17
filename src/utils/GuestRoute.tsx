@@ -1,7 +1,6 @@
 import { ReactNode, useEffect } from "react";
 import ExceptionPage from "../pages/errPage/ExceptionPage";
 import { getToken } from "./tokenManager";
-// import { useAuth } from "../contexts/AuthContext";
 import { useAuthStore } from "../contexts/useAuthStore";
 interface Props {
   children: ReactNode;
@@ -9,7 +8,6 @@ interface Props {
 
 //login
 export default function GuestRoute({ children }: Props) {
-  // const { isLoading } = useAuth();
   const isLoading = useAuthStore((s) => s.isLoading);
   if (isLoading) return null;
 

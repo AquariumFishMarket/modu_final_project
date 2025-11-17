@@ -98,11 +98,13 @@ export default function AuthForm({
       return;
     }
 
-    try {
-      await onSubmit(e);
-    } catch (error) {
-      console.error("인증 폼 제출 에러: ", error);
-    }
+    onSubmit(e);
+
+    // try {
+    //   await onSubmit(e);
+    // } catch (error) {
+    //   console.error("인증 폼 제출 에러: ", error);
+    // }
   };
 
   const isFormValid = useMemo(() => {

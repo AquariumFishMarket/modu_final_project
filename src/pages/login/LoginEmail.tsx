@@ -2,8 +2,6 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthForm from "../../components/common/auth/AuthForm";
 import styled from "styled-components";
-// import { login } from "../../services/authService";
-// import { useAuth } from "../../contexts/AuthContext";
 import { useAuthStore } from "../../contexts/useAuthStore";
 
 const LoginTitle = styled.h2`
@@ -29,7 +27,6 @@ const SignupLink = styled(Link)`
 
 export default function LoginEmail() {
   const navigate = useNavigate();
-  // const { login: authLogin } = useAuth();
   const login = useAuthStore((s) => s.login);
   const isLoading = useAuthStore((s) => s.isLoading);
   const [formError, setFormError] = useState<string>("");
@@ -61,29 +58,13 @@ export default function LoginEmail() {
     const password = formData.get("password") as string;
 
     try {
-      // const result = await login(email, password);
-
-      // if (result.token) {
-      //   authLogin(result.token, {
-      //     _id: result._id,
-      //     username: result.username,
-      //     accountname: result.accountname,
-      //     email: result.email,
-      //     image: result.image,
-      //     intro: result.intro,
-      //   });
-
-      //   navigate("/");
-
-      const user = await login(email, password);
-
-      if (user) {
-        navigate("/", { replace: true });
-      }
+      await login(email, password);
+      navigate("/", { replace: true });
     } catch (error) {
+      console.error("로그인 에러 확인: ", error);
       setFormError(
         error instanceof Error
-          ? error.message // "이메일 또는 비밀번호가 일치하지 않습니다."
+          ? error.message
           : "알 수 없는 오류가 발생했습니다. 다시 시도해주세요."
       );
     }

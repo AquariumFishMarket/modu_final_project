@@ -2,12 +2,10 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Variants } from "framer-motion";
 import { SplashContainer, LogoWrapper, LogoImage } from "./Splash.styled";
-// import { useAuth } from "../../contexts/AuthContext";
 import { useAuthStore } from "../../contexts/useAuthStore";
 
 function Splash() {
   const navigate = useNavigate();
-  // const { isAuthenticated } = useAuth();
   const user = useAuthStore((s) => s.user);
   const isAuthenticated = !!user;
 

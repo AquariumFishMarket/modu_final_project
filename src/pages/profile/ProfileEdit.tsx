@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useHeader } from "../../contexts/HeaderContext";
-// import { useAuth } from "../../contexts/AuthContext";
 import { useAuthStore } from "../../contexts/useAuthStore";
 import EditForm from "../../components/common/form/EditForm";
 import {
@@ -33,8 +32,7 @@ export default function ProfileEdit() {
   const [loading, setLoading] = useState(true);
   const [profileData, setProfileData] = useState<UserProfile | null>(null);
   const [error, setError] = useState<string | null>(null);
-  // const { refreshUserInfo } = useAuth();
-  const refreshUserInfo = useAuthStore((s) => s.refreshUser);
+  const refreshUser = useAuthStore((s) => s.refreshUser);
 
   const profileFields = getProfileFields();
 
@@ -141,7 +139,7 @@ export default function ProfileEdit() {
       //console.log("✅ 프로필 수정 성공");
 
       // AuthContext 업데이트 - 서버에서 최신 정보 가져오기
-      await refreshUserInfo();
+      await refreshUser();
       setToast("프로필이 수정되었습니다😎", () =>
         navigate("/profile", { replace: true })
       );

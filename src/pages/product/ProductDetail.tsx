@@ -3,7 +3,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 import { Product } from "../../types/product";
 import { useHeader } from "../../contexts/HeaderContext";
-// import { useAuth } from "../../contexts/AuthContext";
 import { useAuthStore } from "../../contexts/useAuthStore";
 import {
   deleteProduct,
@@ -264,7 +263,6 @@ export default function ProductDetail() {
   const [product, setProduct] = useState<Product | null>(null);
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
-  // const { currentUser } = useAuth();
   const currentUser = useAuthStore((s) => s.user);
 
   // 헤더 설정

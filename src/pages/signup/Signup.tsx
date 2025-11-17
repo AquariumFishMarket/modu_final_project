@@ -2,9 +2,6 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import AuthForm from "../../components/common/auth/AuthForm";
-// import { signup, login } from "../../services/authService";
-// import { saveToken } from "../../utils/tokenManager";
-// import { useAuth } from "../../contexts/AuthContext";
 import { useAuthStore } from "../../contexts/useAuthStore";
 import {
   validateEmail,
@@ -38,7 +35,6 @@ const LoginLink = styled(Link)`
 export default function Signup() {
   const navigate = useNavigate();
   const [formError, setFormError] = useState<string>("");
-  // const { refreshUserInfo } = useAuth();
   const { setToast } = useToastStore();
   const signup = useAuthStore((s) => s.signup);
   const isLoading = useAuthStore((state) => state.isLoading);
@@ -79,16 +75,8 @@ export default function Signup() {
     const password = formData.get("password") as string;
 
     try {
-      // await signup(email, password);
-      // const loginResult = await login(email, password);
-      // saveToken(loginResult.token);
-      // await refreshUserInfo();
-
-      const user = await signup(email, password);
-
-      if (user) {
-        setToast("회원가입 완료😊", () => navigate("/profile/setup"));
-      }
+      await signup(email, password);
+      setToast("회원가입 완료😊", () => navigate("/profile/setup"));
     } catch (error) {
       setFormError(
         error instanceof Error
