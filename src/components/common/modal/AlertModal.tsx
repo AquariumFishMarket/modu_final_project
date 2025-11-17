@@ -13,6 +13,8 @@ interface AlertModalProps {
     | "report"
     | "reportPost"
     | "sold"
+    | "chatReport"
+    | "chatLeave"
     | null;
   onConfirm?: {
     delete?: () => void;
@@ -22,6 +24,8 @@ interface AlertModalProps {
     report?: () => void;
     reportPost?: () => void;
     sold?: () => void;
+    chatReport?: () => void;
+    chatLeave?: () => void;
   };
 }
 
@@ -60,7 +64,7 @@ const ModalContent = styled.div`
   background: white;
   border-radius: 10px;
   width: 252px;
-  height: 110px;
+  min-height: 110px;
   text-align: center;
   animation: ${modalSlideIn} 0.25s ease-out;
   overflow: hidden;
@@ -70,6 +74,8 @@ const Message = styled.p`
   margin: 22px auto;
   font-size: var(--font-size-lg);
   font-weight: 500;
+  line-height: 1.4;
+  white-space: pre-line;
 `;
 
 const ButtonContainer = styled.div`
@@ -87,7 +93,6 @@ const Button = styled.button<{ $variant: "confirm" | "cancel" }>`
   cursor: pointer;
   background: none;
 
-  /* 취소 버튼 오른쪽 구분선 */
   ${(props) =>
     props.$variant === "cancel" &&
     `
@@ -100,17 +105,22 @@ const Button = styled.button<{ $variant: "confirm" | "cancel" }>`
         return `
           color: var(--color-primary-600);
           &:hover {
-          background-color: rgba(var(--color-primary-600-rgb), 0.1); 
-        }
+            background-color: rgba(var(--color-primary-600-rgb), 0.1); 
+          }
         `;
       case "cancel":
         return `
           color: black;
-          &:hover {  }
         `;
     }
   }}
 `;
+
+type AlertConfig = {
+  message: React.ReactNode;
+  confirmText: string;
+  singleButton?: boolean;
+};
 
 export default function AlertModal({
   isOpen,
@@ -120,7 +130,7 @@ export default function AlertModal({
 }: AlertModalProps) {
   if (!type || !isOpen) return null;
 
-  const getAlertConfig = (alertType: string) => {
+  const getAlertConfig = (alertType: AlertModalProps["type"]): AlertConfig => {
     switch (alertType) {
       case "delete":
         return {
@@ -157,13 +167,38 @@ export default function AlertModal({
           message: "판매완료 처리할까요?",
           confirmText: "판매완료",
         };
-      default: // 타입 안정성 보장을 위해
+      case "chatReport":
+        return {
+          message: (
+            <>
+              신고가 완료되었습니다.
+              <br />
+              신속하게 처리하겠습니다.
+            </>
+          ),
+          confirmText: "확인",
+          singleButton: true,
+        };
+      case "chatLeave":
+        return {
+          message: (
+            <>
+              채팅방을 나가시겠어요?
+              <br />
+              나갈 수 없는 채팅방은 제외됩니다.
+            </>
+          ),
+          confirmText: "나가기",
+          singleButton: false,
+        };
+      default:
         return {
           message: "확인하시겠어요?",
           confirmText: "확인",
         };
     }
   };
+
   const config = getAlertConfig(type);
 
   const handleConfirm = () => {
@@ -177,9 +212,11 @@ export default function AlertModal({
       <ModalContent onClick={(e) => e.stopPropagation()}>
         <Message>{config.message}</Message>
         <ButtonContainer>
-          <Button $variant="cancel" onClick={onClose}>
-            취소
-          </Button>
+          {!config.singleButton && (
+            <Button $variant="cancel" onClick={onClose}>
+              취소
+            </Button>
+          )}
           <Button $variant="confirm" onClick={handleConfirm}>
             {config.confirmText}
           </Button>

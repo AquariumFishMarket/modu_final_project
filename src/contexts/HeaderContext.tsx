@@ -29,11 +29,12 @@ export interface HeaderConfig {
   title?: string;
   userName?: string; // chat type에서 사용
   inputState?: boolean; // edit, post type에서 사용
-  rightElement?: React.ReactNode; 
+  rightElement?: React.ReactNode;
   onBackClick?: () => void;
   onSearchClick?: () => void;
   onMoreClick?: () => void;
   onButtonClick?: () => void;
+  pageTitle?: string;
 }
 
 // Context 타입
@@ -50,6 +51,7 @@ export const HeaderProvider = ({ children }: { children: ReactNode }) => {
   const [config, setConfig] = useState<HeaderConfig>({
     show: true,
     type: "feed",
+    pageTitle: "물고기마켓",
   });
 
   const setHeaderConfig = useCallback((newConfig: Partial<HeaderConfig>) => {

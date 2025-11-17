@@ -35,7 +35,6 @@ function PostDetail() {
   const { setHeaderConfig } = useHeader();
 
   const updateFeedPost = useFeedStore((state) => state.updatePost);
-  const toggleFeedLike = useFeedStore((state) => state.toggleLike);
 
   const [commentText, setCommentText] = useState("");
   const [post, setPost] = useState<any>(null);
@@ -131,6 +130,7 @@ function PostDetail() {
     setHeaderConfig({
       show: true,
       type: "postDetail",
+      pageTitle: "게시글 상세",
       onBackClick: () => navigate(-1),
       rightElement: (
         <MoreMenu
@@ -350,8 +350,8 @@ function PostDetail() {
       <TextField
         left={
           <img
-            src="/img/empty-profile.png"
-            alt="내 프로필"
+            src={currentUser?.image || "/img/empty-profile.png"}
+            alt={`${currentUser?.username} 프로필`}
             style={{
               width: "36px",
               height: "36px",

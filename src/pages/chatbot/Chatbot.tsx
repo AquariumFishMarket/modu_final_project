@@ -66,6 +66,7 @@ export default function Chatbot() {
       show: true,
       type: "feed",
       title: "물고기봇",
+      pageTitle: "챗봇",
       onBackClick: () => navigate(-1),
     });
   }, [setHeaderConfig, navigate]);
@@ -157,7 +158,12 @@ export default function Chatbot() {
         <FaqPanel as="section" aria-label="자주 묻는 질문">
           <FaqHeader>
             <FaqTitle as="h2">자주 묻는 질문</FaqTitle>
-            <CloseButton onClick={() => setShowFaq(false)} aria-label="자주 묻는 질문 패널 닫기">닫기</CloseButton>
+            <CloseButton
+              onClick={() => setShowFaq(false)}
+              aria-label="자주 묻는 질문 패널 닫기"
+            >
+              닫기
+            </CloseButton>
           </FaqHeader>
           <FaqGrid as="div" role="list">
             {CATEGORIES.map((cat) => (
@@ -182,7 +188,8 @@ export default function Chatbot() {
             ))}
           </FaqGrid>
           <FaqFooter>
-            찾으시는 답이 없으면 고객센터 <PhoneNumber>1544-0000</PhoneNumber>으로 연락주세요.
+            찾으시는 답이 없으면 고객센터 <PhoneNumber>1544-0000</PhoneNumber>
+            으로 연락주세요.
           </FaqFooter>
         </FaqPanel>
       )}
@@ -214,7 +221,14 @@ export default function Chatbot() {
           <div ref={messagesEndRef} />
         </MessagesArea>
 
-        <InputArea as="form" onSubmit={(e) => { e.preventDefault(); handleSend(); }} role="search">
+        <InputArea
+          as="form"
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSend();
+          }}
+          role="search"
+        >
           <Input
             ref={inputRef}
             type="text"
@@ -224,7 +238,13 @@ export default function Chatbot() {
             placeholder="메시지를 입력하세요… (예: 환불/교환 규정, 사진/해시태그/영상 규칙)"
             aria-label="챗봇 메시지 입력"
           />
-          <SendButton type="submit" onClick={() => handleSend()} aria-label="메시지 전송">전송</SendButton>
+          <SendButton
+            type="submit"
+            onClick={() => handleSend()}
+            aria-label="메시지 전송"
+          >
+            전송
+          </SendButton>
         </InputArea>
       </ChatboxWrapper>
 
@@ -233,21 +253,24 @@ export default function Chatbot() {
         <GuideTitle as="h2">구현 가이드</GuideTitle>
         <GuideList>
           <GuideItem>
-            <GuideHighlight>거래 정책:</GuideHighlight> 안전결제 없음, 계좌이체 기준. 외부 판매사이트 안내
-            시 해당 판매처 정책 우선.
+            <GuideHighlight>거래 정책:</GuideHighlight> 안전결제 없음, 계좌이체
+            기준. 외부 판매사이트 안내 시 해당 판매처 정책 우선.
           </GuideItem>
           <GuideItem>
-            <GuideHighlight>콘텐츠 규칙:</GuideHighlight> 영상 불가, 사진 10장, 해시태그 10개.
+            <GuideHighlight>콘텐츠 규칙:</GuideHighlight> 영상 불가, 사진 10장,
+            해시태그 10개.
           </GuideItem>
           <GuideItem>
-            <GuideHighlight>미매칭 Fallback:</GuideHighlight> FAQ 자동 오픈 + <PhoneNumber>1544-0000</PhoneNumber> 안내.
+            <GuideHighlight>미매칭 Fallback:</GuideHighlight> FAQ 자동 오픈 +{" "}
+            <PhoneNumber>1544-0000</PhoneNumber> 안내.
           </GuideItem>
           <GuideItem>
-            <GuideHighlight>확장 포인트:</GuideHighlight> 카테고리/인텐트 추가, 라우터로 정책 상세 페이지
-            연결, 금칙어 가드.
+            <GuideHighlight>확장 포인트:</GuideHighlight> 카테고리/인텐트 추가,
+            라우터로 정책 상세 페이지 연결, 금칙어 가드.
           </GuideItem>
           <GuideItem>
-            <GuideHighlight>브랜드 톤:</GuideHighlight> 물고기봇 말투/이모지 유지.
+            <GuideHighlight>브랜드 톤:</GuideHighlight> 물고기봇 말투/이모지
+            유지.
           </GuideItem>
         </GuideList>
       </GuideSection>

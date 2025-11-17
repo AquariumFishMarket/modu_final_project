@@ -74,7 +74,10 @@ function PostHeader({
       <h2 className="sr-only">
         {variant === "comment" ? "댓글 작성자 정보" : "게시자 정보"}
       </h2>
-      <UserInfo>
+      <UserInfo
+        onClick={() => navigate(`/profile/${encodeURIComponent(userId)}`)}
+        style={{ cursor: "pointer" }}
+      >
         <UserAvatarBox
           src={imgSrc}
           alt={avatarAlt}

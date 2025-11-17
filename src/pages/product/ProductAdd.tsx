@@ -1,6 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import CreateForm from "../../components/common/form/CreateForm";
-import { FormData, ProductRequest, CommonFormRef } from "../../components/common/form/types";
+import {
+  FormData,
+  ProductRequest,
+  CommonFormRef,
+} from "../../components/common/form/types";
 import { useHeader } from "../../contexts/HeaderContext";
 import { useEffect, useRef, useState } from "react";
 import { getProductFields } from "../../utils/validation/productValidation";
@@ -21,6 +25,7 @@ export default function ProductAdd() {
       show: true,
       type: "product",
       title: "상품 등록",
+      pageTitle: "상품 등록",
       inputState: isFormValid,
       onBackClick: () => navigate(-1),
       onButtonClick: () => {
@@ -30,7 +35,6 @@ export default function ProductAdd() {
         }
       },
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isFormValid, navigate, setHeaderConfig]);
 
   // 폼 유효성 변경 핸들러
@@ -55,12 +59,12 @@ export default function ProductAdd() {
       };
 
       const newProduct = await fetchProductUpload(productData);
-      setToast("상품 등록이 완료됐습니다😊",()=>{navigate(`/product/${newProduct.id}`)})
-
+      setToast("상품 등록이 완료됐습니다😊", () => {
+        navigate(`/product/${newProduct.id}`);
+      });
     } catch (error) {
       //console.error("상품 등록 실패: ", error);
-      setToast("상품 등록에 실패했습니다😭")
-
+      setToast("상품 등록에 실패했습니다😭");
     }
   };
 

@@ -26,7 +26,7 @@ export default function ProfileEdit() {
   const { setHeaderConfig } = useHeader();
   const formRef = useRef<CommonFormRef>(null);
   const [isFormValid, setIsFormValid] = useState(false);
-  const { setToast } = useToastStore()
+  const { setToast } = useToastStore();
 
   // 상태
   const [loading, setLoading] = useState(true);
@@ -88,6 +88,7 @@ export default function ProfileEdit() {
       show: true,
       type: "edit",
       title: "프로필 수정",
+      pageTitle: "프로필 수정",
       inputState: isFormValid,
       onBackClick: () => navigate("/profile"),
       onButtonClick: () => {
@@ -140,18 +141,22 @@ export default function ProfileEdit() {
 
       // AuthContext 업데이트 - 서버에서 최신 정보 가져오기
       await refreshUserInfo();
-      setToast("프로필이 수정되었습니다😎",()=>navigate("/profile", { replace: true }))
+      setToast("프로필이 수정되었습니다😎", () =>
+        navigate("/profile", { replace: true })
+      );
 
       //navigate("/profile", { replace: true });
     } catch (error) {
       console.error("프로필 수정 실패:", error);
-      setToast("프로필 수정을 실패했습니다😭")
+      setToast("프로필 수정을 실패했습니다😭");
     }
   };
 
   // 🆕 로딩 상태 -> 처리 어떻게 할지
   if (loading) {
-    return <div style={{ textAlign: 'center' }}>프로필 정보를 불러오는 중...</div>;
+    return (
+      <div style={{ textAlign: "center" }}>프로필 정보를 불러오는 중...</div>
+    );
   }
 
   // 🆕 에러 상태 -> 처리 어떻게 할지
