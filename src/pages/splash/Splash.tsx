@@ -9,6 +9,7 @@ function Splash() {
   const { isAuthenticated } = useAuth();
   useEffect(() => {
     const checkAuthAndRedirect = async () => {
+
       const timer = setTimeout(() => {
         if (isAuthenticated) {
           navigate("/feed");

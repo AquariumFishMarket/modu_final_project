@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { forwardRef } from "react";
 
 // 소셜 로그인 버튼 Props
 interface SocialButtonProps {
@@ -8,6 +9,7 @@ interface SocialButtonProps {
   href?: string;
   icon?: string;
   borderColor?: string;
+  loading?: boolean;
 }
 
 // 소셜 로그인 버튼 스타일
@@ -15,6 +17,7 @@ const SocialBtn = styled.button<{
   $width?: number;
   $borderColor?: string;
   $icon?: string;
+  $loading?: boolean;
 }>`
   position: relative;
   border: 1px solid
@@ -37,22 +40,10 @@ const SocialBtn = styled.button<{
   transition: all 0.2s;
 
   /* 아이콘 스타일 */
-  ${(props) =>
-    props.$icon &&
-    `
-    &::before {
-      content: "";
-      background-image: url(${props.$icon});
-      background-size: 20px 20px;
-      background-repeat: no-repeat;
-      background-position: center;
-      width: 24px;
-      height: 24px;
-      position: absolute;
-      left: 14px;
-      flex-shrink: 0;
-    }
-  `}
+  background-size: 20px 20px;
+  background-repeat: no-repeat;
+  background-position: 14px;
+  background-image: ${(props)=>props.$icon};
 
   &:active {
     transform: scale(0.98);
@@ -60,15 +51,14 @@ const SocialBtn = styled.button<{
   }
 `;
 
-export default function SocialButton({
+const SocialButton = forwardRef<HTMLButtonElement, SocialButtonProps>(({
   width,
   text,
   onClick,
   href,
-
   icon,
-  borderColor,
-}: SocialButtonProps) {
+  loading,
+  borderColor,},ref) => {
   if (href) {
     return (
       <SocialBtn
@@ -89,8 +79,46 @@ export default function SocialButton({
       onClick={onClick}
       $borderColor={borderColor}
       $icon={icon}
+      ref={ref}
+      $loading={loading}
     >
       {text}
     </SocialBtn>
   );
-}
+})
+
+// export default function SocialButton({
+//   width,
+//   text,
+//   onClick,
+//   href,
+//   icon,
+//   borderColor,
+// }: SocialButtonProps) {
+//   if (href) {
+//     return (
+//       <SocialBtn
+//         as="a"
+//         $width={width}
+//         href={href}
+//         $borderColor={borderColor}
+//         $icon={icon}
+//       >
+//         {text}
+//       </SocialBtn>
+//     );
+//   }
+
+//   return (
+//     <SocialBtn
+//       $width={width}
+//       onClick={onClick}
+//       $borderColor={borderColor}
+//       $icon={icon}
+//     >
+//       {text}
+//     </SocialBtn>
+//   );
+// }
+
+export default SocialButton
