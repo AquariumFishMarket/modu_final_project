@@ -154,6 +154,7 @@ function Login() {
             icon="/icons/kakao-logo-low.png"
             ref={KakaoRef}
             loading={kakaoLoad}
+            skeleton="#F2C94C"
           />
 
           {/* 구글 로그인 버튼 */}
@@ -165,6 +166,7 @@ function Login() {
             icon="/icons/google-logo-low.png"
             ref={GoogleRef}
             loading={GoogleLoad}
+            skeleton="linear-gradient(45deg, #ea4335, #fbbc05, #34a853, #4285f4)"
           />
 
           {/* 페이스북 로그인 버튼 */}
@@ -176,6 +178,7 @@ function Login() {
             icon="/icons/facebook-logo-low.png"
             ref={FaceBookRef}
             loading={FaceBookLoad}
+            skeleton="#9fd8f8"
           />
           <EmailLoginSignup>
             <StyledLink to="/login/email">이메일로 로그인</StyledLink>

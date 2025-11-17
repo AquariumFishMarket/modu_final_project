@@ -10,6 +10,7 @@ interface SocialButtonProps {
   icon?: string;
   borderColor?: string;
   loading?: boolean;
+  skeleton?: string;
 }
 
 // 소셜 로그인 버튼 스타일
@@ -18,6 +19,7 @@ const SocialBtn = styled.button<{
   $borderColor?: string;
   $icon?: string;
   $loading?: boolean;
+  $skeleton?: string;
 }>`
   position: relative;
   border: 1px solid
@@ -38,25 +40,20 @@ const SocialBtn = styled.button<{
   font-size: 14px;
   border-radius: 44px;
   transition: all 0.2s;
-
-  /* 아이콘 스타일 */
   background-size: 20px 20px;
   background-repeat: no-repeat;
   background-position: 14px;
-  //background-image: url(${(props)=>props.$icon});
-
-  ${(props)=>props.$loading ? `
-
-    ` : `
+  ${(props)=>!props.$loading && `
       &::before {
       content: '';
       position: absolute;
       left: 14px;
       width: 20px;
       height: 20px;
-      background: ${props.$borderColor};
+      background: ${props.$skeleton};
       filter: blur(7px);
       z-index: 10;
+      opacity: 0.6;
       }
     `}
   &:active {
@@ -72,7 +69,8 @@ const SocialButton = forwardRef<HTMLButtonElement, SocialButtonProps>(({
   href,
   icon,
   loading,
-  borderColor,},ref) => {
+  borderColor,
+  skeleton},ref) => {
   if (href) {
     return (
       <SocialBtn
@@ -95,6 +93,7 @@ const SocialButton = forwardRef<HTMLButtonElement, SocialButtonProps>(({
       $icon={icon}
       ref={ref}
       $loading={loading}
+      $skeleton={skeleton}
     >
       {text}
     </SocialBtn>
