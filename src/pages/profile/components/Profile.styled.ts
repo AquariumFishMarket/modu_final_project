@@ -101,7 +101,6 @@ export const UserId = styled.p`
 
 export const UserDescription = styled.p`
   text-align: center;
-  margin: 1.6rem 0 2.4rem 0;
   font-size: var(--font-size-md);
   color: var(--color-gray-dark);
 `;

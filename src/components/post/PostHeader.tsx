@@ -105,7 +105,7 @@ function PostHeader({
         ) : (
           <UserDetails>
             <UserName>{userName}</UserName>
-            <UserId>{userId}</UserId>
+            <UserId>@ {userId}</UserId>
           </UserDetails>
         )}
       </UserInfo>
