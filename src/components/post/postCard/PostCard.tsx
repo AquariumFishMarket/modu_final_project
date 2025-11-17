@@ -73,7 +73,6 @@ const PostCard = forwardRef<HTMLDivElement, PostCardProps>(
     const [canScrollPrev, setCanScrollPrev] = useState(false);
     const [canScrollNext, setCanScrollNext] = useState(false);
     const { isLoading } = useFeedStore();
-
     const imageUrls = getImageUrls(imageSrc);
 
     // Embla Carousel 슬라이드 선택 콜백

@@ -40,6 +40,8 @@ interface FeedStore {
   isInitialLized: boolean;
   isFetching: boolean;
   isLoading: boolean;
+  lastFetchCount: number;
+  requestCount: number;
 
   likedPosts: Record<string, boolean>;
 
@@ -65,6 +67,8 @@ export const useFeedStore = create<FeedStore>((set, get) => ({
   isInitialLized: false,
   isFetching: false,
   isLoading: true,
+  lastFetchCount: 0,
+  requestCount: 0,
 
   likedPosts: loadLikedPosts(),
 
@@ -84,6 +88,8 @@ export const useFeedStore = create<FeedStore>((set, get) => ({
       isLoading: true,
       isInitialLoading: true,
       isInitialLized: false,
+      isFetching: false,
+      requestCount: 0,
     });
 
     await new Promise((resolve) => setTimeout(resolve, 50));
@@ -95,15 +101,28 @@ export const useFeedStore = create<FeedStore>((set, get) => ({
     const token = getToken();
     if (!token) return;
 
-    const { skip, isRefreshing, hasMore, isFetching, likedPosts } = get();
+    if (get().isFetching) return;
 
-    if (isFetching) return;
-    if (isLoadMore && (isRefreshing || !hasMore)) return;
+    const { skip, isRefreshing, requestCount, likedPosts } = get();
 
-    set({
-      isFetching: true,
-      ...(isLoadMore ? { isRefreshing: true } : {}),
-    });
+    if (isLoadMore && isRefreshing) return;
+
+    const MAX_REQUESTS = 10;
+      if (isLoadMore && requestCount >= MAX_REQUESTS) {
+        set({
+          hasMore: false,
+          isRefreshing: false,
+          isFetching: false,
+        });
+        return;
+      }
+
+    if(isLoadMore) {
+      set({ isRefreshing: true })
+    }
+
+    set({ isFetching: true });
+
 
     try {
       const limit = 5;
@@ -125,13 +144,17 @@ export const useFeedStore = create<FeedStore>((set, get) => ({
       const datalist = data.posts || [];
       const serverCount = datalist.length;
 
-      // 더 이상 불러올 데이터 없음
+      //console.log('[fetchFeeds] requestCount:', requestCount + 1, 'serverCount:', serverCount);
+
+
       if (serverCount === 0) {
         set({
           hasMore: false,
           isRefreshing: false,
           isInitialLoading: false,
           isFetching: false,
+          lastFetchCount: 0,
+          requestCount: isLoadMore ? requestCount + 1 : 1,
         });
         return;
       }
@@ -156,6 +179,24 @@ export const useFeedStore = create<FeedStore>((set, get) => ({
       const merged = await Promise.all(
         normalized.map(async (item) => {
           const meta = await fetchPostMeta(item.id);
+
+          const newSkip = isLoadMore ? state.skip + serverCount : serverCount;
+          const newRequestCount = isLoadMore ? requestCount + 1 : 1;
+          const hasMoreNext = normalized.length > 0 && newRequestCount < MAX_REQUESTS;
+
+          return {
+            feedList: newFeedList,
+            isLoading: false,
+            skip: newSkip,
+            isInitialLoading: false,
+            isRefreshing: false,
+            hasMore: hasMoreNext,
+            isInitialLized: true,
+            isFetching: false,
+            lastFetchCount: serverCount,
+            requestCount: newRequestCount
+          };
+        });
 
           const localLiked = likedPosts[item.id];
 
@@ -186,6 +227,7 @@ export const useFeedStore = create<FeedStore>((set, get) => ({
         isFetching: false,
         hasMore: serverCount === limit,
       }));
+
     } catch (err) {
       console.error(err);
       set({
