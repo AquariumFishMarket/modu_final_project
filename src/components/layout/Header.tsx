@@ -58,7 +58,7 @@ function Header() {
   // 그 외 페이지는 기존 로직 유지
   return (
     <HeaderContainer>
-      <h1 className="sr-only">물고기 마켓</h1>
+      <h1 className="sr-only">{config.pageTitle || "물고기마켓"}</h1>
 
       {/* 피드 */}
       {config.type === "feed" && (

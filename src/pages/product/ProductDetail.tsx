@@ -272,6 +272,7 @@ export default function ProductDetail() {
     setHeaderConfig({
       show: true,
       type: "productDetail",
+      pageTitle: "상품 상세",
       onBackClick: () => navigate(`/profile`),
       rightElement: (
         <MoreMenu

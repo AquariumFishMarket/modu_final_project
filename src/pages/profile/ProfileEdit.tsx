@@ -88,6 +88,7 @@ export default function ProfileEdit() {
       show: true,
       type: "edit",
       title: "프로필 수정",
+      pageTitle: "프로필 수정",
       inputState: isFormValid,
       onBackClick: () => navigate("/profile"),
       onButtonClick: () => {
@@ -139,6 +140,7 @@ export default function ProfileEdit() {
       //console.log("✅ 프로필 수정 성공");
 
       // AuthContext 업데이트 - 서버에서 최신 정보 가져오기
+
       await refreshUser();
       setToast("프로필이 수정되었습니다😎", () =>
         navigate("/profile", { replace: true })
