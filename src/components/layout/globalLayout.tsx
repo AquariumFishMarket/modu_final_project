@@ -22,8 +22,8 @@ function LayoutContent() {
   const { setHeaderConfig } = useHeader();
   const navigate = useNavigate();
   const { isAuthenticated, isAuthenticatedRef, currentUser } = useAuth();
-  const [isHeader,setIsHeader] = useState(true)
-  const [isFooter,setIsFooter] = useState(true)
+  const [isHeader,setIsHeader] = useState(false)
+  const [isFooter,setIsFooter] = useState(false)
   //drag 이벤트
   const [pull, setPull] = useState(0);
   const startYRef = useRef(0);
