@@ -6,6 +6,7 @@ import {
   EmptyGalleryMessage,
   MultiImageIndicator,
 } from "./PostGallery.styled";
+import { getImageUrls } from "../../../utils/getImageUrls";
 
 interface Post {
   postId: string;
@@ -56,23 +57,32 @@ function PostGallery({ posts, onPostClick }: PostGalleryProps) {
   if (postsWithImages.length === 0) {
     return (
       <GalleryContainer>
-        <EmptyGalleryMessage>이미지가 있는 게시글이 없습니다.</EmptyGalleryMessage>
+        <EmptyGalleryMessage>
+          이미지가 있는 게시글이 없습니다.
+        </EmptyGalleryMessage>
       </GalleryContainer>
     );
   }
 
   return (
     <GalleryContainer>
-      {postsWithImages.map((post) => (
-        <GalleryItem key={post.postId} onClick={() => handlePostClick(post.postId)}>
-          <GalleryImage
-            src={post.imageSrc}
-            alt={post.imageAlt || post.content}
-            onError={handleImageError}
-          />
-          {post.imageCount && post.imageCount > 1 && <MultiImageIndicator />}
-        </GalleryItem>
-      ))}
+      {postsWithImages.map((post) => {
+        const imageUrls = getImageUrls(post.imageSrc);
+
+        return (
+          <GalleryItem
+            key={post.postId}
+            onClick={() => handlePostClick(post.postId)}
+          >
+            <GalleryImage
+              src={imageUrls[0]}
+              alt={post.imageAlt || post.content}
+              onError={handleImageError}
+            />
+            {imageUrls.length > 1 && <MultiImageIndicator />}
+          </GalleryItem>
+        );
+      })}
     </GalleryContainer>
   );
 }
