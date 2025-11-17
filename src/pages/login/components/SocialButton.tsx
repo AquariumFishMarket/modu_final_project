@@ -43,8 +43,22 @@ const SocialBtn = styled.button<{
   background-size: 20px 20px;
   background-repeat: no-repeat;
   background-position: 14px;
-  background-image: url(${(props)=>props.$icon});
+  //background-image: url(${(props)=>props.$icon});
 
+  ${(props)=>props.$loading ? `
+
+    ` : `
+      &::before {
+      content: '';
+      position: absolute;
+      left: 14px;
+      width: 20px;
+      height: 20px;
+      background: ${props.$borderColor};
+      filter: blur(7px);
+      z-index: 10;
+      }
+    `}
   &:active {
     transform: scale(0.98);
     opacity: 0.8;
