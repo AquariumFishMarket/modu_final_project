@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, scale } from "framer-motion";
 import { Variants } from "framer-motion";
 import SocialButton from "./components/SocialButton";
 
@@ -120,10 +120,11 @@ function Login() {
   };
 
   const logoVariants:Variants = {
-    initial: {  opacity: 0},
+    initial: {  opacity: 0, scale: 1.3},
     animate: {
+      scale: 1,
       opacity: 1,
-      transition: { duration: 1.2, delay: 0.3, ease: "easeInOut" },
+      transition: { duration: 0.7, delay: 0.3, ease: "easeInOut" },
     },
     exit: {
       scale: 0.9,
