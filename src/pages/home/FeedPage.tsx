@@ -5,13 +5,13 @@ import { InitialLoadingSection } from "./FeedPage.styled";
 import PostCard from "../../components/post/postCard/PostCard";
 
 import { useFeedStore } from "../../contexts/useFeedStore";
-import { useAuth } from "../../contexts/AuthContext";
+import { useAuthStore } from "../../contexts/useAuthStore";
 import { reportPost } from "../../services/postService";
 
 
 const FeedPage = () => {
   const navigate = useNavigate();
-  const { currentUser } = useAuth();
+  const currentUser = useAuthStore((s) => s.user);
 
   const toggleLike = useFeedStore((state) => state.toggleLike);
 

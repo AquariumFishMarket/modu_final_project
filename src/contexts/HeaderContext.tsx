@@ -16,11 +16,11 @@ export type HeaderType =
   | "profile"
   | "edit"
   | "post"
-  | "postDetail" // 게시글 상세
+  | "postDetail"
   | "chatList"
   | "chat"
-  | "product" // 상품 등록
-  | "productDetail"; //상품 상세
+  | "product"
+  | "productDetail";
 
 // Header 설정 인터페이스
 export interface HeaderConfig {
@@ -29,11 +29,12 @@ export interface HeaderConfig {
   title?: string;
   userName?: string; // chat type에서 사용
   inputState?: boolean; // edit, post type에서 사용
-  rightElement?: React.ReactNode; 
+  rightElement?: React.ReactNode;
   onBackClick?: () => void;
   onSearchClick?: () => void;
   onMoreClick?: () => void;
   onButtonClick?: () => void;
+  pageTitle?: string;
 }
 
 // Context 타입
@@ -50,6 +51,7 @@ export const HeaderProvider = ({ children }: { children: ReactNode }) => {
   const [config, setConfig] = useState<HeaderConfig>({
     show: true,
     type: "feed",
+    pageTitle: "물고기마켓",
   });
 
   const setHeaderConfig = useCallback((newConfig: Partial<HeaderConfig>) => {

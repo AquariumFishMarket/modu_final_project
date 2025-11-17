@@ -78,19 +78,23 @@ export default function PostWrite() {
   const isEditMode = !!postId;
 
   // 폼 유효성 검사 (텍스트가 있거나 이미지가 있으면 유효)
-  const isFormValid = content.trim().length > 0 || imgArr.length > 0 || existingImagePath.length > 0;
+  const isFormValid =
+    content.trim().length > 0 ||
+    imgArr.length > 0 ||
+    existingImagePath.length > 0;
 
   //toast 알림
   const { setToast } = useToastStore();
-  const notify = (msg:string) => toast(msg,{
-    position: "top-center",
-    autoClose: 3000,
-    hideProgressBar: false,
-    closeOnClick: true,
-    pauseOnHover: true,
-    draggable: true,
-    progress: undefined,
-    theme: "light",
+  const notify = (msg: string) =>
+    toast(msg, {
+      position: "top-center",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
     });
 
   // 수정 모드: 기존 게시글 데이터 불러오기
@@ -109,7 +113,8 @@ export default function PostWrite() {
               textAreaRef.current.value = postData.content;
               // 높이 자동 조절
               textAreaRef.current.style.height = "auto";
-              textAreaRef.current.style.height = textAreaRef.current.scrollHeight + "px";
+              textAreaRef.current.style.height =
+                textAreaRef.current.scrollHeight + "px";
             }
           }
         } catch (error) {
@@ -128,6 +133,7 @@ export default function PostWrite() {
       show: true,
       type: "post",
       title: isEditMode ? "게시글 수정" : "게시글 작성",
+      pageTitle: isEditMode ? "게시글 수정" : "게시글 작성",
       inputState: isFormValid,
       onBackClick: () => navigate(-1),
       onButtonClick: () => {
@@ -151,7 +157,7 @@ export default function PostWrite() {
   };
 
   const handleSubmit = async () => {
-    const actualContent = textAreaRef.current?.value || '';
+    const actualContent = textAreaRef.current?.value || "";
     try {
       // 토큰 불러오기
       const token = localStorage.getItem("authToken");
@@ -168,16 +174,21 @@ export default function PostWrite() {
           formData.append("image", file);
         });
 
-        const uploadRes = await fetch("https://dev.wenivops.co.kr/services/mandarin/image/uploadfiles", {
-          method: "POST",
-          headers: { Authorization: `Bearer ${token}` },
-          body: formData,
-        });
+        const uploadRes = await fetch(
+          "https://dev.wenivops.co.kr/services/mandarin/image/uploadfiles",
+          {
+            method: "POST",
+            headers: { Authorization: `Bearer ${token}` },
+            body: formData,
+          }
+        );
 
         const uploadData = await uploadRes.json();
 
         if (uploadRes.ok && uploadData.info?.length > 0) {
-          const uploadedPaths = uploadData.info.map((img: any) => img.path).join(",");
+          const uploadedPaths = uploadData.info
+            .map((img: any) => img.path)
+            .join(",");
 
           if (isEditMode && existingImagePath) {
             finalImagePath = `${existingImagePath},${uploadedPaths}`;
@@ -191,49 +202,55 @@ export default function PostWrite() {
       }
 
       if (isEditMode && postId) {
-        const updatedPost = await EditPost(postId, actualContent, finalImagePath);
+        const updatedPost = await EditPost(
+          postId,
+          actualContent,
+          finalImagePath
+        );
 
         if (updatedPost) {
           useFeedStore.getState().updatePost(updatedPost);
-          setToast('게시글 수정이 완료됐어요! 😊');
+          setToast("게시글 수정이 완료됐어요! 😊");
           navigate(`/post/${postId}?updated=${Date.now()}`, { replace: true });
         } else {
-          notify('게시글 수정이 실패했어요 🥲');
+          notify("게시글 수정이 실패했어요 🥲");
         }
       } else {
-        const postRes = await fetch("https://dev.wenivops.co.kr/services/mandarin/post", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            post: {
-              content: actualContent,
-              image: finalImagePath,
+        const postRes = await fetch(
+          "https://dev.wenivops.co.kr/services/mandarin/post",
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
             },
-          }),
-        });
+            body: JSON.stringify({
+              post: {
+                content: actualContent,
+                image: finalImagePath,
+              },
+            }),
+          }
+        );
 
         const postData = await postRes.json();
 
         if (postRes.ok) {
-          setToast('게시글 작성이 완료됐어요! 😊')
+          setToast("게시글 작성이 완료됐어요! 😊");
           setContent("");
           setImgArr([]);
           if (textAreaRef.current) {
-            textAreaRef.current.value = '';
+            textAreaRef.current.value = "";
           }
-          navigate('/feed')
+          navigate("/feed");
         } else {
-          notify('게시글 작성이 실패했어요 🥲');
+          notify("게시글 작성이 실패했어요 🥲");
         }
       }
     } catch (err) {
       notify("오류가 발생했습니다 🥲");
     }
   };
-
 
   useEffect(() => {
     if (imgArr.length > 0 && textAreaRef.current?.value !== "") {
@@ -250,7 +267,14 @@ export default function PostWrite() {
   // 로딩 중일 때
   if (isLoading) {
     return (
-      <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div
+        style={{
+          height: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
         <p>게시글을 불러오는 중...</p>
       </div>
     );
@@ -266,7 +290,9 @@ export default function PostWrite() {
         style={{ height: "100%" }}
       >
         <PostContainer>
-          <h2 className="sr-only">{isEditMode ? "게시물 수정" : "게시물 업로드"}</h2>
+          <h2 className="sr-only">
+            {isEditMode ? "게시물 수정" : "게시물 업로드"}
+          </h2>
           <ImageUploadContainer>
             <ImageUpButtonContainer>
               <ImageUpButton
@@ -275,53 +301,87 @@ export default function PostWrite() {
                 size="small"
                 imgArr={imgArr}
                 setImgArr={setImgArr}
-                existingCount={existingImagePath ? existingImagePath.split(",").filter(p => p.trim()).length : 0}
+                existingCount={
+                  existingImagePath
+                    ? existingImagePath.split(",").filter((p) => p.trim())
+                        .length
+                    : 0
+                }
               />
-              <p>{imgArr.length + (existingImagePath ? existingImagePath.split(",").filter(p => p.trim()).length : 0)}/10</p>
+              <p>
+                {imgArr.length +
+                  (existingImagePath
+                    ? existingImagePath.split(",").filter((p) => p.trim())
+                        .length
+                    : 0)}
+                /10
+              </p>
             </ImageUpButtonContainer>
             {/* 수정 모드: 기존 이미지 표시 */}
-            {isEditMode && existingImagePath && existingImagePath.split(",").filter(p => p.trim()).map((imagePath, index) => (
-              <div key={`existing-${index}`} style={{
-                position: "relative",
-                width: "80px",
-                height: "80px",
-                borderRadius: "10px",
-                overflow: "hidden",
-              }}>
-                <img
-                  src={`https://dev.wenivops.co.kr/services/mandarin/${imagePath.includes("/") ? imagePath.split("/")[1] : imagePath}`}
-                  alt={`기존 이미지 ${index + 1}`}
-                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                />
-                <button
-                  onClick={() => {
-                    // 해당 이미지만 제거
-                    const images = existingImagePath.split(",").filter(p => p.trim());
-                    images.splice(index, 1);
-                    setExistingImagePath(images.join(","));
-                  }}
-                  style={{
-                    position: "absolute",
-                    top: "6px",
-                    right: "6px",
-                    width: "22px",
-                    height: "22px",
-                    backgroundColor: "#fff",
-                    border: "none",
-                    borderRadius: "100%",
-                    boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
-                    cursor: "pointer",
-                    zIndex: 20,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    padding: 0,
-                  }}
-                >
-                  <img src="/img/icon-close.svg" alt="닫기" style={{ width: "100%", height: "100%" }} />
-                </button>
-              </div>
-            ))}
+            {isEditMode &&
+              existingImagePath &&
+              existingImagePath
+                .split(",")
+                .filter((p) => p.trim())
+                .map((imagePath, index) => (
+                  <div
+                    key={`existing-${index}`}
+                    style={{
+                      position: "relative",
+                      width: "80px",
+                      height: "80px",
+                      borderRadius: "10px",
+                      overflow: "hidden",
+                    }}
+                  >
+                    <img
+                      src={`https://dev.wenivops.co.kr/services/mandarin/${
+                        imagePath.includes("/")
+                          ? imagePath.split("/")[1]
+                          : imagePath
+                      }`}
+                      alt={`기존 이미지 ${index + 1}`}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                      }}
+                    />
+                    <button
+                      onClick={() => {
+                        // 해당 이미지만 제거
+                        const images = existingImagePath
+                          .split(",")
+                          .filter((p) => p.trim());
+                        images.splice(index, 1);
+                        setExistingImagePath(images.join(","));
+                      }}
+                      style={{
+                        position: "absolute",
+                        top: "6px",
+                        right: "6px",
+                        width: "22px",
+                        height: "22px",
+                        backgroundColor: "#fff",
+                        border: "none",
+                        borderRadius: "100%",
+                        boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
+                        cursor: "pointer",
+                        zIndex: 20,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        padding: 0,
+                      }}
+                    >
+                      <img
+                        src="/img/icon-close.svg"
+                        alt="닫기"
+                        style={{ width: "100%", height: "100%" }}
+                      />
+                    </button>
+                  </div>
+                ))}
             {/* 새로 업로드한 이미지 */}
             <ImageContainer imgArr={imgArr} setDeleteIdx={setDeleteIdx} />
           </ImageUploadContainer>
@@ -330,7 +390,7 @@ export default function PostWrite() {
             <WriteZone>
               <TextArea
                 ref={textAreaRef}
-                id={'post-upload'}
+                id={"post-upload"}
                 placeholder={textPlaceholder}
                 onChange={handleTextChange}
               />

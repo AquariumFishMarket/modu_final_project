@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useHeader } from "../../contexts/HeaderContext";
-import { useAuth } from "../../contexts/AuthContext";
+import { useAuthStore } from "../../contexts/useAuthStore";
 import EditForm from "../../components/common/form/EditForm";
 import {
   CommonFormRef,
@@ -26,13 +26,14 @@ export default function ProfileEdit() {
   const { setHeaderConfig } = useHeader();
   const formRef = useRef<CommonFormRef>(null);
   const [isFormValid, setIsFormValid] = useState(false);
-  const { setToast } = useToastStore()
+  const { setToast } = useToastStore();
 
   // 상태
   const [loading, setLoading] = useState(true);
   const [profileData, setProfileData] = useState<UserProfile | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const { refreshUserInfo } = useAuth();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const refreshUser = useAuthStore((s) => s.refreshUser);
 
   const profileFields = getProfileFields();
 
@@ -87,9 +88,13 @@ export default function ProfileEdit() {
     setHeaderConfig({
       show: true,
       type: "edit",
-      title: "프로필 수정",
-      inputState: isFormValid,
-      onBackClick: () => navigate("/profile"),
+      title: isSubmitting ? "저장 중..." : "저장",
+      pageTitle: "프로필 수정",
+      inputState: isFormValid && !isSubmitting,
+      onBackClick: () => {
+        if (isSubmitting) return;
+        navigate("/profile");
+      },
       onButtonClick: () => {
         // 실제 폼 제출 로직
         if (formRef.current && isFormValid) {
@@ -111,12 +116,13 @@ export default function ProfileEdit() {
 
   // 폼 제출 핸들러
   const handleSubmit = async (data: ProfileFormData) => {
-    try {
-      //console.log("📤 제출 데이터:", data);
+    if (isSubmitting) return;
+    setIsSubmitting(true);
 
+    try {
       const token = getToken();
       if (!token) {
-        throw new Error("로그인이 필요합니다."); // ☑️ 예외처리 필요
+        throw new Error("로그인이 필요합니다.");
       }
 
       let imageUrl = "";
@@ -136,25 +142,25 @@ export default function ProfileEdit() {
         imageUrl
       );
 
-      //console.log("✅ 프로필 수정 성공");
+      await refreshUser();
 
-      // AuthContext 업데이트 - 서버에서 최신 정보 가져오기
-      await refreshUserInfo();
-      setToast("프로필이 수정되었습니다😎",()=>navigate("/profile", { replace: true }))
-
-      //navigate("/profile", { replace: true });
+      setToast("프로필이 수정되었습니다😎", () =>
+        navigate("/profile", { replace: true })
+      );
     } catch (error) {
       console.error("프로필 수정 실패:", error);
-      setToast("프로필 수정을 실패했습니다😭")
+      setToast("프로필 수정을 실패했습니다😭");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  // 🆕 로딩 상태 -> 처리 어떻게 할지
   if (loading) {
-    return <div style={{ textAlign: 'center' }}>프로필 정보를 불러오는 중...</div>;
+    return (
+      <div style={{ textAlign: "center" }}>프로필 정보를 불러오는 중...</div>
+    );
   }
 
-  // 🆕 에러 상태 -> 처리 어떻게 할지
   if (error) {
     return (
       <div>
@@ -165,7 +171,6 @@ export default function ProfileEdit() {
     );
   }
 
-  // 🆕 데이터 없음 -> 처리 어떻게 할지
   if (!profileData) {
     return <div>프로필 정보를 불러올 수 없습니다.</div>;
   }

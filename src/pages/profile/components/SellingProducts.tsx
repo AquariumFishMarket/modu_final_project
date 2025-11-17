@@ -14,7 +14,7 @@ import {
 import ProductImageContainer from "./ProductImageContainer";
 import type { Product } from "../../../types/product";
 import { fetchProductList } from "../../../services/productService";
-import { useAuth } from "../../../contexts/AuthContext";
+import { useAuthStore } from "../../../contexts/useAuthStore";
 
 interface SellingProductsProps {
   isLastSection?: boolean;
@@ -32,7 +32,8 @@ function SellingProducts({
 }: SellingProductsProps) {
   const navigate = useNavigate();
   const params = useParams<{ accountname?: string }>();
-  const { currentUser } = useAuth();
+  // const { currentUser } = useAuth();
+  const currentUser = useAuthStore((s) => s.user);
 
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -205,9 +206,9 @@ function SellingProducts({
               role="listitem"
             >
               <ProductImageContainer
-              src={getProductImageUrl(product.itemImage)}
-              alt={product.itemName}
-              onError={(e)=>handleImageError(e)}
+                src={getProductImageUrl(product.itemImage)}
+                alt={product.itemName}
+                onError={(e) => handleImageError(e)}
               />
 
               <ProductInfoBox>

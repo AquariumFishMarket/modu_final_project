@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { useHeader } from "../../../contexts/HeaderContext";
-import { useAuth } from "../../../contexts/AuthContext";
+// import { useAuth } from "../../../contexts/AuthContext";
+import { useAuthStore } from "../../../contexts/useAuthStore";
 import { useFollowStore } from "../../../contexts/followStore";
 
 import {
@@ -39,9 +40,13 @@ import {
   fetchUserPosts,
   toggleProfileFollow,
 } from "../../../services/profileService";
+import MoreMenu from "../../../components/common/modal/MoreMenu";
+
+//  Profile 컴포넌트
+//  - 내 프로필과 다른 유저의 프로필을 조건부 렌더링
+//  - isMyProfile = targetAccountname === currentUserAccountname로 구분
 
 import { likePost, unlikePost } from "../../../services/postService";
-import MoreMenu from "../../../components/common/modal/MoreMenu";
 import { formatPostDate } from "../../../utils/formatter/dateFormatter";
 import { fetchPostMeta } from "../../../utils/fetchPostMeta";
 import { useFeedStore } from "../../../contexts/useFeedStore";
@@ -49,7 +54,9 @@ import { useFeedStore } from "../../../contexts/useFeedStore";
 function Profile() {
   const navigate = useNavigate();
   const { setHeaderConfig } = useHeader();
-  const { currentUser, isLoading: isAuthLoading, logout } = useAuth();
+  const currentUser = useAuthStore((s) => s.user);
+  const isAuthLoading = useAuthStore((s) => s.isLoading);
+  const logout = useAuthStore((s) => s.logout);
 
   const { accountname: paramAccountname } = useParams<{
     accountname?: string;
@@ -75,7 +82,11 @@ function Profile() {
 
   const isMyProfile = currentUserAccountname === targetAccountname;
 
-  // 헤더 설정
+  const handleLogout = (): void => {
+    logout();
+    navigate("/login", { replace: true });
+  };
+
   useEffect(() => {
     setHeaderConfig({
       show: true,
@@ -85,7 +96,7 @@ function Profile() {
         <MoreMenu
           type="profile"
           onSettings={() => navigate("/settings")}
-          onLogout={() => logout()}
+          onLogout={handleLogout}
         />
       ),
     });

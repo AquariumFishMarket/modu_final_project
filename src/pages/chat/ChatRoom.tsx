@@ -1,14 +1,26 @@
 import { useState, useEffect, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import ProfileImg from "../../components/common/ProfileImg";
 import TextField from "../../components/common/TextField";
 import ImageUpButton from "../../components/common/imageUpload/UploadButton";
 import ImageContainer from "../../components/common/imageUpload/ImageContainer";
 import DefaultButton from "../../components/common/buttons/Button";
+import MoreMenu from "../../components/common/modal/MoreMenu";
+import { useHeader } from "../../contexts/HeaderContext";
 import { mockResponsesByRoom } from "./mockChatData";
-
 import styled from "styled-components";
 import { pusher } from "../../App";
+import AlertModal from "../../components/common/modal/AlertModal";
+
+export interface ChatMessage {
+  id: string;
+  userId: string;
+  username: string;
+  content: string;
+  type: "text" | "image" | "system";
+  timestamp: number;
+  isRead?: boolean;
+}
 
 const ChatContainer = styled.section`
   position: relative;
@@ -28,17 +40,9 @@ const DefaultChatMessage = styled.div`
   border-top-left-radius: 0;
 `;
 const YourChat = styled(DefaultChat)``;
-
 const YourChatMessage = styled(DefaultChatMessage)`
   background: #fff;
   border: 1px solid var(--color-gray-semi-dark);
-  > p {
-    font-size: var(--font-size-md);
-    line-height: 1.4;
-  }
-  > img {
-    max-width: 100%;
-  }
 `;
 const YourTime = styled.div`
   font-size: 1rem;
@@ -66,14 +70,13 @@ const ImageContainerWRapper = styled.div`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  z-index: 99;
+  z-index: 101;
   background-color: #fff;
   border-radius: 15px;
   padding: 20px;
   width: 300px;
   max-height: 250px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  z-index: 101;
 `;
 const Background = styled.div`
   position: fixed;
@@ -91,35 +94,74 @@ const ChatNotice = styled.div`
   background-color: #eeeeee;
   padding: 10px 40px;
   border-radius: 500px;
-`
+`;
 
-export interface ChatMessage {
-  id: string;
-  userId: string;
-  username: string;
-  content: string;
-  type: "text" | "image" | "system";
-  timestamp: number;
-  isRead?: boolean;
-}
-
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzzPfbfdpUEbR5QPIfDS0Z8Yl5a_keypTw-HvCnK1CnUYOUbd2f4wdhkglQxMXsZvTDAA/exec";
-
+const APPS_SCRIPT_URL =
+  "https://script.google.com/macros/s/AKfycbzzPfbfdpUEbR5QPIfDS0Z8Yl5a_keypTw-HvCnK1CnUYOUbd2f4wdhkglQxMXsZvTDAA/exec";
 
 export default function ChatRoom() {
   const { roomId } = useParams<{ roomId: string }>();
+  const navigate = useNavigate();
+  const { setHeaderConfig } = useHeader();
+
   const [imgArr, setImgArr] = useState<File[]>([]);
   const [deleteIndex, setDeleteIdx] = useState<number | undefined>();
   const [imgModalState, setImgModalState] = useState<boolean>(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const messageRef = useRef<ChatMessage[]>([])
-  const scenarioRef = useRef<number>(0)
 
+  const messageRef = useRef<ChatMessage[]>([]);
+  const scenarioRef = useRef<number>(0);
+
+  // 미니 얼럿 상태
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [alertType, setAlertType] = useState<"chatReport" | "chatLeave" | null>(
+    null
+  );
+
+  if (!roomId || !mockResponsesByRoom[roomId])
+    return <p>잘못된 채팅방입니다.</p>;
+
+  const chatUsername = mockResponsesByRoom[roomId][0][0].username;
+
+  const openAlert = (type: "chatReport" | "chatLeave") => {
+    setAlertType(type);
+    setAlertOpen(true);
+  };
+
+  const closeAlert = () => {
+    setAlertOpen(false);
+    setAlertType(null);
+  };
+
+  /* header 세팅 */
+  useEffect(() => {
+    setHeaderConfig({
+      show: true,
+      type: "chat",
+      userName: chatUsername,
+      pageTitle: `${chatUsername}님과의 채팅방`,
+      onBackClick: () => navigate(-1),
+      rightElement: (
+        <MoreMenu
+          type="chat"
+          size="lg"
+          onLeave={() => {
+            openAlert("chatLeave");
+          }}
+          onReport={() => {
+            openAlert("chatReport");
+          }}
+        />
+      ),
+    });
+  }, [roomId]);
+
+  /* 메시지 수신 */
   useEffect(() => {
     const channel = pusher.subscribe(`chat-${roomId}`);
 
-    channel.bind('message', (data: ChatMessage) => {
-      setMessages(prev => [...prev, data]);
+    channel.bind("message", (data: ChatMessage) => {
+      setMessages((prev) => [...prev, data]);
     });
 
     return () => {
@@ -127,54 +169,50 @@ export default function ChatRoom() {
     };
   }, [roomId]);
 
-  useEffect(()=>{
+  useEffect(() => {
     messageRef.current = messages;
-  }, [messages])
+  }, [messages]);
 
-  const handleIncommingMessage = (incoming:ChatMessage) => {
-    const updated = messageRef.current.map(msg =>
+  const handleIncomingMessage = (incoming: ChatMessage) => {
+    const updated = messageRef.current.map((msg) =>
       msg.userId === "me" ? { ...msg, isRead: true } : msg
     );
-    setMessages([...updated, incoming])
-  }
-
-  // 답장 목 데이터 불러오는 함수
-  const sendMockResponse = (roomId: string, scenario:number, index = 0) => {
-    const messagesForRoom = mockResponsesByRoom[roomId][scenario];
-    if(mockResponsesByRoom[roomId].length == scenario) return;
-
-    messagesForRoom.forEach((ele,i)=> {
-      setTimeout(()=>{
-        setMessages(prev => [...prev, ele])
-        const incoming = ele;
-        handleIncommingMessage(incoming)
-      }, i * 1200 + 1000)
-    })
-
-    scenarioRef.current += 1;
-
+    setMessages([...updated, incoming]);
   };
 
-  // 이미지 삭제 처리
+  /* 자동 응답 시나리오 */
+  const sendMockResponse = (roomId: string, step: number) => {
+    const scenario = mockResponsesByRoom[roomId][step];
+    if (!scenario) return;
+
+    scenario.forEach((ele, i) => {
+      setTimeout(() => {
+        setMessages((prev) => [...prev, ele]);
+        handleIncomingMessage(ele);
+      }, i * 1200 + 1000);
+    });
+
+    scenarioRef.current += 1;
+  };
+
+  /* 이미지 삭제 */
   useEffect(() => {
-    setImgArr((prev) => prev.filter((_, i) => i !== deleteIndex));
-    setDeleteIdx(undefined);
+    if (deleteIndex !== undefined) {
+      setImgArr((prev) => prev.filter((_, i) => i !== deleteIndex));
+      setDeleteIdx(undefined);
+    }
   }, [deleteIndex]);
 
-  // 이미지 모달 상태
+  /* 이미지 모달 상태 */
   useEffect(() => {
-    if (imgArr.length > 0) {
-      setImgModalState(true);
-    } else {
-      setImgModalState(false);
-    }
+    setImgModalState(imgArr.length > 0);
   }, [imgArr]);
 
-  //이미지 전송 함수
+  /* 이미지 전송 */
   const handleSubmitImage = () => {
     if (imgArr.length === 0) return;
 
-    const newMessages = imgArr.map(img => ({
+    const newMessages = imgArr.map((img) => ({
       id: (Date.now() + Math.random()).toString(),
       userId: "me",
       username: "나",
@@ -184,21 +222,19 @@ export default function ChatRoom() {
       isRead: false,
     }));
 
-    // 로컬 state에 추가
-    setMessages(prev => [...prev, ...newMessages as ChatMessage[]]);
+    setMessages((prev) => [...prev, ...(newMessages as ChatMessage[])]);
     handleClose();
 
-    // Apps Script 호출 (Pusher로 브로드캐스트)
-    newMessages.forEach(msg => {
+    newMessages.forEach((msg) => {
       fetch(APPS_SCRIPT_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ roomId, message: msg }),
-      }).catch(err => console.error("이미지 전송 실패", err));
+      });
     });
   };
 
-  //텍스트 전송 함수
+  /* 텍스트 전송 */
   const handleSendText = (
     text: string,
     refObj: React.RefObject<HTMLTextAreaElement | null>
@@ -215,7 +251,7 @@ export default function ChatRoom() {
       isRead: false,
     };
 
-    setMessages(prev => [...prev, newMessage]);
+    setMessages((prev) => [...prev, newMessage]);
 
     if (refObj.current) refObj.current.value = "";
 
@@ -223,71 +259,95 @@ export default function ChatRoom() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ roomId, message: newMessage }),
-    }).catch(err => console.error("텍스트 전송 실패", err));
+    });
 
-    if(!roomId) return;
-    sendMockResponse(roomId,scenarioRef.current)
+    sendMockResponse(roomId, scenarioRef.current);
   };
 
+  /* 이미지 모달 닫기 */
   const handleClose = () => {
     setImgModalState(false);
     setImgArr([]);
   };
 
-  if(!roomId) return;
-  const chatUsername = mockResponsesByRoom[roomId][0][0].username
-
+  /* 렌더링 */
   return (
     <>
       <ChatContainer>
-        <h2 className="sr-only">ooo님의 채팅룸</h2>
-        {messages.length == 0 && (
+        <h2 className="sr-only">{chatUsername}님과의 채팅방</h2>
+
+        {messages.length === 0 && (
           <ChatNotice>{chatUsername}님과 대화를 시작해볼까요? 😎</ChatNotice>
         )}
-        {messages.map(msg => (
+
+        {messages.map((msg) =>
           msg.userId === "me" ? (
             <MyChat key={msg.id}>
               <MyTime>
-                {!msg.isRead &&
-                <p style={{ marginBottom: "4px" }}>안읽음</p>
-                }
-                <p>{new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+                {!msg.isRead && (
+                  <p
+                    style={{ color: "var(--color-error)", marginBottom: "4px" }}
+                  >
+                    안읽음
+                  </p>
+                )}
+                <p>
+                  {new Date(msg.timestamp).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </p>
               </MyTime>
+
               <MyChatMessage>
-                {msg.type === "text" ? <p>{msg.content}</p> : <img src={msg.content} alt="" style={{ maxWidth: '100%' }} />}
+                {msg.type === "text" ? (
+                  <p>{msg.content}</p>
+                ) : (
+                  <img src={msg.content} alt="" style={{ maxWidth: "100%" }} />
+                )}
               </MyChatMessage>
             </MyChat>
           ) : (
             <YourChat key={msg.id}>
               <ProfileImg thumbimg={false} width={42} />
               <YourChatMessage>
-                {msg.type === "text" ? <p>{msg.content}</p> : <img src={msg.content} style={{ maxWidth: '100%' }} />}
+                {msg.type === "text" ? (
+                  <p>{msg.content}</p>
+                ) : (
+                  <img src={msg.content} style={{ maxWidth: "100%" }} />
+                )}
               </YourChatMessage>
               <YourTime>
-                <p>{new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+                <p>
+                  {new Date(msg.timestamp).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </p>
               </YourTime>
             </YourChat>
           )
-        ))}
+        )}
       </ChatContainer>
 
+      {/* 이미지 모달 */}
       {imgModalState && (
         <>
-          <Background></Background>
+          <Background />
           <ImageContainerWRapper>
             <ImageContainer imgArr={imgArr} setDeleteIdx={setDeleteIdx} />
             <div style={{ marginTop: "25px", display: "flex", gap: "10px" }}>
               <div style={{ flexBasis: "50%" }}>
                 <DefaultButton
-                  height="medium"
                   text="전송하기"
+                  height="medium"
                   onClick={handleSubmitImage}
                 />
               </div>
               <div style={{ flexBasis: "50%" }}>
                 <DefaultButton
-                  height="medium"
                   text="닫기"
+                  height="medium"
                   variant="secondary"
                   onClick={handleClose}
                 />
@@ -300,7 +360,7 @@ export default function ChatRoom() {
       <TextField
         left={
           <ImageUpButton
-            multiple={true}
+            multiple
             colortype="gray"
             size="small"
             imgArr={imgArr}
@@ -309,7 +369,24 @@ export default function ChatRoom() {
         }
         placeholder="메시지 입력하기.."
         onClick={handleSendText}
-      ></TextField>
+      />
+
+      {/* 미니 얼럿 */}
+      <AlertModal
+        isOpen={alertOpen}
+        type={alertType}
+        onClose={closeAlert}
+        onConfirm={{
+          chatReport: () => {
+            // 신고 완료 후 채팅 리스트로 이동
+            navigate("/chat-list");
+          },
+          chatLeave: () => {
+            // 채팅방 나가기 후 채팅 리스트로 이동
+            navigate("/chat-list");
+          },
+        }}
+      />
     </>
   );
 }
