@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { getAuthHeaders } from "../utils/tokenManager";
-import { useAuth } from "../contexts/AuthContext";
+// import { useAuth } from "../contexts/AuthContext";
+import { useAuthStore } from "../contexts/useAuthStore";
 
 // API BASE URL (Vercel 테스트용)
 const API_BASE_URL = "https://dev.wenivops.co.kr/services/mandarin";
@@ -19,7 +20,8 @@ export interface UserData {
 }
 
 export function useSearch() {
-  const { currentUser } = useAuth();
+  // const { currentUser } = useAuth();
+  const currentUser = useAuthStore((s) => s.user);
 
   const [searchResults, setSearchResults] = useState<UserData[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
