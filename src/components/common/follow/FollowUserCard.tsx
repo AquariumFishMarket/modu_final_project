@@ -10,6 +10,7 @@ import {
   UserIntro,
 } from "./FollowUserCard.styled";
 import DefaultButton from "../buttons/Button";
+import { useAuth } from "../../../contexts/AuthContext";
 
 interface FollowUserCardProps {
   userName: string;
@@ -28,8 +29,10 @@ function FollowUserCard({
   isFollowing,
   onFollowToggle,
 }: FollowUserCardProps) {
+  const { currentUser } = useAuth();
+  const isMe = currentUser?.accountname === userId;
+
   const handleFollowClick = () => {
-    // userId를 콜백에 전달
     onFollowToggle?.(userId);
   };
 
@@ -38,7 +41,6 @@ function FollowUserCard({
       {/* 프로필 링크 영역 */}
       <UserProfileLink to={`/profile/${encodeURIComponent(userId)}`}>
         <UserInfoWrapper>
-          {/* 프로필 이미지 */}
           <UserImageWrapper>
             <UserImage
               src={userImage || "/img/fish_profile.png"}
@@ -49,7 +51,6 @@ function FollowUserCard({
             />
           </UserImageWrapper>
 
-          {/* 이름 + 소개글 */}
           <UserTextInfo>
             <UserName>{userName}</UserName>
             <UserIntro>{userIntro || "소개글이 없습니다."}</UserIntro>
@@ -57,13 +58,15 @@ function FollowUserCard({
         </UserInfoWrapper>
       </UserProfileLink>
 
-      {/* 팔로우 버튼 */}
-      <DefaultButton
-        text={isFollowing ? "언팔로우" : "팔로우"}
-        variant={isFollowing ? "secondary" : "primary"}
-        width={90}
-        onClick={handleFollowClick}
-      />
+      {/* 내 계정이면 버튼 숨김 */}
+      {!isMe && (
+        <DefaultButton
+          text={isFollowing ? "언팔로우" : "팔로우"}
+          variant={isFollowing ? "secondary" : "primary"}
+          width={90}
+          onClick={handleFollowClick}
+        />
+      )}
     </UserCardContainer>
   );
 }
