@@ -4,12 +4,11 @@ import PostCard from "../../components/post/postCard/PostCard";
 import CommentField from "../../components/post/comment/CommentField";
 import TextField from "../../components/common/TextField";
 import { PostDetailContainer, CommentsSection } from "./PostDetail.styled";
+
 import {
   fetchPostDetail,
   fetchPostComments,
   createComment,
-  likePost,
-  unlikePost,
   deleteComment,
   updateComment,
   reportComment,
@@ -20,53 +19,11 @@ import { useAuthStore } from "../../contexts/useAuthStore";
 import { useHeader } from "../../contexts/HeaderContext";
 import MoreMenu from "../../components/common/modal/MoreMenu";
 
-interface Author {
-  _id: string;
-  username: string;
-  accountname: string;
-  intro: string;
-  image: string;
-  isfollow: boolean;
-  following: [];
-  follower: [];
-  followerCount: number;
-  followingCount: number;
-}
+import {
+  likePost as apiLikePost,
+  unlikePost as apiUnlikePost,
+} from "../../services/postService";
 
-interface Post {
-  id: string;
-  content: string;
-  image?: string;
-  createdAt: string;
-  updatedAt: string;
-  hearted: boolean;
-  heartCount: number;
-  comments: Comment[];
-  commentCount: number;
-  author: Author;
-}
-
-interface CommentAuthor {
-  _id: string;
-  username: string;
-  accountname: string;
-  intro: string;
-  image: string;
-  isfollow: boolean;
-  following: [];
-  follower: [];
-  followerCount: number;
-  followingCount: number;
-}
-
-interface Comment {
-  id: string;
-  content: string;
-  createdAt: string;
-  author: CommentAuthor;
-  hearted: boolean;
-  heartCount: number;
-}
 
 function PostDetail() {
   const { postId } = useParams<{ postId: string }>();
@@ -74,13 +31,48 @@ function PostDetail() {
   const location = useLocation();
   const currentUser = useAuthStore((s) => s.user);
   const { setHeaderConfig } = useHeader();
+
+  const updateFeedPost = useFeedStore((state) => state.updatePost);
+  const toggleFeedLike = useFeedStore((state) => state.toggleLike);
+
   const [commentText, setCommentText] = useState("");
-  const [post, setPost] = useState<Post | null>(null);
-  const [comments, setComments] = useState<Comment[]>([]);
+  const [post, setPost] = useState<any>(null);
+  const [comments, setComments] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const lastCommentRef = useRef<HTMLDivElement>(null);
 
-  // 게시글 삭제 핸들러
+  // 피드의 해당 게시글 상태
+  const feedItem = useFeedStore((state) =>
+    state.feedList.find((f) => f.id === postId)
+  );
+
+  useEffect(() => {
+    if (!feedItem || !post) return;
+
+    const sameHearted = post.hearted === feedItem.isLiked;
+    const sameHeartCount = post.heartCount === feedItem.likeCount;
+    const sameCommentCount = post.commentCount === feedItem.commentCount;
+
+    if (sameHearted && sameHeartCount && sameCommentCount) return;
+
+    setPost((prev: any) =>
+      prev
+        ? {
+            ...prev,
+            hearted: feedItem.isLiked,
+            heartCount: feedItem.likeCount,
+            commentCount: feedItem.commentCount,
+          }
+        : prev
+    );
+  }, [
+    feedItem?.isLiked,
+    feedItem?.likeCount,
+    feedItem?.commentCount,
+    post?.id,
+  ]);
+
+  //  게시글 삭제
   const handleDeletePost = async () => {
     if (!postId) return;
 
@@ -93,29 +85,23 @@ function PostDetail() {
     }
   };
 
-  // 게시글 및 댓글 데이터 불러오기
+  //  게시글 + 댓글 로드
   useEffect(() => {
     const loadPostData = async () => {
       if (!postId) return;
 
+      setIsLoading(true);
+
       try {
-        setIsLoading(true);
         const [postData, commentsData] = await Promise.all([
           fetchPostDetail(postId),
           fetchPostComments(postId),
         ]);
 
-        // console.log("🔄 PostDetail 데이터 로드:", {
-        //   id: postData?.id,
-        //   content: postData?.content?.substring(0, 50),
-        //   image: postData?.image,
-        // });
-
-        setPost(postData);
-        // 댓글을 역순으로 정렬 (오래된 댓글이 위로)
+        setPost(postData || null);
         setComments([...commentsData].reverse());
       } catch (error) {
-        console.error("게시글 데이터 로드 실패:", error);
+        console.error("상세 페이지 로드 실패:", error);
       } finally {
         setIsLoading(false);
       }
@@ -124,7 +110,19 @@ function PostDetail() {
     loadPostData();
   }, [postId, location.search]);
 
-  // 헤더 설정 (post 로드 후)
+  //  게시글 신고
+  const handlePostReport = async () => {
+    if (!postId) return;
+
+    try {
+      await reportPost(postId);
+      alert("게시글이 신고되었습니다.");
+    } catch (err) {
+      console.error("게시글 신고 실패:", err);
+    }
+  };
+
+  //  헤더 설정
   useEffect(() => {
     if (!post) return;
 
@@ -142,8 +140,9 @@ function PostDetail() {
         />
       ),
     });
-  }, [post, postId, setHeaderConfig, navigate]);
+  }, [post, setHeaderConfig, navigate, postId]);
 
+  // 댓글 작성
   const handleCommentSubmit = async (
     text: string,
     refObj: React.RefObject<HTMLTextAreaElement | null>
@@ -153,162 +152,128 @@ function PostDetail() {
     try {
       const newComment = await createComment(postId, text);
 
-      // 성공 시 textarea 초기화
+      if (!newComment) return;
+
       if (refObj.current) {
         refObj.current.value = "";
         refObj.current.style.height = "auto";
       }
 
-      if (newComment) {
-        setComments((prev) => {
-          const updated = [...prev, newComment]; // 최신 댓글이 아래로
+      setComments((prev) => [...prev, newComment]);
+      setCommentText("");
 
-          return updated;
+      const newPost = {
+        ...post,
+        commentCount: post.commentCount + 1,
+      };
+
+      setPost(newPost);
+      updateFeedPost(newPost);
+
+      setTimeout(() => {
+        lastCommentRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
         });
-        setCommentText("");
-
-        // 댓글 수 업데이트
-        if (post) {
-          setPost({ ...post, commentCount: post.commentCount + 1 });
-        }
-
-        // 새로 작성한 댓글로 스크롤 (아래로)
-        setTimeout(() => {
-          lastCommentRef.current?.scrollIntoView({
-            behavior: "smooth",
-            block: "start",
-          });
-        }, 100);
-      } else {
-        // fallback: 목록 새로고침
-        const updatedComments = await fetchPostComments(postId);
-
-        // 댓글을 역순으로 정렬 (오래된 댓글이 위로)
-        setComments([...updatedComments].reverse());
-        setCommentText("");
-      }
-    } catch (error) {
-      console.error("댓글 등록 실패:", error);
+      }, 100);
+    } catch (err) {
+      console.error("댓글 등록 실패:", err);
     }
   };
 
+  // 좋아요
   const handleLikeClick = async () => {
     if (!postId || !post) return;
 
-    const prevPost = post;
+    const prev = post;
+    const isLikedNow = post.hearted;
 
     // 낙관적 업데이트
-    setPost({
+    const optimistic = {
       ...post,
-      hearted: !post.hearted,
-      heartCount: post.hearted ? post.heartCount - 1 : post.heartCount + 1,
-    });
+      hearted: !isLikedNow,
+      heartCount: isLikedNow ? post.heartCount - 1 : post.heartCount + 1,
+    };
+    setPost(optimistic);
 
     try {
-      // API 호출 및 응답으로 상태 업데이트
-      const updatedPost = post.hearted
-        ? await unlikePost(postId)
-        : await likePost(postId);
+      const updated = isLikedNow
+        ? await apiUnlikePost(postId)
+        : await apiLikePost(postId);
 
-      if (updatedPost) {
-        setPost(updatedPost);
+      if (updated) {
+        setPost(updated);
+
+        updateFeedPost(updated);
+      } else {
+        setPost(prev);
       }
-    } catch (error) {
-      console.error("좋아요 처리 실패:", error);
-      // 실패 시 롤백
-      setPost(prevPost);
+    } catch (err) {
+      console.error("상세 좋아요 실패:", err);
+      setPost(prev);
     }
   };
 
-  // 댓글 삭제 핸들러
+  // 댓글 삭제
   const handleCommentDelete = async (commentId: string) => {
     if (!postId) return;
 
     const prevComments = [...comments];
 
-    // 낙관적 업데이트 - 즉시 UI에서 제거
-    setComments((prev) => prev.filter((c) => c.id !== commentId));
-
-    // 댓글 수 감소
-    if (post) {
-      setPost({ ...post, commentCount: post.commentCount - 1 });
-    }
-
     try {
       await deleteComment(postId, commentId);
-      //console.log("댓글 삭제 성공");
+
+      setComments((prev) => prev.filter((c) => c.id !== commentId));
+
+      const newPost = {
+        ...post,
+        commentCount: post.commentCount - 1,
+      };
+
+      setPost(newPost);
+      updateFeedPost(newPost);
     } catch (error) {
       console.error("댓글 삭제 실패:", error);
-      // 실패 시 롤백
       setComments(prevComments);
-      if (post) {
-        setPost({ ...post, commentCount: post.commentCount + 1 });
-      }
-      alert("댓글 삭제에 실패했습니다.");
     }
   };
 
-  // 댓글 수정 핸들러
-  const handleCommentUpdate = async (
-    commentId: string,
-    newContent: string
-  ): Promise<void> => {
-    if (!postId || !newContent.trim()) {
-      return;
-    }
-
-    //console.log("댓글 수정 시작:", { postId, commentId, newContent });
+  // 댓글 수정
+  const handleCommentUpdate = async (commentId: string, newContent: string) => {
+    if (!postId || !newContent.trim()) return;
 
     const prevComments = [...comments];
 
     try {
-      const updatedComment = await updateComment(
-        postId,
-        commentId,
-        newContent.trim()
-      );
+      const updated = await updateComment(postId, commentId, newContent.trim());
 
-      if (updatedComment) {
-        // 댓글 목록에서 해당 댓글 업데이트
+      if (updated) {
         setComments((prev) =>
-          prev.map((c) => (c.id === commentId ? updatedComment : c))
+          prev.map((c) => (c.id === commentId ? updated : c))
         );
+
+        updateFeedPost(post);
       }
     } catch (error) {
       console.error("댓글 수정 실패:", error);
-      // 실패 시 롤백
       setComments(prevComments);
-      alert("댓글 수정에 실패했습니다.");
-      throw error; // 에러를 다시 던져서 CommentField에서 catch할 수 있게 함
+      throw error;
     }
   };
 
-  // 댓글 신고 핸들러
+  // 댓글 신고
   const handleCommentReport = async (commentId: string) => {
     if (!postId) return;
 
     try {
       await reportComment(postId, commentId);
       alert("댓글이 신고되었습니다.");
-    } catch (error) {
-      console.error("댓글 신고 실패:", error);
-      alert("댓글 신고에 실패했습니다.");
+    } catch (err) {
+      console.error("댓글 신고 실패:", err);
     }
   };
 
-  // 게시글 신고 핸들러
-  const handlePostReport = async () => {
-    if (!postId) return;
-
-    try {
-      await reportPost(postId);
-      alert("게시글이 신고되었습니다.");
-    } catch (error) {
-      console.error("게시글 신고 실패:", error);
-      alert("게시글 신고에 실패했습니다.");
-    }
-  };
-
+  // 로딩 상태
   if (isLoading) {
     return (
       <PostDetailContainer>
@@ -325,12 +290,10 @@ function PostDetail() {
     );
   }
 
-  // 내 게시글인지 확인
   const isMyPost = currentUser?.accountname === post.author.accountname;
 
   return (
     <PostDetailContainer>
-      {/* 게시글 카드 */}
       <PostCard
         postId={post.id}
         userName={post.author.username}
@@ -349,24 +312,15 @@ function PostDetail() {
         onReportClick={handlePostReport}
       />
 
-      {/* 댓글 섹션 */}
       <CommentsSection>
         {comments.map((comment, index) => {
           const isMyComment =
             currentUser?.accountname === comment.author.accountname;
-          // console.log(
-          //   `댓글 ${index}:`,
-          //   `currentUser=${currentUser?.accountname}`,
-          //   `commentAuthor=${comment.author.accountname}`,
-          //   `isMyComment=${isMyComment}`,
-          //   `userName=${comment.author.username}`
-          // );
 
           return (
             <div
               key={comment.id}
               ref={index === comments.length - 1 ? lastCommentRef : null}
-              style={{ scrollMarginBottom: "150px" }}
             >
               <CommentField
                 commentId={comment.id}
@@ -391,7 +345,6 @@ function PostDetail() {
         })}
       </CommentsSection>
 
-      {/* 댓글 입력 필드 */}
       <TextField
         left={
           <img

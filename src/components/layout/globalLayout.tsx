@@ -41,6 +41,13 @@ function LayoutContent() {
   const { scrollContainerRef } = useFeedData();
   const refreshFeed = useFeedStore((state) => state.refreshFeed);
 
+  const pageVariants = {
+    initial: { opacity: 0, y: 10 },
+    animate: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+    exit: { opacity: 0, transition: { duration: 0.3 } },
+  };
+
+
   useEffect(() => {
     const path = location.pathname;
     if (path !== "/feed") return; // main feed 페이지에서만 작동합니다
@@ -319,30 +326,38 @@ function LayoutContent() {
               <Drop2 src="/img/drop.png" $transform={pull} alt="물방울" />
             </div>
           </RefreshAlert>
-        )}
-        <AnimatePresence mode="wait">
-          <MainContent
-            key={location.pathname}
-            $hasFooter={isFooter}
-            $isProfile={isProfilePage}
-            $isPostDetail={!!isPostDetailPage}
-            as={motion.main}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.26, ease: "easeOut" }}
-            ref={scrollContainerRef}
-            isPadding={location.pathname}
-          >
-            <Outlet />
-          </MainContent>
-        </AnimatePresence>
-        {isFooter && <FooterNav />}
-      </LayoutContainer>
-      {/* 플로팅 챗봇 - position: fixed로 전역에 표시 */}
-      <FloatingChatbot />
-      <ScrollButton scrollContainerRef={scrollContainerRef}></ScrollButton>
-    </>
-  );
+          )}
+          <AnimatePresence mode="wait">
+            <motion.div
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              style={{ height: '100%' }}
+              variants={pageVariants}
+            >
+            <MainContent
+              key={location.pathname}
+              $hasFooter={isFooter}
+              $isProfile={isProfilePage}
+              $isPostDetail={!!isPostDetailPage}
+              as={motion.main}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.26, ease: "easeOut" }}
+              ref={scrollContainerRef}
+              isPadding={location.pathname}
+            >
+              <Outlet />
+            </MainContent>
+            </motion.div>
+          </AnimatePresence>
+          {isFooter && <FooterNav />}
+        </LayoutContainer>
+        {/* 플로팅 챗봇 - position: fixed로 전역에 표시 */}
+        <FloatingChatbot />
+        <ScrollButton scrollContainerRef={scrollContainerRef}></ScrollButton>
+      </>
+    );
 }
 
 export default function GlobalLayout() {

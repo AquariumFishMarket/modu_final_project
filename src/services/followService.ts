@@ -1,57 +1,110 @@
 import { FollowUser } from "../types/follow";
 import { getAuthHeaders } from "../utils/tokenManager";
 
-// API Base URL (환경변수로 관리)
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api";
+const BASE_URL = "https://dev.wenivops.co.kr/services/mandarin";
 
-// 팔로워 목록 조회
+// API 응답 타입
 
-export async function fetchFollowers(userId: string): Promise<FollowUser[]> {
-  const res = await fetch(`${API_BASE_URL}/user/${userId}/followers`, {
-    method: "GET",
-    headers: getAuthHeaders(),
-  });
-
-  if (!res.ok) {
-    throw new Error("팔로워 목록 조회 실패");
-  }
-
-  const data = await res.json();
-  return data.followers as FollowUser[];
+interface FollowApiResponse {
+  _id: string;
+  username: string;
+  accountname: string;
+  intro: string;
+  image: string;
+  isfollow: boolean;
+  following: string[];
+  follower: string[];
+  followerCount: number;
+  followingCount: number;
 }
 
-// 팔로잉 목록 조회
+//  API 응답을 UI 타입으로 변환
 
-export async function fetchFollowing(userId: string): Promise<FollowUser[]> {
-  const res = await fetch(`${API_BASE_URL}/user/${userId}/following`, {
-    method: "GET",
-    headers: getAuthHeaders(),
-  });
+function mapToFollowUser(apiUser: FollowApiResponse): FollowUser {
+  return {
+    userId: apiUser.accountname,
+    userName: apiUser.username,
+    userImage: apiUser.image || "/img/empty-profile.png",
+    userIntro: apiUser.intro || "",
+    isFollowing: apiUser.isfollow,
+  };
+}
 
-  if (!res.ok) {
-    throw new Error("팔로잉 목록 조회 실패");
+//  팔로워 목록 조회
+
+export async function fetchFollowers(
+  accountname: string
+): Promise<FollowUser[]> {
+  try {
+    const res = await fetch(`${BASE_URL}/profile/${accountname}/follower`, {
+      method: "GET",
+      headers: getAuthHeaders(),
+    });
+
+    if (!res.ok) {
+      if (res.status === 404) {
+        return [];
+      }
+      throw new Error("팔로워 목록 조회 실패");
+    }
+
+    const data: FollowApiResponse[] = await res.json();
+    return Array.isArray(data) ? data.map(mapToFollowUser) : [];
+  } catch (error) {
+    throw error;
   }
+}
 
-  const data = await res.json();
-  return data.following as FollowUser[];
+//  팔로잉 목록 조회
+
+export async function fetchFollowing(
+  accountname: string
+): Promise<FollowUser[]> {
+  try {
+    const res = await fetch(`${BASE_URL}/profile/${accountname}/following`, {
+      method: "GET",
+      headers: getAuthHeaders(),
+    });
+
+    if (!res.ok) {
+      if (res.status === 404) {
+        return [];
+      }
+      throw new Error("팔로잉 목록 조회 실패");
+    }
+
+    const data: FollowApiResponse[] = await res.json();
+    return Array.isArray(data) ? data.map(mapToFollowUser) : [];
+  } catch (error) {
+    throw error;
+  }
 }
 
 //  팔로우 / 언팔로우 토글
 
 export async function toggleFollow(
-  targetUserId: string,
+  targetAccountname: string,
   isFollowing: boolean
 ): Promise<void> {
-  const endpoint = isFollowing ? "unfollow" : "follow";
-  const method = isFollowing ? "DELETE" : "POST";
+  try {
+    const url = isFollowing
+      ? `${BASE_URL}/profile/${targetAccountname}/unfollow`
+      : `${BASE_URL}/profile/${targetAccountname}/follow`;
 
-  const res = await fetch(`${API_BASE_URL}/user/${targetUserId}/${endpoint}`, {
-    method,
-    headers: getAuthHeaders(),
-  });
+    const method = isFollowing ? "DELETE" : "POST";
 
-  if (!res.ok) {
-    throw new Error(`${isFollowing ? "언팔로우" : "팔로우"} 실패`);
+    const res = await fetch(url, {
+      method,
+      headers: getAuthHeaders(),
+    });
+
+    if (!res.ok) {
+      const data = await res.json();
+      throw new Error(
+        data.message || `${isFollowing ? "언팔로우" : "팔로우"} 실패`
+      );
+    }
+  } catch (error) {
+    throw error;
   }
 }

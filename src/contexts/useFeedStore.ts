@@ -2,6 +2,35 @@ import { create } from "zustand";
 import { getToken } from "../utils/tokenManager";
 import type { Feed } from "../types/feed";
 import type { Post } from "../types/post";
+import { fetchPostMeta } from "../utils/fetchPostMeta";
+import {
+  likePost as apiLikePost,
+  unlikePost as apiUnlikePost,
+} from "../services/postService";
+
+const LIKE_STORAGE_KEY = "feed-liked-posts";
+
+// 로컬 좋아요 기록 불러오기
+const loadLikedPosts = (): Record<string, boolean> => {
+  if (typeof window === "undefined") return {};
+  try {
+    const raw = localStorage.getItem(LIKE_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+};
+
+// 로컬 좋아요 기록 저장
+const saveLikedPosts = (liked: Record<string, boolean>) => {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(LIKE_STORAGE_KEY, JSON.stringify(liked));
+  } catch {
+    // 저장 실패
+  }
+};
+
 
 interface FeedStore {
   feedList: Feed[];
@@ -12,6 +41,9 @@ interface FeedStore {
   isInitialLized: boolean;
   isFetching: boolean;
   isLoading: boolean;
+  lastFetchCount: number;
+  requestCount: number;
+  likedPosts: Record<string, boolean>;
 
   setFeedList: (list: Feed[]) => void;
   setSkip: (value: number) => void;
@@ -21,7 +53,7 @@ interface FeedStore {
 
   refreshFeed: () => void;
   fetchFeeds: (isLoadMore?: boolean) => Promise<void>;
-  toggleLike: (postId: string) => void;
+  toggleLike: (postId: string) => Promise<Post | null>;
   updatePost: (updatedPost: Post) => void;
 }
 
@@ -34,6 +66,9 @@ export const useFeedStore = create<FeedStore>((set, get) => ({
   isInitialLized: false,
   isFetching: false,
   isLoading: true,
+  lastFetchCount: 0,
+  requestCount: 0,
+  likedPosts: loadLikedPosts(),
 
   setFeedList: (list) => set({ feedList: list }),
   setSkip: (val) => set({ skip: val }),
@@ -50,6 +85,8 @@ export const useFeedStore = create<FeedStore>((set, get) => ({
       isLoading: true,
       isInitialLoading: true,
       isInitialLized: false,
+      isFetching: false,
+      requestCount: 0,
     });
 
     await new Promise((resolve) => setTimeout(resolve, 50));
@@ -62,24 +99,33 @@ export const useFeedStore = create<FeedStore>((set, get) => ({
 
     if (get().isFetching) return;
 
-    const { skip, isRefreshing, hasMore, isLoading } = get();
+    const { skip, isRefreshing, requestCount, likedPosts } = get();
 
-    if (isLoadMore && (isRefreshing || !hasMore)) return;
+    if (isLoadMore && isRefreshing) return;
 
-    set({
-      isFetching: true,
-      ...(isLoadMore ? { isRefreshing: true } : {}),
-    });
+    const MAX_REQUESTS = 10;
+
+    if (isLoadMore && requestCount >= MAX_REQUESTS) {
+      set({
+        hasMore: false,
+        isRefreshing: false,
+        isFetching: false,
+      });
+      return;
+    }
+
+    if(isLoadMore) {
+      set({ isRefreshing: true })
+    }
+
+    set({ isFetching: true });
+
     try {
-      const query = new URLSearchParams();
+
       const limit = 5;
       const querySkip = isLoadMore ? skip : 0;
 
-      query.append("limit", String(limit));
-      query.append("skip", querySkip.toString());
-
-      const url = `https://dev.wenivops.co.kr/services/mandarin/post?${query}`;
-
+      const url = `https://dev.wenivops.co.kr/services/mandarin/post?limit=${limit}&skip=${querySkip}`;
       const res = await fetch(url, {
         method: "GET",
         headers: {
@@ -94,17 +140,21 @@ export const useFeedStore = create<FeedStore>((set, get) => ({
       const datalist = data.posts || [];
       const serverCount = datalist.length;
 
+      //console.log('[fetchFeeds] requestCount:', requestCount + 1, 'serverCount:', serverCount);
+
       if (serverCount === 0) {
         set({
           hasMore: false,
           isRefreshing: false,
           isInitialLoading: false,
           isFetching: false,
+          lastFetchCount: 0,
+          requestCount: isLoadMore ? requestCount + 1 : 1,
         });
         return;
       }
 
-      const normalized = datalist
+      const normalized: Feed[] = datalist
         .filter((ele: Post) => ele.author.email.includes("pirate"))
         .map((ele: Post): Feed => ({
           id: ele.id,
@@ -119,7 +169,24 @@ export const useFeedStore = create<FeedStore>((set, get) => ({
           createdAt: ele.createdAt,
         }));
 
-      const shuffled = normalized.sort(() => 0.5 - Math.random());
+      const merged = await Promise.all(
+          normalized.map(async (item) => {
+            const meta = await fetchPostMeta(item.id);
+            const localLiked = likedPosts[item.id];
+            const finalIsLiked = localLiked ?? meta.hearted;
+            const finalLikeCount = meta.heartCount;
+
+            return {
+              ...item,
+              isLiked: finalIsLiked,
+              likeCount: finalLikeCount,
+              commentCount: meta.commentCount,
+              image: meta.image || item.image,
+            };
+          })
+      );
+
+      const shuffled = merged.sort(() => 0.5 - Math.random());
 
       set((state) => {
         const newFeedList = isLoadMore
@@ -127,18 +194,23 @@ export const useFeedStore = create<FeedStore>((set, get) => ({
           : shuffled;
 
         const newSkip = isLoadMore ? state.skip + serverCount : serverCount;
+        const newRequestCount = isLoadMore ? requestCount + 1 : 1;
+        const hasMoreNext = normalized.length > 0 && newRequestCount < MAX_REQUESTS;
 
         return {
           feedList: newFeedList,
           skip: newSkip,
           isInitialLoading: false,
           isRefreshing: false,
-          hasMore: serverCount === limit,
-          isLoading: false,
+          hasMore: hasMoreNext,
           isInitialLized: true,
           isFetching: false,
-        };
+          lastFetchCount: serverCount,
+          requestCount: newRequestCount
+        }
+
       });
+
     } catch (err) {
       set({
         isRefreshing: false,
@@ -148,20 +220,78 @@ export const useFeedStore = create<FeedStore>((set, get) => ({
     }
   },
 
-  toggleLike: (postId: string) => {
-    const { feedList } = get();
+  toggleLike: async (postId: string): Promise<Post | null> => {
+    const { feedList, likedPosts } = get();
 
-    const updated = feedList.map((feed) =>
+    const target = feedList.find((f) => f.id === postId);
+    if (!target) return null;
+
+    const prevLiked = target.isLiked;
+    const prevFeedList = feedList;
+    const prevLikedPosts = likedPosts;
+
+    const optimisticLiked = !prevLiked;
+
+    // 낙관적 업데이트
+    const optimisticFeedList = feedList.map((feed) =>
       feed.id === postId
         ? {
             ...feed,
-            isLiked: !feed.isLiked,
-            likeCount: feed.isLiked ? feed.likeCount - 1 : feed.likeCount + 1,
+                isLiked: optimisticLiked,
+            likeCount: optimisticLiked
+              ? feed.likeCount + 1
+              : Math.max(feed.likeCount - 1, 0),
           }
         : feed
     );
 
-    set({ feedList: updated });
+    set({ feedList: optimisticFeedList });
+
+    try {
+      const updatedPost = (
+        prevLiked ? await apiUnlikePost(postId) : await apiLikePost(postId)
+      ) as Post | null;
+
+      if (!updatedPost) {
+        set({ feedList: prevFeedList, likedPosts: prevLikedPosts });
+        return null;
+      }
+
+      set((state) => {
+        const syncedFeedList = state.feedList.map((feed) =>
+          feed.id === updatedPost.id
+            ? {
+                ...feed,
+                content: updatedPost.content,
+                image: updatedPost.image ?? feed.image,
+                isLiked: updatedPost.hearted,
+                likeCount: updatedPost.heartCount,
+                commentCount: updatedPost.commentCount,
+              }
+            : feed
+        );
+
+        const newLikedPosts = {
+          ...state.likedPosts,
+          [postId]: updatedPost.hearted,
+        };
+        saveLikedPosts(newLikedPosts);
+
+        return {
+          feedList: syncedFeedList,
+          likedPosts: newLikedPosts,
+        };
+      });
+
+      return updatedPost;
+    } catch (error) {
+      console.error("피드 좋아요 토글 실패:", error);
+      set({
+        feedList: prevFeedList,
+        likedPosts: prevLikedPosts,
+      });
+      return null;
+    }
   },
 
   updatePost: (updatedPost: Post) => {
@@ -172,10 +302,10 @@ export const useFeedStore = create<FeedStore>((set, get) => ({
         ? {
             ...feed,
             content: updatedPost.content,
-            image: updatedPost.image ?? "",
-            isLiked: updatedPost.hearted ?? feed.isLiked,
-            likeCount: updatedPost.heartCount ?? feed.likeCount,
-            commentCount: updatedPost.commentCount ?? feed.commentCount,
+            image: updatedPost.image ?? feed.image,
+            isLiked: updatedPost.hearted,
+            likeCount: updatedPost.heartCount,
+            commentCount: updatedPost.commentCount,
           }
         : feed
     );
