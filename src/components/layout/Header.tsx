@@ -124,7 +124,7 @@ function Header() {
           </IconButton>
           <DefaultButton
             text={config.title || "저장"}
-            type="submit"
+            type="button"
             width={90}
             height="medium"
             disabled={!config.inputState}
@@ -141,7 +141,7 @@ function Header() {
           </IconButton>
           <DefaultButton
             text={config.title || ""}
-            type="submit"
+            type="button"
             width={90}
             height="medium"
             disabled={!config.inputState}

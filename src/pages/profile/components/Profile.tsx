@@ -33,8 +33,8 @@ import PostStateBar from "../../../components/post/PostStateBar";
 import PostGallery from "./PostGallery";
 import ProfileImageContainer from "./ProfileImageContainer";
 import MoreMenu from "../../../components/common/modal/MoreMenu";
-
 import { formatPostDate } from "../../../utils/formatter/dateFormatter";
+import ProfileSkeleton from "./skeleton/ProfileSkeleton";
 
 function Profile() {
   const navigate = useNavigate();
@@ -82,17 +82,12 @@ function Profile() {
     });
   }, [navigate, setHeaderConfig, handleLogout]);
 
-  // 로딩 처리
-  if (loading || !profile) {
-    return (
-      <ProfileSection>
-        <LoadingText>로딩 중...</LoadingText>
-      </ProfileSection>
-    );
-  }
-
   return (
     <>
+    {(loading || !profile) ? (
+      <ProfileSkeleton />
+    ) : (
+      <>
       {/* 프로필 상단 */}
       <ProfileSection>
         <ProfileContainer>
@@ -223,6 +218,8 @@ function Profile() {
           </MyFeedSection>
         </>
       )}
+      </>
+    )}
     </>
   );
 }
