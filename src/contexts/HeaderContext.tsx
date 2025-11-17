@@ -16,11 +16,11 @@ export type HeaderType =
   | "profile"
   | "edit"
   | "post"
-  | "postDetail" // 게시글 상세
+  | "postDetail"
   | "chatList"
   | "chat"
-  | "product" // 상품 등록
-  | "productDetail"; //상품 상세
+  | "product"
+  | "productDetail";
 
 // Header 설정 인터페이스
 export interface HeaderConfig {
