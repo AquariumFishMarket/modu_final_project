@@ -214,135 +214,135 @@ function Profile() {
 
   return (
     <>
-      <ProfileSection>
-        <h2 className="sr-only">프로필</h2>
+    <ProfileSection>
+      <h2 className="sr-only">프로필</h2>
 
-        <ProfileContainer>
-          {/* 상단 FOLLOWER - IMAGE - FOLLOWING */}
-          <ProfileTopSection>
-            <FollowStatBox
-              onClick={() =>
-                navigate(`/profile/${profileData.accountname}/follower`)
-              }
-            >
-              <FollowerValue>{profileData.followerCount}</FollowerValue>
-              <FollowText>followers</FollowText>
-            </FollowStatBox>
+      <ProfileContainer>
+        {/* 상단 FOLLOWER - IMAGE - FOLLOWING */}
+        <ProfileTopSection>
+          <FollowStatBox
+            onClick={() =>
+              navigate(`/profile/${profileData.accountname}/follower`)
+            }
+          >
+            <FollowerValue>{profileData.followerCount}</FollowerValue>
+            <FollowText>followers</FollowText>
+          </FollowStatBox>
 
-            <ProfileImageContainer
-              src={profileData.image}
-              alt={`${profileData.username}의 프로필 이미지`}
-              onError={(e) => {
-                const t = e.currentTarget;
-                if (!t.src.includes("/img/fish_profile.png"))
-                  t.src = "/img/fish_profile.png";
-              }}
-            />
+          <ProfileImageContainer
+            src={profileData.image}
+            alt={`${profileData.username}의 프로필 이미지`}
+            onError={(e) => {
+              const t = e.currentTarget;
+              if (!t.src.includes("/img/fish_profile.png"))
+                t.src = "/img/fish_profile.png";
+            }}
+          />
 
-            <FollowStatBox
-              onClick={() =>
-                navigate(`/profile/${profileData.accountname}/following`)
-              }
-            >
-              <FollowingValue>{profileData.followingCount}</FollowingValue>
-              <FollowText>following</FollowText>
-            </FollowStatBox>
-          </ProfileTopSection>
+          <FollowStatBox
+            onClick={() =>
+              navigate(`/profile/${profileData.accountname}/following`)
+            }
+          >
+            <FollowingValue>{profileData.followingCount}</FollowingValue>
+            <FollowText>following</FollowText>
+          </FollowStatBox>
+        </ProfileTopSection>
 
-          {/* 유저 정보 */}
-          <UserInfoBox>
-            <UserName>{profileData.username}</UserName>
-            <UserId>@{profileData.accountname}</UserId>
-          </UserInfoBox>
+        {/* 유저 정보 */}
+        <UserInfoBox>
+          <UserName>{profileData.username}</UserName>
+          <UserId>@{profileData.accountname}</UserId>
+        </UserInfoBox>
 
-          <UserDescription>{profileData.intro}</UserDescription>
+        <UserDescription>{profileData.intro}</UserDescription>
 
-          {/* 버튼 그룹 */}
-          <ActionButtonsContainer>
-            {isMyProfile ? (
-              <>
-                <DefaultButton
-                  text="프로필 수정"
-                  variant="white"
-                  width={120}
-                  height="medium"
-                  onClick={() => navigate("/profile/edit")}
-                />
-                <DefaultButton
-                  text="상품 등록"
-                  variant="white"
-                  width={120}
-                  height="medium"
-                  onClick={() => navigate("/product")}
-                />
-              </>
-            ) : (
-              <>
-                <IconButton $iconUrl="/img/icon-message.svg" />
-                <DefaultButton
-                  text={profileData.isfollow ? "팔로잉" : "팔로우"}
-                  height="medium"
-                  variant={profileData.isfollow ? "secondary" : "primary"}
-                  width={120}
-                  onClick={handleFollowToggle}
-                />
-                <IconButton $iconUrl="/img/icon-share.svg" />
-              </>
-            )}
-          </ActionButtonsContainer>
-        </ProfileContainer>
-      </ProfileSection>
-
-      {/* 상품 */}
-      <SellingProducts isLastSection={postsList.length === 0} />
-
-      {/* 게시글 */}
-      {postsList.length > 0 && (
-        <>
-          <PostStateBar postState={postState} setPostState={setPostState} />
-
-          <MyFeedSection>
-            {postState === "list" ? (
-              <PostListContainer>
-                {postsList.map((post) => (
-                  <PostCard
-                    key={post.id}
-                    postId={post.id}
-                    userName={post.author.username}
-                    userId={post.author.accountname}
-                    avatarSrc={post.author.image}
-                    avatarAlt={`@${post.author.accountname} 프로필 이미지`}
-                    content={post.content}
-                    imageSrc={post.image}
-                    dateTime={post.createdAt}
-                    likeCount={post.heartCount}
-                    commentCount={post.commentCount}
-                    isLiked={post.hearted}
-                    onCommentClick={() => navigate(`/post/${post.id}`)}
-                  />
-                ))}
-              </PostListContainer>
-            ) : (
-              <PostGallery
-                posts={postsList.map((post) => ({
-                  postId: post.id,
-                  userName: post.author.username,
-                  userId: post.author.accountname,
-                  avatarSrc: post.author.image,
-                  content: post.content,
-                  imageSrc: post.image,
-                  dateTime: post.createdAt,
-                  dateText: formatPostDate(post.createdAt),
-                  likeCount: post.heartCount,
-                  commentCount: post.commentCount,
-                  isLiked: post.hearted,
-                }))}
-                onPostClick={(id) => navigate(`/post/${id}`)}
+        {/* 버튼 그룹 */}
+        <ActionButtonsContainer>
+          {isMyProfile ? (
+            <>
+              <DefaultButton
+                text="프로필 수정"
+                variant="white"
+                width={120}
+                height="medium"
+                onClick={() => navigate("/profile/edit")}
               />
-            )}
-          </MyFeedSection>
-        </>
-      )}
+              <DefaultButton
+                text="상품 등록"
+                variant="white"
+                width={120}
+                height="medium"
+                onClick={() => navigate("/product")}
+              />
+            </>
+          ) : (
+            <>
+              <IconButton $iconUrl="/img/icon-message.svg" />
+              <DefaultButton
+                text={profileData.isfollow ? "팔로잉" : "팔로우"}
+                height="medium"
+                variant={profileData.isfollow ? "secondary" : "primary"}
+                width={120}
+                onClick={handleFollowToggle}
+              />
+              <IconButton $iconUrl="/img/icon-share.svg" />
+            </>
+          )}
+        </ActionButtonsContainer>
+      </ProfileContainer>
+    </ProfileSection>
+
+    {/* 상품 */}
+    <SellingProducts isLastSection={postsList.length === 0} />
+
+    {/* 게시글 */}
+    {postsList.length > 0 && (
+      <>
+        <PostStateBar postState={postState} setPostState={setPostState} />
+
+        <MyFeedSection>
+          {postState === "list" ? (
+            <PostListContainer>
+              {postsList.map((post) => (
+                <PostCard
+                  key={post.id}
+                  postId={post.id}
+                  userName={post.author.username}
+                  userId={post.author.accountname}
+                  avatarSrc={post.author.image}
+                  avatarAlt={`@${post.author.accountname} 프로필 이미지`}
+                  content={post.content}
+                  imageSrc={post.image}
+                  dateTime={post.createdAt}
+                  likeCount={post.heartCount}
+                  commentCount={post.commentCount}
+                  isLiked={post.hearted}
+                  onCommentClick={() => navigate(`/post/${post.id}`)}
+                />
+              ))}
+            </PostListContainer>
+          ) : (
+            <PostGallery
+              posts={postsList.map((post) => ({
+                postId: post.id,
+                userName: post.author.username,
+                userId: post.author.accountname,
+                avatarSrc: post.author.image,
+                content: post.content,
+                imageSrc: post.image,
+                dateTime: post.createdAt,
+                dateText: formatPostDate(post.createdAt),
+                likeCount: post.heartCount,
+                commentCount: post.commentCount,
+                isLiked: post.hearted,
+              }))}
+              onPostClick={(id) => navigate(`/post/${id}`)}
+            />
+          )}
+        </MyFeedSection>
+      </>
+    )}
     </>
   );
 }

@@ -5,6 +5,8 @@ import {
   ProductTitle,
   ProductListContainer,
   ProductCard,
+  ProductImageBox,
+  ProductImage,
   ProductInfoBox,
   ProductName,
   ProductPrice,
