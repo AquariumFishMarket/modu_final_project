@@ -47,6 +47,7 @@ export const useAuthStore = create<State>()(
             } catch (err) {
               console.warn("브로드캐스트 로그아웃 중 토큰 제거 실패:", err);
             }
+            window.location.reload();
           }
           if (type === "login") {
             set({ token: ev.data.token });
@@ -54,7 +55,6 @@ export const useAuthStore = create<State>()(
         };
       } catch (err) {
         console.warn("BroadcastChannel을 사용할 수 없습니다:", err);
-        // bc = null;
       }
 
       return {
