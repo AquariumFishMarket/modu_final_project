@@ -16,18 +16,17 @@ export const uploadImage = async (file: File): Promise<string> => {
 
   const data = await response.json();
 
-  // ✅ filename이 없으면 에러
+  // filename이 없으면 에러
   if (!data.info.filename) {
-    console.error("❌ filename이 없습니다:", data);
     throw new Error("이미지 업로드 후 파일명을 받지 못했습니다.");
   }
 
-  // ✅ 이미 전체 URL이면 그대로 반환
+  // 이미 전체 URL이면 그대로 반환
   if (data.info.filename.startsWith("http")) {
     return data.info.filename;
   }
 
-  // ✅ 상대 경로면 전체 URL 생성
+  // 상대 경로면 전체 URL 생성
   const fullUrl = `${API_BASE_URL}/${data.info.filename}`;
 
   return fullUrl;

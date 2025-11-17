@@ -1,6 +1,7 @@
+import { getAuthHeaders } from "../utils/tokenManager";
+
 // API 호출 관리 서비스
 const BASE_URL = "https://dev.wenivops.co.kr/services/mandarin";
-const DEFAULT_PROFILE_IMG = "/img/empty-profile.png";
 
 export interface AuthResponse {
   message: string;
@@ -25,11 +26,16 @@ export interface LoginResponse {
   token: string;
 }
 
+export interface LoginErrorReponse {
+  message: string;
+  status: number;
+}
+
 export interface CheckDuplicateResponse {
   message: string;
 }
 
-// 이메일 중복 체크
+// 이메일 중복 체크 API
 export const checkEmailDuplicate = async (
   email: string
 ): Promise<CheckDuplicateResponse> => {
@@ -50,7 +56,7 @@ export const checkEmailDuplicate = async (
   return data;
 };
 
-// 계정 ID 중복 체크
+// 계정 ID 중복 API
 export const checkAccountIdDuplicate = async (
   accountId: string
 ): Promise<CheckDuplicateResponse> => {
@@ -71,30 +77,22 @@ export const checkAccountIdDuplicate = async (
   return data;
 };
 
-// 회원가입
-export const signup = async (
-  email: string,
-  password: string
-): Promise<AuthResponse> => {
-  // 임시 username과 accountname 생성 (나중에 프로필 설정에서 변경)
-  const timestamp = Date.now();
-  const tempUsername = `user_${timestamp}`;
-  const tempAccountname = `account_${timestamp}`;
-
+// 회원가입 API
+export const signup = async (payload: {
+  username: string;
+  email: string;
+  password: string;
+  accountname: string;
+  intro?: string;
+  image?: string;
+}): Promise<AuthResponse> => {
   const response = await fetch(`${BASE_URL}/user`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      user: {
-        username: tempUsername,
-        email: email,
-        password: password,
-        accountname: tempAccountname,
-        intro: "",
-        image: DEFAULT_PROFILE_IMG,
-      },
+      user: payload,
     }),
   });
 
@@ -107,7 +105,7 @@ export const signup = async (
   return data;
 };
 
-// 로그인
+// 로그인 API
 export const login = async (
   email: string,
   password: string
@@ -128,8 +126,24 @@ export const login = async (
   const data = await response.json();
 
   if (!response.ok) {
+    console.log("API 응답 실패:", response.status, data); // 확인
     throw new Error("이메일 또는 비밀번호가 일치하지 않습니다.");
   }
 
   return data;
+};
+
+export const getMyInfo = async () => {
+  const response = await fetch(`${BASE_URL}/user/myinfo`, {
+    method: "GET",
+    headers: getAuthHeaders(),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error("사용자 정보를 불러오는 데 실패했습니다.");
+  }
+
+  return data; // { user: {} }
 };
