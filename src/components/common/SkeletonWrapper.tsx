@@ -8,6 +8,7 @@ interface SkeletonProps{
     marginBottom?: number;
     marginLeft?: number;
     marginRight?: number;
+    borderRadius?: number;
 }
 
 interface SkeletonStyleProps {
@@ -17,6 +18,7 @@ interface SkeletonStyleProps {
     $marginBottom?: number;
     $marginLeft?: number;
     $marginRight?: number;
+    $borderRadius?: number;
 }
 
 const SkeletonContainer = styled.div<SkeletonStyleProps>`
@@ -26,6 +28,7 @@ const SkeletonContainer = styled.div<SkeletonStyleProps>`
     margin-bottom: ${({ $marginBottom }) => $marginBottom ?? 0}px;
     margin-left: ${({ $marginLeft })=> $marginLeft ?? 0}px;
     margin-right: ${({ $marginRight })=> $marginRight ?? 0}px;
+    border-radius: ${({ $borderRadius })=> $borderRadius ?? 0}px;
     overflow: hidden;
 `
 
@@ -38,6 +41,7 @@ export default function SkeletonWrapper({...props}:SkeletonProps) {
             $marginBottom={props.marginBottom}
             $marginLeft={props.marginLeft}
             $marginRight={props.marginRight}
+            $borderRadius={props.borderRadius}
         >
             <Skeleton />
         </SkeletonContainer>

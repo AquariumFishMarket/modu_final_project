@@ -8,7 +8,6 @@ import { useFeedStore } from "../../contexts/useFeedStore";
 import { useAuth } from "../../contexts/AuthContext";
 import { reportPost } from "../../services/postService";
 
-import SkeletonWrapper from "../../components/common/SkeletonWrapper";
 
 const FeedPage = () => {
   const navigate = useNavigate();
@@ -82,7 +81,7 @@ const FeedPage = () => {
   //   return (
   //       <main>
   //         <InitialLoadingSection>
-  //           <p>불러오는 중...</p>
+  //           <p>불러오는 중...🤩🤩🤩🤩🤩</p>
   //         </InitialLoadingSection>
   //       </main>
   //   );

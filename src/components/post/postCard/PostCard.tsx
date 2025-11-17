@@ -70,7 +70,7 @@ const PostCard = forwardRef<HTMLDivElement, PostCardProps>(
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(false);
-  const { isLoading } = useFeedStore();
+
   // 이미지 URL 배열 처리
   const getImageUrls = (imageSrc?: string): string[] => {
     if (!imageSrc) return [];

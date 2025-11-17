@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   PostHeader as StyledPostHeader,
@@ -11,6 +11,8 @@ import MoreMenu from "../common/modal/MoreMenu";
 import { formatPostDate } from "../../utils/formatter/dateFormatter";
 import { deletePost, EditPost } from "../../services/postService";
 import UserAvatarBox from "./UserAvatar";
+import SkeletonWrapper from "../common/SkeletonWrapper";
+import { useFeedStore } from "../../contexts/useFeedStore";
 
 interface PostHeaderProps {
   userName: string;
@@ -47,7 +49,7 @@ function PostHeader({
 }: PostHeaderProps) {
   const navigate = useNavigate();
   const [imgSrc, setImgSrc] = useState(avatarSrc);
-
+  const { isLoading, feedList } = useFeedStore();
   const handleImageError = () => {
     setImgSrc("/img/fish-logo-GB.png");
   };
@@ -69,63 +71,87 @@ function PostHeader({
     }
   };
 
+  useEffect(()=>{
+    console.log(feedList.length)
+  },[])
+
   return (
     <StyledPostHeader>
       <h2 className="sr-only">
         {variant === "comment" ? "댓글 작성자 정보" : "게시자 정보"}
       </h2>
       <UserInfo>
-        <UserAvatarBox
-          src={imgSrc}
-          alt={avatarAlt}
-          onError={handleImageError}
-          variant={variant}
-        />
-        {variant === "comment" ? (
+        {isLoading ? (
           <>
-            <UserName>{userName}</UserName>
-            {dateTime && (
-              <time
-                dateTime={dateTime}
-                style={{
-                  fontSize: "1rem",
-                  color: "var(--color-gray-dark)",
-                  marginLeft: "0.6rem",
-                }}
-              >
-                {formatPostDate(dateTime)}
-              </time>
-            )}
+            <SkeletonWrapper width={42} height={42} borderRadius={500} />
+            <UserDetails>
+              <SkeletonWrapper width={100} height={20} />
+              <SkeletonWrapper width={100} height={20} />
+            </UserDetails>
           </>
         ) : (
-          <UserDetails>
-            <UserName>{userName}</UserName>
-            <UserId>{userId}</UserId>
-          </UserDetails>
+          <>
+            <UserAvatarBox
+              src={imgSrc}
+              alt={avatarAlt}
+              onError={handleImageError}
+              variant={variant}
+            />
+            {variant === "comment" ? (
+              <>
+                <UserName>{userName}</UserName>
+                {dateTime && (
+                  <time
+                    dateTime={dateTime}
+                    style={{
+                      fontSize: "1rem",
+                      color: "var(--color-gray-dark)",
+                      marginLeft: "0.6rem",
+                    }}
+                  >
+                    {formatPostDate(dateTime)}
+                  </time>
+                )}
+              </>
+            ) : (
+              <UserDetails>
+                <UserName>{userName}</UserName>
+                <UserId>{userId}</UserId>
+              </UserDetails>
+            )}
+          </>
         )}
-      </UserInfo>
 
-      {variant === "comment" ? (
-        <MoreMenu
-          type="comment"
-          size="md"
-          authorAccountname={authorAccountname}
-          isMyComment={isMyComment}
-          onEdit={onEdit}
-          onDelete={onDelete}
-          onReport={onReport}
-        />
-      ) : (
-        <MoreMenu
-          type="post"
-          size="sm"
-          authorAccountname={authorAccountname}
-          isMyPost={isMyPost}
-          onEdit={handleEditPost}
-          onDelete={handleDeletePost}
-          onReport={onReport}
-        />
-      )}
+      </UserInfo>
+        {isLoading ? (
+          <>
+            <SkeletonWrapper width={18} height={18}/>
+          </>
+        ) : (
+          <>
+            {variant === "comment" ? (
+              <MoreMenu
+                type="comment"
+                size="md"
+                authorAccountname={authorAccountname}
+                isMyComment={isMyComment}
+                onEdit={onEdit}
+                onDelete={onDelete}
+                onReport={onReport}
+              />
+            ) : (
+              <MoreMenu
+                type="post"
+                size="sm"
+                authorAccountname={authorAccountname}
+                isMyPost={isMyPost}
+                onEdit={handleEditPost}
+                onDelete={handleDeletePost}
+                onReport={onReport}
+              />
+            )}
+          </>
+        )}
     </StyledPostHeader>
   );
 }

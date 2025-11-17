@@ -154,6 +154,7 @@ export const useFeedStore = create<FeedStore>((set, get) => ({
 
         return {
           feedList: newFeedList,
+          isLoading: false,
           skip: newSkip,
           isInitialLoading: false,
           isRefreshing: false,
