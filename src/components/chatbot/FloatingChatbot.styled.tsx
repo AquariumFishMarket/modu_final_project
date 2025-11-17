@@ -13,7 +13,7 @@ export const FloatingButton = styled.button`
   cursor: pointer;
   z-index: 1000;
   border-radius: 50%;
-  box-shadow: 0 4px 12px var(--color-primary-700);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08), 0 12px 28px rgba(0, 0, 0, 0.1);
   transition: box-shadow 0.3s ease;
   display: flex;
   align-items: center;
@@ -44,7 +44,8 @@ export const FloatingButton = styled.button`
   }
 
   &:hover {
-    box-shadow: 0 8px 16px var(--color-primary-900);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.16),
+      0 0 24px rgba(36, 90, 246, 0.22);
 
     img {
       animation: swimHover 1.5s infinite ease-in-out;
@@ -138,7 +139,6 @@ export const ModalHeader = styled.div`
   justify-content: space-between;
   background: var(--color-primary-600);
   color: #ffffff;
-  box-shadow: 0 2px 8px var(--color-primary-900);
 
   @media (max-width: 480px) {
     padding: 1.5rem 2rem;

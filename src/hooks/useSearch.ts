@@ -1,12 +1,10 @@
 import { useState, useRef, useEffect } from "react";
 import { getAuthHeaders } from "../utils/tokenManager";
-import { useAuth } from "../contexts/AuthContext"; // 🔥 추가
+import { useAuth } from "../contexts/AuthContext";
 
-// API Base URL
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api";
+// API BASE URL (Vercel 테스트용)
+const API_BASE_URL = "https://dev.wenivops.co.kr/services/mandarin";
 
-// API 응답 형식
 export interface UserData {
   _id: string;
   username: string;
@@ -20,38 +18,22 @@ export interface UserData {
   followingCount: number;
 }
 
-// 사용자 검색 커스텀 훅
 export function useSearch() {
-  const { currentUser } = useAuth(); // 🔥 로그인한 내 정보 추가
+  const { currentUser } = useAuth();
 
-  /* 검색 결과 목록 */
   const [searchResults, setSearchResults] = useState<UserData[]>([]);
-
-  /* 로딩 상태 */
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
-  /* 검색을 한 번이라도 수행했는지 여부 */
   const [hasSearched, setHasSearched] = useState<boolean>(false);
-
-  /* 현재 검색 키워드 */
   const [currentKeyword, setCurrentKeyword] = useState<string>("");
-
-  /* 입력창 value 상태 */
   const [inputValue, setInputValue] = useState<string>("");
-
-  /* 에러 상태 */
   const [error, setError] = useState<string | null>(null);
 
-  /* 디바운스 타이머 */
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  /* 검색 요청 ID */
   const searchIdRef = useRef<number>(0);
-
-  /* AbortController (요청 중단용) */
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  // 검색 API 호출 함수
+  //  검색 API 호출 함수
+
   const fetchUsers = async (
     keyword: string,
     requestId: number
@@ -74,20 +56,21 @@ export function useSearch() {
         }
       );
 
+      // 최신 요청만 처리
       if (requestId !== searchIdRef.current) return null;
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "검색 실패");
+        const err = await response.json();
+        throw new Error(err.message || "검색 실패");
       }
 
       const data = await response.json();
 
-      if (Array.isArray(data)) return data as UserData[];
-      if (data.users && Array.isArray(data.users))
-        return data.users as UserData[];
+      // 서버 응답 포맷 대응
+      if (Array.isArray(data)) return data;
+      if (data.users && Array.isArray(data.users)) return data.users;
 
-      console.error("예상치 못한 API 응답 형식:", data);
+      console.error("🔍 예기치 않은 응답:", data);
       return [];
     } catch (error) {
       if (error instanceof Error && error.name === "AbortError") return null;
@@ -95,8 +78,9 @@ export function useSearch() {
     }
   };
 
-  // 🔥 실제 검색 실행 함수 (여기에 내 계정 제외 로직 포함)
-  const performSearch = async (keyword: string): Promise<void> => {
+  //  검색 실행
+
+  const performSearch = async (keyword: string) => {
     if (!keyword.trim()) {
       setSearchResults([]);
       setHasSearched(false);
@@ -119,61 +103,47 @@ export function useSearch() {
 
       if (results === null) return;
 
-      // 🔥 여기에서 내 계정 제외 필터링
-      const filtered = results.filter((user) => user._id !== currentUser?._id);
+      const filtered = results.filter(
+        (user) => user._id !== currentUser?._id // 내 계정 제외
+      );
 
       setSearchResults(filtered);
-      setError(null);
     } catch (error) {
-      console.error("검색 중 오류 발생:", error);
-      setSearchResults([]);
+      console.error("검색 중 오류:", error);
       setError("검색 중 오류가 발생했습니다. 다시 시도해 주세요.");
+      setSearchResults([]);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // 🔍 입력 핸들러 (디바운스 포함)
+  //  입력값 변경 핸들러 + 디바운싱
+
   const handleInputChange = (value: string) => {
     setInputValue(value);
 
-    if (!value.trim()) {
+    // 빈값 or 한글자 → 초기화
+    if (!value.trim() || value.trim().length < 2) {
       setSearchResults([]);
       setHasSearched(false);
+      setIsLoading(false);
       setCurrentKeyword("");
-      setIsLoading(false);
       setError(null);
 
-      if (debounceTimerRef.current) {
-        clearTimeout(debounceTimerRef.current);
-        debounceTimerRef.current = null;
-      }
+      if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
       return;
     }
 
-    if (value.trim().length < 2) {
-      setSearchResults([]);
-      setHasSearched(false);
-      setIsLoading(false);
-      setError(null);
-
-      if (debounceTimerRef.current) {
-        clearTimeout(debounceTimerRef.current);
-        debounceTimerRef.current = null;
-      }
-      return;
-    }
-
-    if (debounceTimerRef.current) {
-      clearTimeout(debounceTimerRef.current);
-    }
+    // 디바운스 리셋
+    if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
 
     debounceTimerRef.current = setTimeout(() => {
       performSearch(value);
     }, 300);
   };
 
-  // 입력값 초기화
+  //  검색 초기화
+
   const clearSearch = () => {
     setInputValue("");
     setSearchResults([]);
@@ -184,11 +154,11 @@ export function useSearch() {
 
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current);
-      debounceTimerRef.current = null;
     }
   };
 
-  // 언마운트 시 정리
+  //  언마운트 시 정리
+
   useEffect(() => {
     return () => {
       if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
