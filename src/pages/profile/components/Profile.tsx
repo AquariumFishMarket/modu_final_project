@@ -406,74 +406,10 @@ function Profile() {
                 }))}
                 onPostClick={(id) => navigate(`/post/${id}`)}
               />
-            </>
-          ) : (
-            <>
-              <IconButton $iconUrl="/img/icon-message.svg" />
-              <DefaultButton
-                text={profileData.isfollow ? "팔로잉" : "팔로우"}
-                height="medium"
-                variant={profileData.isfollow ? "secondary" : "primary"}
-                width={120}
-                onClick={handleFollowToggle}
-              />
-              <IconButton $iconUrl="/img/icon-share.svg" />
-            </>
-          )}
-        </ActionButtonsContainer>
-      </ProfileContainer>
-    </ProfileSection>
-
-    {/* 상품 */}
-    <SellingProducts isLastSection={postsList.length === 0} />
-
-    {/* 게시글 */}
-    {postsList.length > 0 && (
-      <>
-        <PostStateBar postState={postState} setPostState={setPostState} />
-
-        <MyFeedSection>
-          {postState === "list" ? (
-            <PostListContainer>
-              {postsList.map((post) => (
-                <PostCard
-                  key={post.id}
-                  postId={post.id}
-                  userName={post.author.username}
-                  userId={post.author.accountname}
-                  avatarSrc={post.author.image}
-                  avatarAlt={`@${post.author.accountname} 프로필 이미지`}
-                  content={post.content}
-                  imageSrc={post.image}
-                  dateTime={post.createdAt}
-                  likeCount={post.heartCount}
-                  commentCount={post.commentCount}
-                  isLiked={post.hearted}
-                  onCommentClick={() => navigate(`/post/${post.id}`)}
-                />
-              ))}
-            </PostListContainer>
-          ) : (
-            <PostGallery
-              posts={postsList.map((post) => ({
-                postId: post.id,
-                userName: post.author.username,
-                userId: post.author.accountname,
-                avatarSrc: post.author.image,
-                content: post.content,
-                imageSrc: post.image,
-                dateTime: post.createdAt,
-                dateText: formatPostDate(post.createdAt),
-                likeCount: post.heartCount,
-                commentCount: post.commentCount,
-                isLiked: post.hearted,
-              }))}
-              onPostClick={(id) => navigate(`/post/${id}`)}
-            />
-          )}
-        </MyFeedSection>
-      </>
-    )}
+            )}
+          </MyFeedSection>
+        </>
+      )}
     </>
   );
 }
