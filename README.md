@@ -30,11 +30,9 @@ Ctrl(⌘) + 클릭하여 새 탭에서 열 수 있습니다.
   <a href="https://fishmarket-six.vercel.app/"><strong>https://fishmarket-six.vercel.app/</strong></a>
 </p>
 
-### 시연 GIF / 영상 (준비 중)
+### 시연 GIF 
 
-피드 · 게시글 작성 · 프로필 · 검색 · 챗봇 등  
-핵심 사용자 흐름을 GIF/영상으로 제공합니다.  
-발표 시 해당 콘텐츠를 중심으로 기능 시연을 진행할 예정입니다.
+![Image](https://github.com/user-attachments/assets/7af2b06b-abf4-42a4-909d-9f73e0565340)
 
 <br>
 
@@ -971,6 +969,7 @@ npm run build
 
 본 프로젝트는 교육 및 포트폴리오 목적으로 제작되었습니다.  
 상업적 사용 또는 2차 배포 시에는 팀과 먼저 협의가 필요합니다.
+
 
 
 
