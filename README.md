@@ -397,69 +397,125 @@ React Router v6 기반으로,
 ### 1) API 응답 필드 불일치 (hearted vs isLiked)
 
 **문제**  
-백엔드 제공 API는 좋아요 여부를 `hearted`로 반환하지만,  
-프론트 UI는 `isLiked` 필드를 기준으로 렌더링하고 있었습니다.  
-이로 인해
-
+  빠르게 타이핑하면 검색 결과가 뒤섞임
+"결과 없음"과 "API 오류"가 랜덤하게 섞여 UI 깜빡임
+1글자 입력에도 불필요한 API 요청이 계속 호출
+실제 사용자에게 "검색이 불안정하다"는 피드백 발생
 - 좋아요 토글 시 UI가 즉시 반응하지 않음
 - 화면 새로고침 시 좋아요 상태가 뒤바뀌어 보임  
   과 같은 문제가 발생했습니다.
 
 **원인**  
-UI에서 사용하는 데이터 스키마와 API 응답 스키마가 일치하지 않음.
+1. 레이스 컨디션 발생
+  * 요청이 여러 개 동시에 전송
+  * 느린 응답이 최신 검색 결과를 덮어버림
+2. AbortController 타이밍 문제
+  * abort 호출 전에 새 요청이 실행됨
+    → 중단된 요청이 완전히 사라지지 않고 응답이 들어옴
+3. 디바운스 이전에 불필요한 호출
+  * 1글자/공백 입력도 API로 전달
+    → 서버 404 + UI 깜빡임 빈번
+4. 404(검색 결과 없음)를 오류로 처리함
+  * “에러”로 분류 → UI가 항상 에러 상태로 변경됨
 
 **해결**  
-`feedService` 및 `useFeedStore`에서  
-API 응답 데이터를 프론트에서 사용하는 형태로 변환하는 **매핑 레이어**를 추가했습니다.
-
-```ts
-isLiked: item.hearted;
+1) AbortController로 이전 요청 즉시 취소
+```typescript
+if (abortControllerRef.current) {
+  abortControllerRef.current.abort();
+}
 ```
+→ 중복 요청 제거
+→ 빠른 입력에도 불필요한 응답 방지
 
-이후 모든 컴포넌트는 isLiked만 신뢰하도록 일관성 확보.
+2) 요청 ID(searchIdRef)로 최신 요청만 반영
+```typescript
+if (requestId !== searchIdRef.current) return null;
+```
+→ 느린 응답이 최신 검색 결과를 덮는 문제 해결
+→ 레이스 컨디션 근본 차단
+
+3) 2글자 미만 입력은 API 호출 차단 + 디바운스 300ms
+```typescript
+if (!trimmed || trimmed.length < 2) return;
+```
+→ 1글자 입력 시 API 호출 완전 차단
+→ API 호출 횟수 대폭 감소
+→ UX 부드러워짐
+
+4) “결과 없음(404)”은 정상 흐름으로 처리
+```typescript
+if (response.status === 404) return [];
+```
+→ UI 에러 상태 전환 제거
+→ 자연스럽게 “결과 없음” 화면 렌더링
+
 
 #### 배운 점 / 적용 원칙
+백엔드(hearted)와 프론트(isLiked)의 스키마 불일치가 UI 버그의 핵심 원인
+그래서 API 응답을 UI 전용 스키마로 변환하는 매핑 레이어(Data Adapter)를 추가
+이후 UI, Store, LocalStorage는 isLiked 하나만 사용하도록 통일
 
-프론트/백엔드 간 데이터 스키마가 불일치할 수 있으므로
-**중간 매핑 레이어(Data Adapter Layer)**를 두는 것이 안전함.
-
-UI는 하나의 스키마만 의존하도록 해야 유지보수가 훨씬 쉬워짐.
+이 방식으로 좋아요 상태가 모든 화면에서 일관되게 유지되고 유지보수가 훨씬 쉬워졌다.
 
 ---
 
-### 2) 무한 스크롤 중복 호출 문제
+### 2) 검색 기능 오류
 
-**문제**
-`IntersectionObserver` 콜백이 연속적으로 호출되며
-같은 페이지를 여러 번 요청하거나,
-hasMore가 false인데도 API 요청이 발생하는 문제가 있었음.
+**문제**  
+  빠른 타이핑 시 요청이 뒤섞임(레이스 컨디션)
+  1글자/공백 입력도 API 호출
+  404(결과 없음)도 에러로 처리 → UI 깜빡임
+  이전 요청 abort 처리 지연 → 결과가 뒤엉킴
 
-**원인**
-요청 상태 관리가 명확히 분리되지 않아
-Race Condition(요청 교차 문제)이 발생.
+  검색 자체가 불안정한 상태였음.
 
-**해결**
-아래와 같은 요청 가드 로직을 적용해 중복 호출 완전히 차단.
+**원인**  
+  AbortController가 동시 요청을 완전히 중단시키지 못함
+  requestId 검사 부재
+  디바운스 타이머가 제대로 초기화되지 않음
+  서버 응답 메시지 불일치로 UI가 매번 다른 상태로 진입
+
+**해결**  
+  AbortController로 이전 요청 즉시 취소
+  requestId(currentRequestId) 비교로 최신 요청만 반영
+  2글자 미만 입력 시 요청 차단
+  404는 에러가 아니라 “검색 결과 없음”으로 정상 처리
 
 ```ts
-if (isFetching) return;
-if (isLoadMore && (isRefreshing || !hasMore)) return;
+handleInputChange(value) {
+  const trimmed = value.trim();
+  if (trimmed.length < 2) return resetResults();
+
+  // 디바운스 적용
+  clearTimeout(timer);
+  timer = setTimeout(() => performSearch(trimmed), 300);
+}
+
+async function performSearch(keyword) {
+  // 1. 요청 번호 증가
+  searchIdRef.current++;
+  const requestId = searchIdRef.current;
+
+  // 2. 이전 요청 abort
+  abortControllerRef.current?.abort();
+  const controller = new AbortController();
+  abortControllerRef.current = controller;
+
+  const res = await fetchUsers(keyword, controller);
+
+  // 3. 최신 요청만 반영
+  if (requestId !== searchIdRef.current) return;
+
+  setSearchResults(res || []);
+}
 ```
-
-`isFetching`: API 요청 중인지
-
-`isRefreshing`: 뒤로 불러오기 상황인지
-
-`hasMore`: 다음 데이터가 존재하는지
-
-를 기준으로 요청 흐름을 통제.
 
 #### 배운 점 / 적용 원칙
 
-비동기 요청이 많은 UI(Kakao/Instagram 스타일)에서는
-요청 상태를 명확히 구분하는 것만으로도 레이스 컨디션 대부분 해결 가능
-
-무한스크롤은 특히 “중복 요청 방지”가 핵심
+  검색처럼 비동기 요청이 많은 UI는
+  abort + requestId + 최소 글자 수 조건만 잘 적용해도
+  대부분의 race 문제를 해결할 수 있음.
 
 ---
 
@@ -825,6 +881,7 @@ npm run build
 
 본 프로젝트는 교육 및 포트폴리오 목적으로 제작되었습니다.  
 상업적 사용 또는 2차 배포 시에는 팀과 먼저 협의가 필요합니다.
+
 
 
 
