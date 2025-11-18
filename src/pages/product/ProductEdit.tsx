@@ -123,7 +123,7 @@ export default function ProductEdit() {
 
   // 로딩 상태 처리
   if (!product) {
-    return <div>상품 정보를 불러오는 중...</div>;
+    return <div style={{ textAlign: 'center' }}>상품 정보를 불러오는 중...</div>;
   }
 
   return (
