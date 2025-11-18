@@ -71,7 +71,8 @@ export default function ChatList() {
       setHeaderConfig({
         show: true,
         type: "chatList",
-        pageTitle: "채팅 목록", 
+        pageTitle: "채팅 목록",
+        leftElement: undefined, 
         onBackClick: () => history.back(),
         rightElement: (
           <MoreMenu
@@ -92,6 +93,20 @@ export default function ChatList() {
       setHeaderConfig({
         show: true,
         type: "chatList",
+        leftElement: (
+          <button
+            onClick={resetEdit}
+            style={{
+              padding: "6px 14px",
+              borderRadius: "18px",
+              border: "none",
+              fontSize: "14px",
+              background: "var(--color-gray-light)",
+            }}
+          >
+            취소
+          </button>
+        ),
         onBackClick: resetEdit,
         rightElement: (
           <button

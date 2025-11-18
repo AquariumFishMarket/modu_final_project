@@ -117,7 +117,7 @@ export default function ProductEdit() {
 
   // 에러 처리하기
   if (!product) {
-    return <div>상품 정보를 불러오는 중...</div>;
+    return <div style={{ textAlign: 'center' }}>상품 정보를 불러오는 중...</div>;
   }
 
   return (

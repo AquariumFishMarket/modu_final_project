@@ -79,7 +79,7 @@ function Profile() {
         />
       ),
     });
-  }, [navigate, setHeaderConfig, handleLogout]);
+  }, [navigate, setHeaderConfig, logout]);
 
   return (
     <>

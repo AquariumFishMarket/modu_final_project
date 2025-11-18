@@ -233,7 +233,7 @@ function LayoutContent() {
       setHeaderConfig({
         show: true,
         type: "chat",
-        userName: "잉어킹",
+        userName: "",
         onBackClick: () => navigate(-1),
       });
       return;

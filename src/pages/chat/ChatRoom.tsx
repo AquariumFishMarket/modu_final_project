@@ -154,7 +154,7 @@ export default function ChatRoom() {
         />
       ),
     });
-  }, [roomId]);
+  }, []);
 
   /* 메시지 수신 */
   useEffect(() => {
