@@ -30,6 +30,7 @@ export interface HeaderConfig {
   userName?: string; // chat type에서 사용
   inputState?: boolean; // edit, post type에서 사용
   rightElement?: React.ReactNode;
+  leftElement?: React.ReactNode;
   onBackClick?: () => void;
   onSearchClick?: () => void;
   onMoreClick?: () => void;

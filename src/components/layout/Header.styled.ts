@@ -31,10 +31,6 @@ export const SectionCombine = styled.section`
   border-bottom: 1px solid #dbdbdb;
 `;
 
-export const Title = styled.h2`
-  font-size: var(--font-size-xl);
-`;
-
 export const SubTitle = styled.h2``;
 
 export const AllyHiddenTitle = styled.h2`

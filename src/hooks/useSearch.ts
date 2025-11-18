@@ -1,9 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { getAuthHeaders } from "../utils/tokenManager";
-// import { useAuth } from "../contexts/AuthContext";
 import { useAuthStore } from "../contexts/useAuthStore";
 
-// API BASE URL (Vercel 테스트용)
 const API_BASE_URL = "https://dev.wenivops.co.kr/services/mandarin";
 
 export interface UserData {
@@ -20,7 +18,6 @@ export interface UserData {
 }
 
 export function useSearch() {
-  // const { currentUser } = useAuth();
   const currentUser = useAuthStore((s) => s.user);
 
   const [searchResults, setSearchResults] = useState<UserData[]>([]);
@@ -34,8 +31,7 @@ export function useSearch() {
   const searchIdRef = useRef<number>(0);
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  //  검색 API 호출 함수
-
+  // 검색 API 요청
   const fetchUsers = async (
     keyword: string,
     requestId: number
@@ -61,27 +57,42 @@ export function useSearch() {
       // 최신 요청만 처리
       if (requestId !== searchIdRef.current) return null;
 
+      const errData = await response
+        .clone()
+        .json()
+        .catch(() => ({}));
+
       if (!response.ok) {
-        const err = await response.json();
-        throw new Error(err.message || "검색 실패");
+        // 서버가 빈 결과도 오류로 보내는 경우 처리
+        if (
+          errData?.message === "검색 결과가 없습니다" ||
+          errData?.message === "User not found" ||
+          errData?.message === "사용자를 찾을 수 없습니다"
+        ) {
+          return [];
+        }
+
+        throw new Error(errData?.message || "검색 실패");
       }
 
       const data = await response.json();
 
-      // 서버 응답 포맷 대응
+      // 배열로 오는 경우
       if (Array.isArray(data)) return data;
+
       if (data.users && Array.isArray(data.users)) return data.users;
 
-      console.error("🔍 예기치 않은 응답:", data);
+      console.warn("예기치 않은 응답:", data);
       return [];
     } catch (error) {
-      if (error instanceof Error && error.name === "AbortError") return null;
+      if (error instanceof Error && error.name === "AbortError") {
+        return null;
+      }
       throw error;
     }
   };
 
-  //  검색 실행
-
+  // 검색 실행
   const performSearch = async (keyword: string) => {
     if (!keyword.trim()) {
       setSearchResults([]);
@@ -105,13 +116,18 @@ export function useSearch() {
 
       if (results === null) return;
 
-      const filtered = results.filter(
-        (user) => user._id !== currentUser?._id // 내 계정 제외
-      );
+      if (Array.isArray(results) && results.length === 0) {
+        setSearchResults([]);
+        setError(null);
+        return;
+      }
+
+      const filtered = results.filter((user) => user._id !== currentUser?._id);
 
       setSearchResults(filtered);
-    } catch (error) {
-      console.error("검색 중 오류:", error);
+      setError(null);
+    } catch (err) {
+      console.error("검색 중 오류:", err);
       setError("검색 중 오류가 발생했습니다. 다시 시도해 주세요.");
       setSearchResults([]);
     } finally {
@@ -119,12 +135,10 @@ export function useSearch() {
     }
   };
 
-  //  입력값 변경 핸들러 + 디바운싱
-
+  // 입력 + 디바운싱 처리
   const handleInputChange = (value: string) => {
     setInputValue(value);
 
-    // 빈값 or 한글자 → 초기화
     if (!value.trim() || value.trim().length < 2) {
       setSearchResults([]);
       setHasSearched(false);
@@ -133,10 +147,10 @@ export function useSearch() {
       setError(null);
 
       if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+
       return;
     }
 
-    // 디바운스 리셋
     if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
 
     debounceTimerRef.current = setTimeout(() => {
@@ -144,8 +158,7 @@ export function useSearch() {
     }, 300);
   };
 
-  //  검색 초기화
-
+  // 검색 초기화
   const clearSearch = () => {
     setInputValue("");
     setSearchResults([]);
@@ -159,8 +172,7 @@ export function useSearch() {
     }
   };
 
-  //  언마운트 시 정리
-
+  // 언마운트 정리
   useEffect(() => {
     return () => {
       if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
