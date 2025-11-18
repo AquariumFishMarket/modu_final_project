@@ -57,7 +57,11 @@ export default function ProductEdit() {
       inputState: isFormValid && !isSubmitting,
       onBackClick: () => {
         if (isSubmitting) return;
-        navigate(-1);
+        // 상세 페이지에서 다시 수정 페이지로 돌아오지 않도록
+        navigate(`/product/${id}`, {
+          replace: true,
+          state: { from: `/product/${id}/edit` },
+        });
       },
       onButtonClick: () => {
         if (isSubmitting) return;
@@ -117,7 +121,9 @@ export default function ProductEdit() {
 
   // 에러 처리하기
   if (!product) {
-    return <div style={{ textAlign: 'center' }}>상품 정보를 불러오는 중...</div>;
+    return (
+      <div style={{ textAlign: "center" }}>상품 정보를 불러오는 중...</div>
+    );
   }
 
   return (

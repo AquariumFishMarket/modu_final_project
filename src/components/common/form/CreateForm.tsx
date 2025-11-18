@@ -53,31 +53,37 @@ function CreateFormInner<T extends FormData>(
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [validationStatus, setValidationStatus] = useState<{
     [key: string]: "idle" | "checking" | "success" | "error";
-  }>({}); // 🆕
-  const [imgFiles, setImgFiles] = useState<File[]>([]);
+  }>({});
+  const [imgFile, setImgFile] = useState<File | null>(null);
   const [deleteIdx, setDeleteIdx] = useState<number | undefined>();
 
-  const hasSelectedImage = imgFiles.length > 0;
+  const hasSelectedImage = !!imgFile;
 
   const previewUrl = useMemo(
-    () => (imgFiles[0] ? URL.createObjectURL(imgFiles[0]) : undefined),
-    [imgFiles]
+    () => (imgFile ? URL.createObjectURL(imgFile) : undefined),
+    [imgFile]
   );
 
   const handleProfileImageClick = () => {
     if (hasSelectedImage) {
-      setImgFiles([]);
+      setImgFile(null);
     }
   };
 
   // 이미지 삭제 처리
   React.useEffect(() => {
     if (deleteIdx !== undefined) {
-      const newImgFiles = imgFiles.filter((_, index) => index !== deleteIdx);
-      setImgFiles(newImgFiles);
+      setImgFile(null);
       setDeleteIdx(undefined);
     }
-  }, [deleteIdx, imgFiles]);
+  }, [deleteIdx]);
+
+  const handleSetImgArr = (filesOrUpdater: React.SetStateAction<File[]>) => {
+    if (typeof filesOrUpdater === "function") return;
+    const files = (filesOrUpdater as File[]) || [];
+    const last = files.length > 0 ? files[files.length - 1] : undefined;
+    setImgFile(last || null);
+  };
 
   // 버튼 활성화 조건
   const isFormValid = useMemo(() => {
@@ -177,11 +183,11 @@ function CreateFormInner<T extends FormData>(
         ...formValues,
       };
 
-      if (imgFiles.length > 0) {
+      if (imgFile) {
         if (formType === "profile") {
-          submissionData.image = imgFiles[0];
+          submissionData.image = imgFile;
         } else if (formType === "product") {
-          submissionData.itemImage = imgFiles[0];
+          submissionData.itemImage = imgFile;
         }
       }
 
@@ -247,8 +253,12 @@ function CreateFormInner<T extends FormData>(
           {/* 상품용 이미지 렌더링 */}
           {formType === "product" && (
             <ImageContainer
-              key={`product-images-${imgFiles.length}`}
-              imgArr={imgFiles}
+              key={
+                imgFile
+                  ? `${imgFile.name}-${imgFile.lastModified}`
+                  : "product-images-none"
+              }
+              imgArr={imgFile ? [imgFile] : []}
               setDeleteIdx={setDeleteIdx}
             />
           )}
@@ -258,8 +268,8 @@ function CreateFormInner<T extends FormData>(
               multiple={false} // 상품도 단일 이미지
               colortype="color"
               size="small"
-              imgArr={imgFiles}
-              setImgArr={setImgFiles}
+              imgArr={imgFile ? [imgFile] : []}
+              setImgArr={handleSetImgArr}
             />
           </FormBtnContainer>
         </FormImgContainer>

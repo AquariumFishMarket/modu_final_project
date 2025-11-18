@@ -11,15 +11,18 @@ import {
   ProductContainer,
   ProductImage,
   ProductInfo,
-  ProductTitle, Price, SoldTag,
-  ProductStats, TimeStamp,
+  ProductTitle,
+  Price,
+  SoldTag,
+  ProductStats,
+  TimeStamp,
   StatsGroup,
   StatItem,
   BottomActionBar,
   ActionButton,
   LikeButton,
-  ContentWrapper
-} from './ProductDetail.styled'
+  ContentWrapper,
+} from "./ProductDetail.styled";
 import MoreMenu from "../../components/common/modal/MoreMenu";
 import { formatPostDate } from "../../utils/formatter/dateFormatter";
 import "react-toastify/dist/ReactToastify.css";
@@ -27,16 +30,16 @@ import SkeletonWrapper from "../../components/common/SkeletonWrapper";
 import { useToastStore } from "../../contexts/useToastStore";
 
 export default function ProductDetail() {
+  const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { setHeaderConfig } = useHeader();
-  const navigate = useNavigate();
   const [product, setProduct] = useState<Product | null>(null);
-  const [detailLoading,setDetailLoading] = useState(true);
-  const [detailerror,setDetailError] = useState(false);
+  const [detailLoading, setDetailLoading] = useState(true);
+  const [detailerror, setDetailError] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const currentUser = useAuthStore((s) => s.user);
-  const {setToast} = useToastStore()
+  const { setToast } = useToastStore();
 
   // 헤더 설정
   useEffect(() => {
@@ -46,7 +49,7 @@ export default function ProductDetail() {
       show: true,
       type: "productDetail",
       pageTitle: "상품 상세",
-      onBackClick: () => navigate(`/profile`),
+      onBackClick: () => navigate(-1),
       rightElement: (
         <MoreMenu
           type="product"
@@ -63,10 +66,10 @@ export default function ProductDetail() {
     });
   }, [product]);
 
-  useEffect(()=>{
-    if(!product) return;
-    setDetailLoading(false)
-  },[product])
+  useEffect(() => {
+    if (!product) return;
+    setDetailLoading(false);
+  }, [product]);
 
   useEffect(() => {
     const loadProduct = async () => {
@@ -86,10 +89,9 @@ export default function ProductDetail() {
         }
 
         setProduct(productData);
-
       } catch (error) {
         console.error("상품 정보 로드 실패:", error);
-        setDetailError(true)
+        setDetailError(true);
         if (error instanceof Error) {
           alert(error.message);
         }
@@ -100,7 +102,6 @@ export default function ProductDetail() {
 
     loadProduct();
   }, [id]);
-
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     if (!product) return;
@@ -124,13 +125,12 @@ export default function ProductDetail() {
 
   // 채팅하기
   const handleChatStart = () => {
-    setToast("준비중입니다!😇")
+    setToast("준비중입니다!😇");
   };
 
   // 구매하기
   const handlePurchase = () => {
-
-    if(!product) return
+    if (!product) return;
     if (!product.link) return;
     window.open(product.link, "_blank");
   };
@@ -141,7 +141,9 @@ export default function ProductDetail() {
 
     try {
       await deleteProduct(id);
-      setToast("상품이 삭제되었습니다😎",()=>{navigate("/profile")})
+      setToast("상품이 삭제되었습니다😎", () => {
+        navigate("/profile");
+      });
     } catch (error) {
       console.error("상품 삭제 실패:", error);
       alert(
@@ -158,7 +160,7 @@ export default function ProductDetail() {
     setProduct({ ...product, status: "sold" });
   };
 
-  if(product) {
+  if (product) {
     return (
       <>
         <ContentWrapper>
@@ -262,30 +264,28 @@ export default function ProductDetail() {
           )}
         </BottomActionBar>
       </>
-    )
+    );
   }
-  if(!product) {
+  if (!product) {
     return (
       <>
-      {detailLoading && (
-        <>
-          <ContentWrapper>
-            <ProductContainer>
-              <SkeletonWrapper height={300}/>
-            </ProductContainer>
-            <div style={{ marginTop: '15px' }}>
-              <SkeletonWrapper width={200} height={18} />
-              <SkeletonWrapper width={350} height={18} marginTop={12}/>
-            </div>
+        {detailLoading && (
+          <>
+            <ContentWrapper>
+              <ProductContainer>
+                <SkeletonWrapper height={300} />
+              </ProductContainer>
+              <div style={{ marginTop: "15px" }}>
+                <SkeletonWrapper width={200} height={18} />
+                <SkeletonWrapper width={350} height={18} marginTop={12} />
+              </div>
 
-            <SkeletonWrapper width={100} height={18} marginTop={20}/>
-          </ContentWrapper>
-        </>
+              <SkeletonWrapper width={100} height={18} marginTop={20} />
+            </ContentWrapper>
+          </>
         )}
-      {detailerror && (
-        '상품을 찾을 수 없어요!'
-      )}
+        {detailerror && "상품을 찾을 수 없어요!"}
       </>
-    )
+    );
   }
 }
