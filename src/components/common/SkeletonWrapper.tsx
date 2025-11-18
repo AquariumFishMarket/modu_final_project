@@ -2,7 +2,7 @@ import styled from "styled-components";
 import { Skeleton } from "./Skeleton";
 
 interface SkeletonProps{
-    width: number;
+    width?: number;
     height: number;
     marginTop?: number;
     marginBottom?: number;
@@ -12,7 +12,7 @@ interface SkeletonProps{
 }
 
 interface SkeletonStyleProps {
-    $width: number;
+    $width?: number;
     $height: number;
     $marginTop?: number;
     $marginBottom?: number;
@@ -22,7 +22,7 @@ interface SkeletonStyleProps {
 }
 
 const SkeletonContainer = styled.div<SkeletonStyleProps>`
-    width: ${({ $width }) => $width}px;
+    width: ${({ $width }) => $width ? `${$width}px` : '`100%' };
     height: ${({ $height }) => $height}px;
     margin-top: ${({ $marginTop }) => $marginTop ?? 0}px;
     margin-bottom: ${({ $marginBottom }) => $marginBottom ?? 0}px;

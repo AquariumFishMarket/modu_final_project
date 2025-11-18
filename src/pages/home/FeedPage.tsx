@@ -1,13 +1,12 @@
 import { useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { InitialLoadingSection } from "./FeedPage.styled";
 import PostCard from "../../components/post/postCard/PostCard";
 
 import { useFeedStore } from "../../contexts/useFeedStore";
 import { useAuthStore } from "../../contexts/useAuthStore";
 import { reportPost } from "../../services/postService";
-
+import FeedSkeleton from "./skeleton/FeedSkeleton";
 
 const FeedPage = () => {
   const navigate = useNavigate();
@@ -77,18 +76,9 @@ const FeedPage = () => {
     [fetchFeeds]
   );
 
-  // if (isLoading) {
-  //   return (
-  //       <main>
-  //         <InitialLoadingSection>
-  //           <p>불러오는 중...🤩🤩🤩🤩🤩</p>
-  //         </InitialLoadingSection>
-  //       </main>
-  //   );
-  // }
-
   return (
     <>
+    {isLoading && <FeedSkeleton />}
         {feedList.map((feed, idx) => {
           const isLast = idx === feedList.length - 1;
           const isMyPost = currentUser?.accountname === feed.userId;

@@ -46,7 +46,8 @@ export const PostMain = styled.figure`
     width: 100%;
     height: auto;
     min-height: 180px;
-    aspect-ratio: 16 / 9;
+    max-height: 450px;
+    //aspect-ratio: 16 / 9;
     object-fit: cover;
     border: 1px solid var(--color-gray-medium);
     border-radius: 1rem;

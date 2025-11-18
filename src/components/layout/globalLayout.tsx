@@ -32,7 +32,7 @@ function LayoutContent() {
   const [isHeader,setIsHeader] = useState(false)
   const [isFooter,setIsFooter] = useState(false)
   const user = useAuthStore((s) => s.user);
- 
+
   //drag 이벤트
   const [pull, setPull] = useState(0);
   const startYRef = useRef(0);
@@ -235,7 +235,7 @@ function LayoutContent() {
       setHeaderConfig({
         show: true,
         type: "chat",
-        userName: "잉어킹",
+        userName: "",
         onBackClick: () => navigate(-1),
       });
       return;
