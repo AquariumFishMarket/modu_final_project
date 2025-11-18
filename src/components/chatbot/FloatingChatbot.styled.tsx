@@ -68,17 +68,10 @@ export const FloatingButton = styled.button`
   }
 
   @media (max-width: 768px) {
-    bottom: 8rem;
-    right: 2.5rem;
-    width: 6rem;
-    height: 6rem;
-  }
-
-  @media (max-width: 480px) {
-    bottom: 7rem;
-    right: 1.5rem;
-    width: 5rem;
-    height: 5rem;
+    bottom: 14rem;
+    right: 1.9rem;
+    width: 4rem;
+    height: 4rem;
   }
 `;
 

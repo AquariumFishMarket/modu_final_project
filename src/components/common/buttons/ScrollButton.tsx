@@ -11,6 +11,10 @@ const ScrollBtnContainer = styled.div`
   flex-direction: column;
   gap: 8px;
   transition: top 0.1s ease-in-out;
+
+  @media (max-width: 768px) {
+    right: 20px;
+  }
 `;
 
 const TopButton = styled.button`
