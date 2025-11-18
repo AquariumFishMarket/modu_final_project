@@ -66,15 +66,16 @@ function EditFormInner<T extends FormData>(
   }, [initialImageUrl]);
 
   // 이미지 업로드 핸들러 (배열 → 단일)
-  const handleImageChange: Dispatch<SetStateAction<File[]>> = useCallback(
-    (filesOrUpdater) => {
-      if (typeof filesOrUpdater === "function") return;
+  const handleImageChange: Dispatch<SetStateAction<File[]>> = (
+    filesOrUpdater
+  ) => {
+    if (typeof filesOrUpdater === "function") return;
 
-      const files = filesOrUpdater as File[];
-      setImgFile(files[0] || null);
-    },
-    []
-  );
+    const files = filesOrUpdater as File[];
+    // 마지막 파일을 선택해 덮어쓰기
+    const last = files.length > 0 ? files[files.length - 1] : undefined;
+    setImgFile(last || null);
+  };
 
   // 버튼 활성화 조건
   const isFormValid = useMemo(() => {
