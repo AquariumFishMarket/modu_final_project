@@ -1,5 +1,6 @@
+<center>
 ![Image](https://github.com/user-attachments/assets/b6dd958c-1ce2-4301-b995-7e130aaa0b51)
-
+</center>
 
 <h1 align="center">물고기마켓 (Aquarium Fish Market)</h1>
 
@@ -949,6 +950,7 @@ npm run build
 
 본 프로젝트는 교육 및 포트폴리오 목적으로 제작되었습니다.  
 상업적 사용 또는 2차 배포 시에는 팀과 먼저 협의가 필요합니다.
+
 
 
 
