@@ -118,7 +118,7 @@ export default function PostWrite() {
             }
           }
         } catch (error) {
-          notify("게시글을 불러오는데 실패했습니다 🥲");
+          setToast("게시글을 불러오는데 실패했습니다 🥲");
         } finally {
           setIsLoading(false);
         }
@@ -150,7 +150,6 @@ export default function PostWrite() {
 
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const target = e.target;
-    const newValue = e.target.value;
     target.style.height = "auto";
     target.style.height = target.scrollHeight + "px";
     setContent(e.target.value);
@@ -162,7 +161,7 @@ export default function PostWrite() {
       // 토큰 불러오기
       const token = localStorage.getItem("authToken");
       if (!token) {
-        alert("토큰이 없습니다. 로그인 해주세요.");
+        setToast("토큰이 없습니다. 로그인 해주세요!");
         return;
       }
 
@@ -196,7 +195,7 @@ export default function PostWrite() {
             finalImagePath = uploadedPaths;
           }
         } else {
-          alert("이미지 업로드 실패");
+          setToast("이미지 업로드 실패😭");
           return;
         }
       }
@@ -210,10 +209,11 @@ export default function PostWrite() {
 
         if (updatedPost) {
           useFeedStore.getState().updatePost(updatedPost);
-          setToast("게시글 수정이 완료됐어요! 😊");
-          navigate(`/post/${postId}?updated=${Date.now()}`, { replace: true });
+          setToast("게시글 수정이 완료됐어요! 😊",()=>{
+            navigate(`/post/${postId}?updated=${Date.now()}`, { replace: true })
+          });
         } else {
-          notify("게시글 수정이 실패했어요 🥲");
+          setToast("게시글 수정이 실패했어요 🥲");
         }
       } else {
         const postRes = await fetch(
@@ -236,19 +236,18 @@ export default function PostWrite() {
         const postData = await postRes.json();
 
         if (postRes.ok) {
-          setToast("게시글 작성이 완료됐어요! 😊");
+          setToast("게시글 작성이 완료됐어요! 😊",()=>{navigate("/feed")});
           setContent("");
           setImgArr([]);
           if (textAreaRef.current) {
             textAreaRef.current.value = "";
           }
-          navigate("/feed");
         } else {
-          notify("게시글 작성이 실패했어요 🥲");
+          setToast("게시글 작성이 실패했어요 🥲");
         }
       }
     } catch (err) {
-      notify("오류가 발생했습니다 🥲");
+      setToast("오류가 발생했습니다 🥲");
     }
   };
 
