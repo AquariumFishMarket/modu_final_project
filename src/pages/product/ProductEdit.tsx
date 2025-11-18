@@ -57,7 +57,7 @@ export default function ProductEdit() {
       inputState: isFormValid && !isSubmitting,
       onBackClick: () => {
         if (isSubmitting) return;
-        navigate(`/product/${id}`);
+        navigate(-1);
       },
       onButtonClick: () => {
         if (isSubmitting) return;
@@ -109,7 +109,7 @@ export default function ProductEdit() {
       });
     } catch (error) {
       console.error("상품 수정 실패:", error);
-      alert("상품 수정에 실패했습니다. 다시 시도해주세요.");
+      setToast("상품 수정을 실패했습니다😭");
     } finally {
       setIsSubmitting(false);
     }
