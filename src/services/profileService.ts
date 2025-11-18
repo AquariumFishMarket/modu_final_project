@@ -4,7 +4,7 @@ import { UserProfile } from "../types/user";
 
 const BASE_URL = "https://dev.wenivops.co.kr/services/mandarin";
 
-// 임시 기본 이미지
+// 기본 이미지
 const DEFAULT_PROFILE_IMG = "/img/empty-profile.png";
 
 export interface AuthResponse {
@@ -34,10 +34,10 @@ export interface MyProfileResponse {
 }
 
 /**
- * 👤 통합 프로필 조회 함수
- * 내 프로필: accountname 미지정 또는 내 계정명과 동일
- * 타인 프로필: accountname 지정 & 내 계정명과 다름
- * 반환: UserProfile | null
+ * 통합 프로필 조회
+ * @param accountname 계정ID
+ * @param currentUserAccountname 현재 사용자의 계정 ID
+ * @retun  UserProfile(data.user, data.profile)
  */
 export const fetchProfile = async (
   accountname?: string,
@@ -64,12 +64,15 @@ export const fetchProfile = async (
       ? data.profile
       : data.user;
   } catch (error) {
+    console.error(error);
     return null;
   }
 };
 
 /**
- * 👤🆕 프로필 업데이트
+ * 프로필 업데이트
+ * @param user(username, accountname, intro, image)
+ * @return user
  */
 export const updateProfile = async (
   username: string,
@@ -96,25 +99,28 @@ export const updateProfile = async (
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`프로필 업데이트에 실패했습니다: ${response.status}`);
+      throw new Error(`프로필 업데이트에 실패했습니다: ${errorText}`);
     }
 
     const data = await response.json();
 
     return data;
   } catch (error) {
-    throw error;
+    console.error(error);
+    throw null;
   }
 };
 
 /**
- * 📜 사용자 게시글 피드 가져오기
+ * 사용자 게시글 피드
+ * @param accountname 계정ID
+ * @return post
  */
 export const fetchUserPosts = async (
   accountname: string
 ): Promise<Post[] | null> => {
   try {
-    const limit = 1000; // ☑️ 무한 스크롤 되면 개수 20개로 줄이기
+    const limit = 20; // maximum: 1000
 
     const response = await fetch(
       `${BASE_URL}/post/${accountname}/userpost?limit=${limit}`,
@@ -135,14 +141,16 @@ export const fetchUserPosts = async (
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
   } catch (error) {
+    console.error(error);
     return null;
   }
 };
 
 /**
- * 🔄 팔로우/언팔로우 처리
- * POST /profile/:accountname/follow - 팔로우
- * DELETE /profile/:accountname/unfollow - 언팔로우
+ * 팔로우/언팔로우
+ * @param accountname 계정ID
+ * @param isFollowing 팔로잉 여부
+ * @return boolean
  */
 export async function toggleProfileFollow(
   accountname: string,
@@ -169,12 +177,15 @@ export async function toggleProfileFollow(
 
     return true;
   } catch (error) {
-    throw error;
+    console.error(error);
+    return false;
   }
 }
 
 /**
- * 게시글 좋아요 토글
+ * 게시글 좋아요
+ * @param postId 게시글 고유번호
+ * @return boolean
  */
 export async function togglePostLike(postId: string): Promise<boolean> {
   try {
@@ -187,6 +198,7 @@ export async function togglePostLike(postId: string): Promise<boolean> {
 
     return true;
   } catch (error) {
-    throw error;
+    console.error(error);
+    return false;
   }
 }

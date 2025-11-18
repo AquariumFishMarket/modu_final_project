@@ -36,7 +36,6 @@ export default function ProductAdd() {
         if (isSubmitting) return;
         // 실제 폼 제출 로직
         if (formRef.current) {
-          console.log("submitForm 호출");
           formRef.current.submitForm();
         }
       },
@@ -69,13 +68,8 @@ export default function ProductAdd() {
 
       const newProduct = await fetchProductUpload(productData);
 
-      // setToast("상품 등록이 완료됐습니다😊");
-      // setTimeout(() => {
-      //   navigate(`/product/${newProduct.id}`);
-      // }, 1500);
-
       setToast("상품 등록이 완료됐습니다😊", () => {
-        navigate(`/product/${newProduct.id}`)
+        navigate(`/product/${newProduct.id}`);
       });
     } catch (error) {
       console.error("상품 등록 실패: ", error);

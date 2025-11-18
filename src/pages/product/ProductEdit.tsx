@@ -45,7 +45,7 @@ export default function ProductEdit() {
     };
 
     loadProduct();
-  }, [id, navigate]);
+  }, [id]);
 
   // 헤더 설정
   useEffect(() => {
@@ -57,7 +57,7 @@ export default function ProductEdit() {
       inputState: isFormValid && !isSubmitting,
       onBackClick: () => {
         if (isSubmitting) return;
-        navigate(`/product/${id}`);
+        navigate(-1);
       },
       onButtonClick: () => {
         if (isSubmitting) return;
@@ -104,24 +104,18 @@ export default function ProductEdit() {
 
       await updateProduct(id, updatedProductData);
 
-      // setToast("상품 수정을 완료했습니다😀");
-      // setTimeout(() => {
-      //   navigate(`/product/${id}`);
-      // }, 1500);
-
-
       setToast("상품 수정을 완료했습니다😀", () => {
-        navigate(`/product/${id}`)
+        navigate(`/product/${id}`);
       });
     } catch (error) {
       console.error("상품 수정 실패:", error);
-      alert("상품 수정에 실패했습니다. 다시 시도해주세요.");
+      setToast("상품 수정을 실패했습니다😭");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // 로딩 상태 처리
+  // 에러 처리하기
   if (!product) {
     return <div style={{ textAlign: 'center' }}>상품 정보를 불러오는 중...</div>;
   }

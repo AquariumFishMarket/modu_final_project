@@ -29,8 +29,8 @@ function LayoutContent() {
   const { setHeaderConfig } = useHeader();
   const navigate = useNavigate();
 
-  const [isHeader,setIsHeader] = useState(false)
-  const [isFooter,setIsFooter] = useState(false)
+  const [isHeader, setIsHeader] = useState(false);
+  const [isFooter, setIsFooter] = useState(false);
   const user = useAuthStore((s) => s.user);
 
   //drag 이벤트
@@ -48,7 +48,6 @@ function LayoutContent() {
     animate: { opacity: 1, y: 0, transition: { duration: 0.5 } },
     exit: { opacity: 0, transition: { duration: 0.3 } },
   };
-
 
   useEffect(() => {
     const path = location.pathname;
@@ -208,14 +207,13 @@ function LayoutContent() {
       return;
     }
 
-    // 🆕 상품 수정 - 폼 관련 설정 제거 (상품 상세보다 뒤에 위치)
+    // 상품 수정
     if (path.match(/^\/product\/[^/]+\/edit$/)) {
       setHeaderConfig({
         show: true,
         type: "edit",
-        inputState: true, // 삭제
+        inputState: true,
         onBackClick: () => navigate(-1),
-        onButtonClick: () => console.log("상품 수정 완료"), // 삭제
       });
       return;
     }
@@ -328,15 +326,15 @@ function LayoutContent() {
               <Drop2 src="/img/drop.png" $transform={pull} alt="물방울" />
             </div>
           </RefreshAlert>
-          )}
-          <AnimatePresence mode="wait">
-            <motion.div
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              style={{ height: '100%' }}
-              variants={pageVariants}
-            >
+        )}
+        <AnimatePresence mode="wait">
+          <motion.div
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            style={{ height: "100%" }}
+            variants={pageVariants}
+          >
             <MainContent
               key={location.pathname}
               $hasFooter={isFooter}
@@ -351,15 +349,15 @@ function LayoutContent() {
             >
               <Outlet />
             </MainContent>
-            </motion.div>
-          </AnimatePresence>
-          {isFooter && <FooterNav />}
-        </LayoutContainer>
-        {/* 플로팅 챗봇 - position: fixed로 전역에 표시 */}
-        <FloatingChatbot />
-        <ScrollButton scrollContainerRef={scrollContainerRef}></ScrollButton>
-      </>
-    );
+          </motion.div>
+        </AnimatePresence>
+        {isFooter && <FooterNav />}
+      </LayoutContainer>
+      {/* 플로팅 챗봇 - position: fixed로 전역에 표시 */}
+      <FloatingChatbot />
+      <ScrollButton scrollContainerRef={scrollContainerRef}></ScrollButton>
+    </>
+  );
 }
 
 export default function GlobalLayout() {

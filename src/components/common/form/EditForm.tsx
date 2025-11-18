@@ -170,7 +170,7 @@ function EditFormInner<T extends FormData>(
     e.preventDefault();
   };
 
-  // 최초 마운트 시에만 초기값으로 폼 상태 설정 (입력 후에는 덮어쓰지 않음)
+  // 최초 마운트 시에만 초기값으로 폼 상태 설정
   useEffect(() => {
     if (Object.keys(initialValues).length > 0) {
       setFormValues(() => {

@@ -81,7 +81,7 @@ export default function MoreMenu({
   const currentUser = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
 
-  // 본인 여부 확인 (authorAccountname이 제공된 경우)
+  // 본인 여부 확인
   const isOwner = authorAccountname
     ? currentUser?.accountname === authorAccountname
     : undefined;

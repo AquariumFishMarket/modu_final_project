@@ -126,7 +126,7 @@ export const login = async (
   const data = await response.json();
 
   if (!response.ok) {
-    console.log("API 응답 실패:", response.status, data); // 확인
+    console.log("API 응답 실패:", response.status, data);
     throw new Error("이메일 또는 비밀번호가 일치하지 않습니다.");
   }
 
