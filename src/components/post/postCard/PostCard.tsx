@@ -17,7 +17,6 @@ import {
   CarouselDot,
   CarouselButton,
 } from "./PostCard.styled";
-import { Skeleton } from "../../common/Skeleton";
 import PostHeader from "../PostHeader";
 import { formatPostDate } from "../../../utils/formatter/dateFormatter";
 import { useNavigate } from "react-router-dom";
