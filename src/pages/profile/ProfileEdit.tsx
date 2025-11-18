@@ -29,11 +29,10 @@ export default function ProfileEdit() {
   const { setToast } = useToastStore();
 
   // 상태
-  const [loading, setLoading] = useState(true);
   const [profileData, setProfileData] = useState<UserProfile | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const refreshUser = useAuthStore((s) => s.refreshUser);
+  const updateUser = useAuthStore((s) => s.updateUser);
 
   const profileFields = getProfileFields();
 
@@ -41,7 +40,6 @@ export default function ProfileEdit() {
   useEffect(() => {
     const loadProfile = async () => {
       try {
-        setLoading(true);
         setError(null);
 
         const token = getToken();
@@ -50,7 +48,6 @@ export default function ProfileEdit() {
           throw new Error("로그인이 필요합니다.");
         }
 
-        const start = Date.now();
         const data = await fetchProfile();
 
         if (!data) throw new Error("프로필 정보를 불러올 수 없습니다.");
@@ -61,28 +58,16 @@ export default function ProfileEdit() {
           intro: data.intro || "",
           image: data.image,
         });
-
-        // 최소 0.8초 로딩 화면 유지
-        const elapsed = Date.now() - start;
-        const minDelay = 800;
-        if (elapsed < minDelay) {
-          setTimeout(() => setLoading(false), minDelay - elapsed);
-        } else {
-          setLoading(false);
-        }
       } catch (error) {
         console.error("프로필 로딩 실패:", error);
         setError(
           error instanceof Error ? error.message : "오류가 발생했습니다."
         );
-
-        setTimeout(() => navigate("/profile"), 2000);
-        setLoading(false);
       }
     };
 
     loadProfile();
-  }, [navigate]);
+  }, []);
 
   useEffect(() => {
     setHeaderConfig({
@@ -96,7 +81,6 @@ export default function ProfileEdit() {
         navigate("/profile");
       },
       onButtonClick: () => {
-        // 실제 폼 제출 로직
         if (formRef.current && isFormValid) {
           formRef.current.submitForm();
         }
@@ -107,7 +91,7 @@ export default function ProfileEdit() {
     return () => {
       setHeaderConfig({ show: false });
     };
-  }, [isFormValid, setHeaderConfig, navigate]);
+  }, [isFormValid, isSubmitting, setHeaderConfig, navigate, profileData]);
 
   // 폼 유효성 변경 핸들러
   const handleValidationChange = (isValid: boolean) => {
@@ -142,7 +126,12 @@ export default function ProfileEdit() {
         imageUrl
       );
 
-      await refreshUser();
+      updateUser({
+        username: data.username,
+        accountname: data.accountname,
+        intro: data.intro || "",
+        image: imageUrl,
+      });
 
       setToast("프로필이 수정되었습니다😎", () =>
         navigate("/profile", { replace: true })
@@ -155,12 +144,7 @@ export default function ProfileEdit() {
     }
   };
 
-  if (loading) {
-    return (
-      <div style={{ textAlign: "center" }}>프로필 정보를 불러오는 중...</div>
-    );
-  }
-
+  // 에러 처리하기
   if (error) {
     return (
       <div>

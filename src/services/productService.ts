@@ -78,7 +78,7 @@ export const fetchProductDetail = async (
 export const updateProduct = async (
   productId: string,
   productData: Partial<Product>
-): Promise<void> => {
+): Promise<Product> => {
   const response = await fetch(`${BASE_URL}/product/${productId}`, {
     method: "PUT",
     headers: getAuthHeaders(),
@@ -97,7 +97,7 @@ export const updateProduct = async (
     if (response.status === 401) {
       throw new Error("유효하지 않은 토큰입니다.");
     }
-    throw new Error(`상품 수정 실패: ${response.status}`);
+    throw new Error("상품 수정 실패: ");
   }
 
   const data = await response.json();
@@ -127,8 +127,6 @@ export const deleteProduct = async (productId: string): Promise<void> => {
     }
     throw new Error(`상품 삭제 실패: ${response.status}`);
   }
-
-  // const data = await response.json();
 
   // 삭제만 하면 되니까 반환 하지 않음
 };
