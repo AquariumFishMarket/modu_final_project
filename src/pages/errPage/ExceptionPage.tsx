@@ -22,6 +22,16 @@ const dropscale = keyframes `
         opacity: 0;
     }
 `
+const Wrapper = styled(ErrPageSection)`
+    position: absolute;
+    top:0;
+    left:0;
+    max-width: 600px;
+    width: 100%;
+    height: 100vh;
+    margin: 0;
+`
+
 const Drop = styled.img`
     position: absolute;
     top: -10px;
@@ -63,7 +73,7 @@ export default function ExceptionPage ({text,type}:Exception) {
     }
 
     return (
-        <ErrPageSection>
+        <Wrapper>
             <h2 className="sr-only">로그인 확인 페이지</h2>
             <div style={{ position: 'relative' }}>
                 {imageLoad &&
@@ -110,6 +120,6 @@ export default function ExceptionPage ({text,type}:Exception) {
                     />
                 )}
             </ErrorContent>
-        </ErrPageSection>
+        </Wrapper>
     )
 }
