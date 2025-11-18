@@ -91,7 +91,7 @@ export default function ProfileEdit() {
     return () => {
       setHeaderConfig({ show: false });
     };
-  }, [isFormValid, isSubmitting, setHeaderConfig, navigate, profileData]);
+  }, [isFormValid, isSubmitting, setHeaderConfig, navigate]);
 
   // 폼 유효성 변경 핸들러
   const handleValidationChange = (isValid: boolean) => {
@@ -155,9 +155,7 @@ export default function ProfileEdit() {
     );
   }
 
-  if (!profileData) {
-    return <div>프로필 정보를 불러올 수 없습니다.</div>;
-  }
+  if (!profileData) return null;
 
   return (
     <EditForm
