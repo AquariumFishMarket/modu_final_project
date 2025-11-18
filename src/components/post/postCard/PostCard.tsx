@@ -151,7 +151,7 @@ const PostCard = forwardRef<HTMLDivElement, PostCardProps>(
                   <ImageCarouselContainer>
                     {imageUrls.map((url, index) => (
                       <ImageCarouselSlide key={index}>
-                        <img
+                        <ImageBox
                           src={url}
                           alt={`${imageAlt || "게시글 이미지"} ${index + 1}`}
                           onError={(e) => {
