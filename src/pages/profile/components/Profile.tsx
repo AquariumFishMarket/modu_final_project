@@ -33,14 +33,17 @@ import ProfileImageContainer from "./ProfileImageContainer";
 
 import type { UserProfile } from "../../../types/user";
 import type { Post } from "../../../types/post";
+import type { Product } from "../../../types/product";
 
 import {
   fetchProfile,
   fetchUserPosts,
   toggleProfileFollow,
 } from "../../../services/profileService";
-import MoreMenu from "../../../components/common/modal/MoreMenu";
 
+import { fetchProductList } from "../../../services/productService";
+
+import MoreMenu from "../../../components/common/modal/MoreMenu";
 import { likePost, unlikePost } from "../../../services/postService";
 import { formatPostDate } from "../../../utils/formatter/dateFormatter";
 import { fetchPostMeta } from "../../../utils/fetchPostMeta";
@@ -49,6 +52,7 @@ import { useFeedStore } from "../../../contexts/useFeedStore";
 function Profile() {
   const navigate = useNavigate();
   const { setHeaderConfig } = useHeader();
+
   const currentUser = useAuthStore((s) => s.user);
   const isAuthLoading = useAuthStore((s) => s.isLoading);
   const logout = useAuthStore((s) => s.logout);
@@ -61,7 +65,10 @@ function Profile() {
   const clearFollowUpdate = useFollowStore((state) => state.clearUpdate);
 
   const [profileData, setProfileData] = useState<UserProfile | null>(null);
+
   const [postsList, setPostsList] = useState<Post[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+
   const [isLoading, setIsLoading] = useState(true);
   const [postState, setPostState] = useState<"list" | "gallery">("list");
   const [isFollowLoading, setIsFollowLoading] = useState(false);
@@ -69,7 +76,6 @@ function Profile() {
   const toggleFeedLike = useFeedStore((state) => state.toggleLike);
 
   const currentUserAccountname = currentUser?.accountname ?? "";
-
   const targetAccountname =
     paramAccountname && paramAccountname.trim() !== ""
       ? paramAccountname
@@ -97,7 +103,7 @@ function Profile() {
     });
   }, [navigate, setHeaderConfig, logout]);
 
-  // 프로필 / 게시글 불러오기
+  // 프로필 + 상품 + 게시글 로드
   useEffect(() => {
     const loadProfile = async () => {
       if (isAuthLoading) return;
@@ -110,39 +116,30 @@ function Profile() {
       setIsLoading(true);
 
       try {
-  
         const profile = await fetchProfile(
           targetAccountname,
           currentUserAccountname
         );
 
-        if (!profile) {
-          throw new Error("프로필 정보를 불러올 수 없습니다.");
-        }
+        if (!profile) throw new Error("프로필 로드 실패");
 
         setProfileData(profile);
 
-        const posts = await fetchUserPosts(profile.accountname);
+        // 판매상품 목록 로드
+        const { product } = await fetchProductList(profile.accountname);
+        setProducts(product);
 
+        // 게시글 목록 로드
+        const posts = await fetchUserPosts(profile.accountname);
         const enhancedPosts: Post[] = await Promise.all(
           (posts || []).map(async (post) => {
             try {
               const meta = await fetchPostMeta(post.id);
-
               return {
                 ...post,
-                heartCount:
-                  typeof meta.heartCount === "number"
-                    ? meta.heartCount
-                    : post.heartCount,
-                commentCount:
-                  typeof meta.commentCount === "number"
-                    ? meta.commentCount
-                    : post.commentCount,
-                hearted:
-                  typeof meta.hearted === "boolean"
-                    ? meta.hearted
-                    : post.hearted,
+                heartCount: meta.heartCount ?? post.heartCount,
+                commentCount: meta.commentCount ?? post.commentCount,
+                hearted: meta.hearted ?? post.hearted,
                 image: meta.image || post.image,
               };
             } catch {
@@ -153,7 +150,7 @@ function Profile() {
 
         setPostsList(enhancedPosts);
       } catch (err) {
-        console.error("프로필 로드 실패:", err);
+        console.error("프로필 로드 중 오류:", err);
       } finally {
         setIsLoading(false);
       }
@@ -168,10 +165,8 @@ function Profile() {
     currentUserAccountname,
   ]);
 
-
   useEffect(() => {
     if (!updatedFollow || !profileData) return;
-
 
     if (updatedFollow.accountname === profileData.accountname) {
       setProfileData((prev) =>
@@ -188,7 +183,6 @@ function Profile() {
       );
     }
 
-    // 내 프로필이면 내가 팔로우한 수 갱신
     if (isMyProfile) {
       setProfileData((prev) =>
         prev
@@ -206,7 +200,6 @@ function Profile() {
     clearFollowUpdate();
   }, [updatedFollow, profileData, clearFollowUpdate, isMyProfile]);
 
-  // 팔로우 / 언팔 토글
   const handleFollowToggle = async () => {
     if (!profileData || isFollowLoading) return;
 
@@ -233,7 +226,6 @@ function Profile() {
     }
   };
 
-  // 좋아요 기능
   const handleProfileLike = async (post: Post) => {
     const isLikedNow = post.hearted;
 
@@ -261,7 +253,6 @@ function Profile() {
       }
     } catch (err) {
       console.error("좋아요 처리 실패:", err);
-
     }
   };
 
@@ -350,7 +341,10 @@ function Profile() {
         </ProfileContainer>
       </ProfileSection>
 
-      <SellingProducts isLastSection={postsList.length === 0} />
+      <SellingProducts
+        products={products}
+        isLastSection={postsList.length === 0}
+      />
 
       {postsList.length > 0 && (
         <>
