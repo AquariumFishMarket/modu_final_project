@@ -36,6 +36,7 @@ export function useSearch() {
     keyword: string,
     requestId: number
   ): Promise<UserData[] | null> => {
+    // 이전 요청 중단
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
@@ -44,57 +45,80 @@ export function useSearch() {
     abortControllerRef.current = controller;
 
     try {
+      const headers = getAuthHeaders();
+
+      // 토큰 없으면 로그인 필요
+      if (!headers || !("Authorization" in headers)) {
+        throw new Error("로그인이 필요합니다.");
+      }
+
       const response = await fetch(
         `${API_BASE_URL}/user/searchuser/?keyword=${encodeURIComponent(
           keyword
         )}`,
         {
-          headers: getAuthHeaders(),
+          headers,
           signal: controller.signal,
         }
       );
 
-      // 최신 요청만 처리
+      // 최신 요청이 아니면 무시
       if (requestId !== searchIdRef.current) return null;
 
+      // 에러 응답 미리 파싱
       const errData = await response
         .clone()
         .json()
-        .catch(() => ({}));
+        .catch(() => ({} as any));
 
+      const rawMessage: string =
+        errData?.message ||
+        errData?.error ||
+        (Array.isArray(errData?.errors) ? errData.errors[0] : "") ||
+        "";
+
+      // 서버 응답 에러 처리
       if (!response.ok) {
-        // 서버가 빈 결과도 오류로 보내는 경우 처리
+        const msg = rawMessage || "검색 실패";
+
+        // 토큰 없음
+        if (msg.includes("토큰이 없습니다") || response.status === 401) {
+          throw new Error("로그인이 필요합니다.");
+        }
+
+        // 검색 결과 없음
         if (
-          errData?.message === "검색 결과가 없습니다" ||
-          errData?.message === "User not found" ||
-          errData?.message === "사용자를 찾을 수 없습니다"
+          msg.includes("사용자를 찾을 수 없") ||
+          msg.includes("User not found") ||
+          msg.includes("검색 결과가 없습니다") ||
+          response.status === 404
         ) {
           return [];
         }
 
-        throw new Error(errData?.message || "검색 실패");
+        // 그 외 진짜 에러만 throw
+        throw new Error(msg);
       }
 
       const data = await response.json();
 
-      // 배열로 오는 경우
       if (Array.isArray(data)) return data;
-
       if (data.users && Array.isArray(data.users)) return data.users;
 
-      console.warn("예기치 않은 응답:", data);
       return [];
-    } catch (error) {
-      if (error instanceof Error && error.name === "AbortError") {
+    } catch (err) {
+      if (err instanceof Error && err.name === "AbortError") {
         return null;
       }
-      throw error;
+      throw err;
     }
   };
 
-  // 검색 실행
+  // 실제 검색 실행
   const performSearch = async (keyword: string) => {
-    if (!keyword.trim()) {
+    const trimmed = keyword.trim();
+
+    if (!trimmed) {
       setSearchResults([]);
       setHasSearched(false);
       setCurrentKeyword("");
@@ -105,41 +129,44 @@ export function useSearch() {
 
     setIsLoading(true);
     setHasSearched(true);
-    setCurrentKeyword(keyword.trim());
+    setCurrentKeyword(trimmed);
     setError(null);
 
     searchIdRef.current += 1;
     const currentRequestId = searchIdRef.current;
 
     try {
-      const results = await fetchUsers(keyword, currentRequestId);
+      const results = await fetchUsers(trimmed, currentRequestId);
 
+      // 중단된 요청
       if (results === null) return;
 
-      if (Array.isArray(results) && results.length === 0) {
-        setSearchResults([]);
-        setError(null);
-        return;
-      }
-
+      // 자기 자신 제외
       const filtered = results.filter((user) => user._id !== currentUser?._id);
-
       setSearchResults(filtered);
-      setError(null);
     } catch (err) {
       console.error("검색 중 오류:", err);
-      setError("검색 중 오류가 발생했습니다. 다시 시도해 주세요.");
+
+      if (err instanceof Error && err.message === "로그인이 필요합니다.") {
+        setError("검색 기능은 로그인 후 이용할 수 있습니다.");
+      } else {
+        setError("검색 중 오류가 발생했습니다. 다시 시도해 주세요.");
+      }
+
       setSearchResults([]);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // 입력 + 디바운싱 처리
+  // 입력값 + 디바운스
   const handleInputChange = (value: string) => {
     setInputValue(value);
 
-    if (!value.trim() || value.trim().length < 2) {
+    const trimmed = value.trim();
+
+    // 2글자 미만이면 검색 안 함
+    if (!trimmed || trimmed.length < 2) {
       setSearchResults([]);
       setHasSearched(false);
       setIsLoading(false);
@@ -147,18 +174,17 @@ export function useSearch() {
       setError(null);
 
       if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
-
       return;
     }
 
     if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
 
     debounceTimerRef.current = setTimeout(() => {
-      performSearch(value);
+      performSearch(trimmed);
     }, 300);
   };
 
-  // 검색 초기화
+  // 초기화
   const clearSearch = () => {
     setInputValue("");
     setSearchResults([]);
@@ -172,7 +198,7 @@ export function useSearch() {
     }
   };
 
-  // 언마운트 정리
+  // 언마운트 시 정리
   useEffect(() => {
     return () => {
       if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
