@@ -100,7 +100,15 @@ const ChatImgContainer = styled.div`
   }
 `;
 const ChatFileInfo = styled.div`
+  width: calc(100% - 70px);
   font-size: var(--font-size-md);
+  > p {
+    width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
 `;
 
 // File 또는 URL에서 이미지 URL 생성하는 헬퍼 함수

@@ -24,6 +24,8 @@ import {
   likePost as apiLikePost,
   unlikePost as apiUnlikePost,
 } from "../../services/postService";
+import { useToastStore } from "../../contexts/useToastStore";
+import SkeletonWrapper from "../../components/common/SkeletonWrapper";
 
 function PostDetail() {
   const { postId } = useParams<{ postId: string }>();
@@ -31,6 +33,7 @@ function PostDetail() {
   const location = useLocation();
   const currentUser = useAuthStore((s) => s.user);
   const { setHeaderConfig } = useHeader();
+  const { setToast } = useToastStore();
 
   const updateFeedPost = useFeedStore((state) => state.updatePost);
 
@@ -77,10 +80,11 @@ function PostDetail() {
 
     try {
       await deletePost(postId);
-      navigate(-1);
+      setToast('게시글을 삭제했습니다😇',()=>{navigate(-1)})
+
     } catch (error) {
       console.error("게시글 삭제 실패:", error);
-      alert("게시글 삭제에 실패했습니다.");
+      setToast("게시글 삭제에 실패했습니다");
     }
   };
 
@@ -115,7 +119,7 @@ function PostDetail() {
 
     try {
       await reportPost(postId);
-      alert("게시글이 신고되었습니다.");
+      setToast("게시글이 신고되었습니다 🙀");
     } catch (err) {
       console.error("게시글 신고 실패:", err);
     }
@@ -267,102 +271,117 @@ function PostDetail() {
 
     try {
       await reportComment(postId, commentId);
-      alert("댓글이 신고되었습니다.");
+      setToast("댓글이 신고되었습니다🙀");
     } catch (err) {
       console.error("댓글 신고 실패:", err);
     }
   };
 
-  // 로딩 상태
-  if (isLoading) {
+  if(isLoading) {
     return (
-      <PostDetailContainer>
-        <p>로딩 중...</p>
-      </PostDetailContainer>
-    );
+      <>
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <SkeletonWrapper width={42} height={42} borderRadius={500}/>
+          <div>
+            <SkeletonWrapper width={100} height={14} />
+            <SkeletonWrapper width={100} height={14} marginTop={5}/>
+          </div>
+        </div>
+        <div style={{ paddingLeft: '54px', marginTop:'20px' }}>
+          <SkeletonWrapper width={180} height={18} />
+          <SkeletonWrapper width={250} height={18} marginTop={5}/>
+          <SkeletonWrapper width={320} height={18} marginTop={5}/>
+        </div>
+      </>
+    )
   }
 
-  if (!post) {
+  if(!isLoading && post) {
+    const isMyPost = currentUser?.accountname === post.author.accountname;
+    return (
+      <>
+          <PostDetailContainer>
+            <PostCard
+              postId={post.id}
+              userName={post.author.username}
+              userId={post.author.accountname}
+              avatarSrc={post.author.image}
+              avatarAlt={`${post.author.username} 프로필`}
+              content={post.content}
+              imageSrc={post.image}
+              imageAlt={post.image ? "게시글 이미지" : undefined}
+              dateTime={post.createdAt}
+              likeCount={post.heartCount}
+              commentCount={post.commentCount}
+              isLiked={post.hearted}
+              isMyPost={isMyPost}
+              onLikeClick={handleLikeClick}
+              onReportClick={handlePostReport}
+            />
+
+            <CommentsSection>
+              {comments.map((comment, index) => {
+                const isMyComment =
+                  currentUser?.accountname === comment.author.accountname;
+
+                return (
+                  <div
+                    key={comment.id}
+                    ref={index === comments.length - 1 ? lastCommentRef : null}
+                  >
+                    <CommentField
+                      commentId={comment.id}
+                      userName={comment.author.username}
+                      userId={comment.author.accountname}
+                      avatarSrc={comment.author.image}
+                      avatarAlt={`${comment.author.username} 프로필`}
+                      content={comment.content}
+                      dateTime={comment.createdAt}
+                      dateText={comment.createdAt}
+                      isLiked={comment.hearted}
+                      likeCount={comment.heartCount}
+                      isMyComment={isMyComment}
+                      onDelete={() => handleCommentDelete(comment.id)}
+                      onUpdate={(newContent) =>
+                        handleCommentUpdate(comment.id, newContent)
+                      }
+                      onReport={() => handleCommentReport(comment.id)}
+                    />
+                  </div>
+                );
+              })}
+            </CommentsSection>
+
+            <TextField
+              left={
+                <img
+                  src={currentUser?.image || "/img/empty-profile.png"}
+                  alt={`${currentUser?.username} 프로필`}
+                  style={{
+                    width: "36px",
+                    height: "36px",
+                    borderRadius: "50%",
+                    objectFit: "cover",
+                  }}
+                />
+              }
+              placeholder="댓글 입력하기..."
+              onClick={handleCommentSubmit}
+            />
+          </PostDetailContainer>
+      </>
+    )
+  }
+
+  if(!isLoading && !post) {
     return (
       <PostDetailContainer>
         <p>게시글을 찾을 수 없습니다.</p>
       </PostDetailContainer>
-    );
+    )
   }
 
-  const isMyPost = currentUser?.accountname === post.author.accountname;
 
-  return (
-    <PostDetailContainer>
-      <PostCard
-        postId={post.id}
-        userName={post.author.username}
-        userId={post.author.accountname}
-        avatarSrc={post.author.image}
-        avatarAlt={`${post.author.username} 프로필`}
-        content={post.content}
-        imageSrc={post.image}
-        imageAlt={post.image ? "게시글 이미지" : undefined}
-        dateTime={post.createdAt}
-        likeCount={post.heartCount}
-        commentCount={post.commentCount}
-        isLiked={post.hearted}
-        isMyPost={isMyPost}
-        onLikeClick={handleLikeClick}
-        onReportClick={handlePostReport}
-      />
-
-      <CommentsSection>
-        {comments.map((comment, index) => {
-          const isMyComment =
-            currentUser?.accountname === comment.author.accountname;
-
-          return (
-            <div
-              key={comment.id}
-              ref={index === comments.length - 1 ? lastCommentRef : null}
-            >
-              <CommentField
-                commentId={comment.id}
-                userName={comment.author.username}
-                userId={comment.author.accountname}
-                avatarSrc={comment.author.image}
-                avatarAlt={`${comment.author.username} 프로필`}
-                content={comment.content}
-                dateTime={comment.createdAt}
-                dateText={comment.createdAt}
-                isLiked={comment.hearted}
-                likeCount={comment.heartCount}
-                isMyComment={isMyComment}
-                onDelete={() => handleCommentDelete(comment.id)}
-                onUpdate={(newContent) =>
-                  handleCommentUpdate(comment.id, newContent)
-                }
-                onReport={() => handleCommentReport(comment.id)}
-              />
-            </div>
-          );
-        })}
-      </CommentsSection>
-
-      <TextField
-        left={
-          <img
-            src={currentUser?.image || "/img/empty-profile.png"}
-            alt={`${currentUser?.username} 프로필`}
-            style={{
-              width: "36px",
-              height: "36px",
-              borderRadius: "50%",
-              objectFit: "cover",
-            }}
-          />
-        }
-        placeholder="댓글 입력하기..."
-        onClick={handleCommentSubmit}
-      />
-    </PostDetailContainer>
-  );
 }
 
 export default PostDetail;
