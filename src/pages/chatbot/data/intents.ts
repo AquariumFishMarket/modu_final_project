@@ -210,7 +210,7 @@ export const INTENTS: Intent[] = [
   },
 ];
 
-// ✅ 카테고리 목록
+// 카테고리 목록
 export const CATEGORIES: IntentCategory[] = [
   "거래·결제 안내",
   "환불·교환·수수료",
