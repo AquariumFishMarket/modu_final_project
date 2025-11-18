@@ -39,7 +39,7 @@ export function useProfileData(targetAccountname?: string) {
 
   const isMyProfile = resolvedAccountname === currentAccountname;
 
-  // 프로필 / 게시글 불러오기
+  // 프로필 / 게시글 로딩
   useEffect(() => {
     const loadData = async () => {
       if (isAuthLoading) return;
@@ -52,28 +52,23 @@ export function useProfileData(targetAccountname?: string) {
       setLoading(true);
 
       try {
-        // 프로필 로드
+        const fetched = await fetchProfile(
+          resolvedAccountname,
+          currentAccountname
+        );
+        if (!fetched) throw new Error("프로필 정보를 불러올 수 없습니다.");
+
         let loadedProfile: UserProfile;
 
         if (isMyProfile) {
           loadedProfile = {
-            _id: currentUser._id,
+            ...fetched,
             username: currentUser.username,
             accountname: currentUser.accountname,
-            image: currentUser.image,
             intro: currentUser.intro,
-            followerCount: 0,
-            followingCount: 0,
-            follower: [],
-            following: [],
-            isfollow: false,
+            image: currentUser.image,
           };
         } else {
-          const fetched = await fetchProfile(
-            resolvedAccountname,
-            currentAccountname
-          );
-          if (!fetched) throw new Error("프로필 정보를 불러올 수 없습니다.");
           loadedProfile = fetched;
         }
 
@@ -127,11 +122,11 @@ export function useProfileData(targetAccountname?: string) {
     currentAccountname,
   ]);
 
-  // 팔로우 상태가 다른 곳에서 바뀐 경우 동기화
+  // 팔로우 동기화
   useEffect(() => {
     if (!updatedFollow || !profile) return;
 
-    // 내가 보고 있는 프로필의 팔로우 정보가 바뀐 경우
+    // 보고 있는 프로필의 팔로우 정보 변경
     if (updatedFollow.accountname === profile.accountname) {
       setProfile((prev) =>
         prev
@@ -147,7 +142,7 @@ export function useProfileData(targetAccountname?: string) {
       );
     }
 
-    // 내 프로필이면 내가 팔로우한 수 갱신
+    // 내 프로필이면 followingCount 변경
     if (isMyProfile) {
       setProfile((prev) =>
         prev
@@ -165,7 +160,7 @@ export function useProfileData(targetAccountname?: string) {
     clearFollowUpdate();
   }, [updatedFollow, profile, clearFollowUpdate, isMyProfile]);
 
-  // 팔로우 / 언팔 토글
+  // 팔로우 / 언팔로우
   const handleFollowToggle = useCallback(async () => {
     if (!profile || isFollowLoading) return;
     setIsFollowLoading(true);
@@ -173,6 +168,7 @@ export function useProfileData(targetAccountname?: string) {
     try {
       await toggleProfileFollow(profile.accountname, profile.isfollow);
 
+      // 즉시 UI 반영
       setProfile((prev) =>
         prev
           ? {
@@ -184,14 +180,18 @@ export function useProfileData(targetAccountname?: string) {
             }
           : prev
       );
+
+      if (isMyProfile) {
+        await useAuthStore.getState().refreshUser();
+      }
     } catch (err) {
       console.error("팔로우 토글 실패:", err);
     } finally {
       setIsFollowLoading(false);
     }
-  }, [profile, isFollowLoading]);
+  }, [profile, isFollowLoading, isMyProfile]);
 
-  // 좋아요 기능
+  // 좋아요 토글
   const handleProfileLike = useCallback(
     async (post: Post) => {
       const isLikedNow = post.hearted;
@@ -220,7 +220,6 @@ export function useProfileData(targetAccountname?: string) {
         }
       } catch (error) {
         console.error("좋아요 처리 실패:", error);
-        // 실패 시 롤백까지 하고 싶다면 여기서 setPostsList(prev => ...) 로 복구 가능
       }
     },
     [toggleFeedLike]
