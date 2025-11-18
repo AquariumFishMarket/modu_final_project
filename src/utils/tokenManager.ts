@@ -18,7 +18,7 @@ export const removeToken = (): void => {
   localStorage.removeItem(TOKEN_KEY);
 };
 
-// auth에서 가져옴
+// 요청 header
 export const getAuthHeaders = (): HeadersInit => {
   const token = getToken();
   return {

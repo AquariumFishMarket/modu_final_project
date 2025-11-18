@@ -1,6 +1,5 @@
 import { checkAccountIdDuplicate } from "../../services/authService";
 import type { FormFieldConfig } from "../../components/common/form/types";
-// import type { CheckDuplicateResponse } from "../../services/authService";
 
 // 사용자명 유효성 검사
 export const validateUsername = (username: string): string | null => {
@@ -24,7 +23,7 @@ export const validateAccountId = async (
     return "계정 ID는 3자 이상이어야 합니다.";
   }
 
-  // 중복 검사 (API 호출 시뮬레이션)
+  // 중복 검사
   try {
     const result = await checkAccountIdDuplicate(accountId);
     if (result.message === "이미 가입된 계정ID 입니다.") {
@@ -41,20 +40,9 @@ export const validateAccountId = async (
     console.error("계정 ID 중복 확인 오류:", err);
     return "계정 ID 중복 확인 중 오류가 발생했습니다.";
   }
-
-  return null;
 };
 
-// 중복 검사 API 시뮬레이션
-// const checkAccountIdDuplicate = async (accountId: string): Promise<boolean> => {
-//   return new Promise((resolve) => {
-//     setTimeout(() => {
-//       const duplicateIds = ["admin", "test", "user123"]; // ID 중복 테스트 데이터
-//       resolve(duplicateIds.includes(accountId.toLowerCase()));
-//     }, 500);
-//   });
-// };
-
+// 사용자 정보 필드
 export const getProfileFields = (): FormFieldConfig[] => [
   {
     name: "username",

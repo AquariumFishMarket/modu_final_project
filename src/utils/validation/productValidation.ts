@@ -19,7 +19,6 @@ export const validateProductName = (productName: string): string | null => {
 
 // 가격 유효성 검사 및 포맷팅
 export const validatePrice = (price: string): string | null => {
-  // 숫자만 추출 (콤마, 공백 제거)
   const numbersOnly = price.replace(/[^\d]/g, "");
 
   if (!numbersOnly) {
@@ -42,12 +41,10 @@ export const validatePrice = (price: string): string | null => {
 
 // 가격 포맷팅 함수 (콤마 추가)
 export const formatPrice = (price: string): string => {
-  // 숫자만 추출
   const numbersOnly = price.replace(/[^\d]/g, "");
 
   if (!numbersOnly) return "";
 
-  // 숫자를 천 단위로 콤마 추가
   return parseInt(numbersOnly).toLocaleString();
 };
 
@@ -66,7 +63,6 @@ export const validateProductLink = (link: string): string | null => {
     return "올바른 URL 형식이 아닙니다. (http:// 또는 https://로 시작해야 합니다)";
   }
 
-  // 유효한 URL인지 추가 검사
   try {
     new URL(trimmedLink);
   } catch {
@@ -76,26 +72,7 @@ export const validateProductLink = (link: string): string | null => {
   return null;
 };
 
-// 상품 설명 유효성 검사 (10-500자)
-// export const validateDescription = (description: string): string | null => {
-//   const trimmedDesc = description.trim();
-
-//   if (!trimmedDesc) {
-//     return "상품 설명을 입력해주세요.";
-//   }
-
-//   if (trimmedDesc.length < 10) {
-//     return "상품 설명은 10자 이상 입력해주세요.";
-//   }
-
-//   if (trimmedDesc.length > 500) {
-//     return "상품 설명은 500자 이하로 입력해주세요.";
-//   }
-
-//   return null;
-// };
-
-// 상품 필드 설정 객체
+// 상품 필드
 export const getProductFields = () => {
   const fields = [
     {
@@ -120,15 +97,6 @@ export const getProductFields = () => {
       required: true,
       validator: validateProductLink,
     },
-    // {
-    //   name: "description",
-    //   label: "상품 설명",
-    //   placeholder: "상품에 대한 자세한 설명을 입력해주세요.",
-    //   required: true,
-    //   validator: validateDescription,
-    //   type: "textarea" as const,
-    //   maxLength: 500,
-    // },
   ];
 
   return fields;

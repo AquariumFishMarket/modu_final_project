@@ -206,7 +206,6 @@ export default function AlertModal({
     onClose();
   };
 
-  // Portal을 사용해서 document.body에 직접 렌더링
   return createPortal(
     <ModalOverlay $isOpen={isOpen} onClick={onClose}>
       <ModalContent onClick={(e) => e.stopPropagation()}>

@@ -8,7 +8,6 @@ import {
   validatePassword,
   validateEmailDuplicate,
 } from "../../utils/validation/AuthValidation";
-// import { toast } from "react-toastify";
 import { useToastStore } from "../../contexts/useToastStore";
 
 const Signuptitle = styled.h2`
@@ -39,7 +38,7 @@ export default function Signup() {
   const signup = useAuthStore((s) => s.signup);
   const isLoading = useAuthStore((state) => state.isLoading);
 
-  // 회원가입 폼 필드 설정
+  // 회원가입 폼 필드
   const signupFields = [
     {
       type: "email" as const,

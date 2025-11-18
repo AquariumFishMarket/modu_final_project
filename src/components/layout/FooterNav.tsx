@@ -35,19 +35,19 @@ const navItems: NavItemType[] = [
   },
   {
     label: "채팅",
-    path: "/chat-list" /* 수정 필요 */,
+    path: "/chat-list",
     icon: CHAT,
     activeIcon: CHATACTIVE,
   },
   {
     label: "게시물 작성",
-    path: "/post" /* 수정 필요 */,
+    path: "/post",
     icon: WRITE,
     activeIcon: WRITEACTIVE,
   },
   {
     label: "프로필",
-    path: "/profile" /* 수정 필요 */,
+    path: "/profile",
     icon: PROFILE,
     activeIcon: PROFILEACTIVE,
   },

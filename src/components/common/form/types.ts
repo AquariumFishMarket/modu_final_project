@@ -1,19 +1,15 @@
-// 공통 Form 타입
+/**
+ * 공통 Form 타입
+ */
 
-// ===================================
 // 기본 타입
-// ===================================
-
 export type FormMode = "create" | "edit";
 
 export interface CommonFormRef {
   submitForm: () => Promise<void>;
 }
 
-// ===================================
 // 폼 필드 설정
-// ===================================
-
 export interface FormFieldConfig {
   name: string;
   label: string;
@@ -26,12 +22,8 @@ export interface FormFieldConfig {
   disabled?: boolean; // 읽기 전용 필드 (계정ID)
 }
 
-// ===================================
-// 폼 데이터 타입
-// ===================================
-
 /**
- * 폼에서 수집하는 데이터
+ *  폼 데이터 타입
  * - 텍스트 필드는 string
  * - 이미지 필드는 File (새 이미지) 또는 string (기존 URL)
  */
@@ -58,19 +50,14 @@ export interface ProductFormData extends BaseFormData {
 
 export type FormData = ProfileFormData | ProductFormData;
 
-// ===================================
 // 유효성 검사
-// ===================================
-
 export type ValidationErrors = Record<string, string>;
 
-// ===================================
-// API 요청 타입
-// ===================================
-
 /**
- * 프로필 업데이트 API 요청
+ * API 요청 타입
  */
+
+// 프로필 업데이트 API 요청
 export interface ProfileRequest {
   username: string;
   accountname: string;
@@ -78,9 +65,7 @@ export interface ProfileRequest {
   image?: string; // URL 문자열
 }
 
-/**
- * 상품 등록/수정 API 요청
- */
+// 상품 등록/수정 API 요청
 export interface ProductRequest {
   itemName: string;
   price: number;
@@ -88,13 +73,11 @@ export interface ProductRequest {
   itemImage: string;
 }
 
-// ===================================
-// 컴포넌트 Props
-// ===================================
-
-/**
- * 공통 Form Props
+/*
+ * 컴포넌트 Props
  */
+
+// 공통 Form Props
 export interface BaseFormProps<T extends FormData = FormData> {
   formType: "profile" | "product";
   fields: FormFieldConfig[];
@@ -103,9 +86,7 @@ export interface BaseFormProps<T extends FormData = FormData> {
   onValidationChange?: (isValid: boolean) => void;
 }
 
-/**
- * CreateForm Props (새로 생성)
- */
+// CreateForm Props (새로 생성)
 export interface CreateFormProps<T extends FormData = FormData>
   extends BaseFormProps<T> {
   buttonText?: string;
@@ -113,9 +94,7 @@ export interface CreateFormProps<T extends FormData = FormData>
   imageRequired?: boolean; // 상품 이미지 필수 여부
 }
 
-/**
- * EditForm Props (수정)
- */
+// EditForm Props (수정)
 export interface EditFormProps<T extends FormData = FormData>
   extends BaseFormProps<T> {
   initialValues?: Record<string, string>;

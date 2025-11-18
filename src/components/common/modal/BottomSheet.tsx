@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { createPortal } from "react-dom"; // LayoutContainer -> overflow-y: hidden 피하기 위해
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence, PanInfo } from "framer-motion";
 import styled from "styled-components";
 
@@ -114,8 +114,8 @@ export default function BottomSheet({
     event: MouseEvent | TouchEvent | PointerEvent,
     info: PanInfo
   ) {
-    const threshold = 30; // 30px 이상 드래그하면 닫기
-    const velocity = info.velocity.y; // 드래그 속도
+    const threshold = 30;
+    const velocity = info.velocity.y;
 
     if (info.offset.y > threshold || velocity > 100) {
       onClose();
@@ -123,7 +123,7 @@ export default function BottomSheet({
   }
 
   const handleDragHandleClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); // 이벤트 버블링 방지 (필요시)
+    e.stopPropagation();
     onClose();
   };
 
@@ -147,7 +147,6 @@ export default function BottomSheet({
     };
   }, [isOpen, onClose]);
 
-  // Portal을 사용해서 document.body에 직접 렌더링
   return createPortal(
     <AnimatePresence>
       {isOpen && (
@@ -164,10 +163,10 @@ export default function BottomSheet({
             animate="visible"
             exit="hidden"
             drag="y"
-            dragConstraints={{ top: 0 }} // 위로는 드래그 불가
+            dragConstraints={{ top: 0 }}
             dragElastic={0.2}
             onDragEnd={handleDragEnd}
-            onClick={(e) => e.stopPropagation()} // 이벤트 버블링 방지
+            onClick={(e) => e.stopPropagation()}
           >
             <DragHandle onClick={handleDragHandleClick} />
             <Content>{children}</Content>
