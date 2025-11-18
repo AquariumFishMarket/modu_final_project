@@ -62,7 +62,7 @@ export const RefreshAlert = styled.div<{ $letter: boolean; $height: number }>`
   span {
     display: inline-block;
     position: relative;
-    max-width: ${(props) => (props.$height > 30 ? "80px" : "0px")};
+    max-width: ${(props) => (props.$height > 30 ? "120px" : "0px")};
     top: ${(props) => (props.$height > 30 ? "0" : "-20px")};
     opacity: ${(props) => (props.$height > 30 ? "1" : "0")};
     transform: ${(props) =>
@@ -88,7 +88,7 @@ export const Fish1 = styled.img<{ $transform: number }>`
   left: -50px;
   transform: scale3d(0.5, 0.5, 0.5);
   opacity: 0;
-  animation: ${(props) => props.$transform > 60 && "animations 0.7s forwards"};
+  animation: ${(props) => props.$transform > 90 && "animations 0.7s forwards"};
   @keyframes animations {
     0% {
       top: -35px;
@@ -110,7 +110,7 @@ export const Fish2 = styled.img<{ $transform: number }>`
   right: -50px;
   transform: scale3d(0.5, 0.5, 0.5) scaleX(-1);
   opacity: 0;
-  animation: ${(props) => props.$transform > 60 && "animations2 0.7s forwards"};
+  animation: ${(props) => props.$transform > 90 && "animations2 0.7s forwards"};
   @keyframes animations2 {
     0% {
       bottom: -35px;
@@ -132,7 +132,7 @@ export const Seashall = styled.img<{ $transform: number }>`
   right: 0;
   transform: scale3d(0.7, 0.7, 0.7);
   opacity: 0;
-  animation: ${(props) => props.$transform > 60 && "animations3 0.7s forwards"};
+  animation: ${(props) => props.$transform > 90 && "animations3 0.7s forwards"};
   @keyframes animations3 {
     0% {
       bottom: -25px;
@@ -154,7 +154,7 @@ export const Coral = styled.img<{ $transform: number }>`
   left: -60px;
   transform: scale3d(0.7, 0.7, 0.7);
   opacity: 0;
-  animation: ${(props) => props.$transform > 60 && "animations4 0.7s forwards"};
+  animation: ${(props) => props.$transform > 90 && "animations4 0.7s forwards"};
   @keyframes animations4 {
     0% {
       top: -10px;
@@ -176,7 +176,7 @@ export const Drop = styled.img<{ $transform: number }>`
   right: -30px;
   transform: scale3d(0.4, 0.4, 0.4);
   opacity: 0;
-  animation: ${(props) => props.$transform > 60 && "animations5 0.7s forwards"};
+  animation: ${(props) => props.$transform > 90 && "animations5 0.7s forwards"};
   @keyframes animations5 {
     0% {
       top: -35px;
@@ -196,7 +196,7 @@ export const Drop2 = styled.img<{ $transform: number }>`
   left: -60px;
   transform: scale3d(0.6, 0.6, 0.6);
   opacity: 0;
-  animation: ${(props) => props.$transform > 60 && "animations6 0.7s forwards"};
+  animation: ${(props) => props.$transform > 90 && "animations6 0.7s forwards"};
   @keyframes animations6 {
     0% {
       bottom: -40px;
@@ -204,7 +204,7 @@ export const Drop2 = styled.img<{ $transform: number }>`
       opacity: 0;
     }
     100% {
-      bottom: -40px;
+      bottom: -50px;
       left: -60px;
       opacity: 1;
     }

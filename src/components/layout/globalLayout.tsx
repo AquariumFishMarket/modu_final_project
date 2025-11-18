@@ -310,7 +310,7 @@ function LayoutContent() {
                 alt="조개껍질"
               ></Seashall>
               <p>
-                땡겨서 <span>피쉬마켓</span> 새로고침
+                땡겨서 <span>물고기마켓</span> 새로고침
               </p>
               <Fish2
                 src="/img/fish-character.png"
